@@ -1,0 +1,63 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gérer les Utilisateurs
+{% endblock %}
+
+{% block body %}
+	<div class="container py-4">
+		<h1 class="mb-4 text-white">
+			<i class="bi bi-people-fill me-2"></i>Gérer les Utilisateurs</h1>
+
+		<div class="card bg-dark border-0 shadow-lg">
+			<div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+				<h5 class="mb-0">Liste des utilisateurs ({{ 200 }}
+					au total)</h5>
+				<a href="{{ path('admin_user_new') }}" class="btn btn-success btn-sm">
+					<i class="bi bi-plus-circle-fill me-2"></i>Ajouter un utilisateur</a>
+			</div>
+			<div class="card-body p-0">
+				<div class="table-responsive">
+					<table class="table table-dark table-striped table-hover mb-0">
+						<thead>
+							<tr>
+								<th>ID</th>
+								<th>Nom</th>
+								<th>Email</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for user in pagination %}
+								<tr>
+									<td>{{ user.id }}</td>
+									<td>{{ user.name }}</td>
+									<td>{{ user.email }}</td>
+									<td class="text-end">
+										<a href="{{ path('admin_user_show', {'id': user.id}) }}" class="btn btn-info btn-sm me-1">
+											<i class="bi bi-eye-fill"></i>
+										</a>
+
+										<form method="post" action="{{ path('admin_user_delete', {'id': user.id}) }}" onsubmit="return confirm('Confirmer la suppression ?');" class="d-inline">
+											<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+											<button class="btn btn-danger btn-sm">
+												<i class="bi bi-trash-fill"></i>
+											</button>
+										</form>
+									</td>
+
+								</tr>
+							{% else %}
+								<tr>
+									<td colspan="5" class="text-center text-muted">Aucun utilisateur trouvé</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<div class="card-footer bg-dark">
+				{{ knp_pagination_render(pagination) }}
+				{# Pagination avec KnpPaginator #}
+			</div>
+		</div>
+	</div>
+{% endblock %}
