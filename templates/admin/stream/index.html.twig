@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Stream index{% endblock %}
+
+{% block body %}
+    <h1>Stream index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Viewers</th>
+                <th>Url</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for stream in streams %}
+            <tr>
+                <td>{{ stream.id }}</td>
+                <td>{{ stream.title }}</td>
+                <td>{{ stream.viewers }}</td>
+                <td>{{ stream.url }}</td>
+                <td>
+                    <a href="{{ path('admin_stream_show', {'id': stream.id}) }}">show</a>
+                    <a href="{{ path('admin_stream_edit', {'id': stream.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('admin_stream_new') }}">Create new</a>
+{% endblock %}
