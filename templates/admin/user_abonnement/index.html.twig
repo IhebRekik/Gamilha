@@ -1,16 +1,18 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Gamelha - Gestion des équipes{% endblock %}
+{% block title %}Gamelha - Abonnements utilisateurs{% endblock %}
 
 {% block body %}
 <div class="container py-4">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="text-white">
-            <i class="bi bi-people-fill text-primary me-2"></i>Gestion des équipes
+            <i class="bi bi-credit-card-2-front-fill text-primary me-2"></i>
+            Abonnements des utilisateurs
         </h1>
-        <a href="{{ path('admin_team_new') }}" class="btn btn-success shadow-sm">
-            <i class="bi bi-plus-lg me-1"></i> Nouvelle équipe
+
+        <a href="{{ path('app_user_abonnement_new') }}" class="btn btn-success shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> Nouvel abonnement
         </a>
     </div>
 
@@ -21,59 +23,50 @@
                     <thead class="text-secondary text-uppercase small border-bottom border-primary border-opacity-25">
                         <tr>
                             <th class="ps-4">ID</th>
-                            <th>Nom de l’équipe</th>
-                            <th>Membres</th>
+                            <th>Date début</th>
+                            <th>Date fin</th>
                             <th class="text-end pe-4">Actions</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                    {% for team in teams %}
+                    {% for ua in user_abonnements %}
                         <tr class="border-bottom border-secondary border-opacity-10">
-                            <td class="ps-4 text-secondary">#{{ team.id }}</td>
+                            <td class="ps-4 text-secondary">#{{ ua.id }}</td>
 
                             <td>
-                                <span class="fw-semibold text-white">
-                                    {{ team.name }}
+                                <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25 px-3 py-2">
+                                    <i class="bi bi-calendar-check me-1"></i>
+                                    {{ ua.dateDebut ? ua.dateDebut|date('d/m/Y') : '—' }}
                                 </span>
                             </td>
 
                             <td>
-                                <span class="badge bg-info border border-light border-opacity-25 px-3 py-2">
-                                    <i class="bi bi-person-fill me-1"></i>
-                                    {{ team.members|length }}
+                                <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25 px-3 py-2">
+                                    <i class="bi bi-calendar-x me-1"></i>
+                                    {{ ua.dateFin ? ua.dateFin|date('d/m/Y') : '—' }}
                                 </span>
                             </td>
 
                             <td class="text-end pe-4">
                                 <div class="btn-group shadow-sm">
-                                    <a href="{{ path('admin_team_show', {'id': team.id}) }}"
+                                    <a href="{{ path('app_user_abonnement_show', {'id': ua.id}) }}"
                                        class="btn btn-sm btn-outline-info">
                                         <i class="bi bi-eye"></i>
                                     </a>
 
-                                    <a href="{{ path('admin_team_edit', {'id': team.id}) }}"
+                                    <a href="{{ path('app_user_abonnement_edit', {'id': ua.id}) }}"
                                        class="btn btn-sm btn-outline-warning">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-
-                                    <form method="post"
-                                          action="{{ path('admin_team_delete', {'id': team.id}) }}"
-                                          onsubmit="return confirm('Confirmer la suppression ?');"
-                                          class="d-inline">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ team.id) }}">
-                                        <button class="btn btn-sm btn-outline-danger">
-                                            <i class="bi bi-trash"></i>
-                                        </button>
-                                    </form>
                                 </div>
                             </td>
                         </tr>
                     {% else %}
                         <tr>
                             <td colspan="4" class="text-center py-5 text-secondary">
-                                <i class="bi bi-people fs-1 d-block mb-2"></i>
-                                Aucune équipe trouvée.
+                                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                Aucun abonnement utilisateur trouvé.
                             </td>
                         </tr>
                     {% endfor %}

@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit UserAbonnement{% endblock %}
+
+{% block body %}
+    <h1>Edit UserAbonnement</h1>
+
+    {{ include('admin/user_abonnement/_form.html.twig', {'button_label': 'Update'}) }}
+
+
+    {{ include('admin/user_abonnement/_delete_form.html.twig') }}
+{% endblock %}

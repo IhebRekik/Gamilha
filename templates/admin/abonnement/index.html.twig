@@ -1,0 +1,86 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gamelha - Abonnements
+{% endblock %}
+
+{% block body %}
+	<div class="container py-4">
+
+		<div class="d-flex justify-content-between align-items-center mb-4">
+			<h1 class="text-white">
+				<i class="bi bi-card-checklist text-primary me-2"></i>
+				Gestion des abonnements
+			</h1>
+
+			<a href="{{ path('app_abonnement_new') }}" class="btn btn-success shadow-sm">
+				<i class="bi bi-plus-lg me-1"></i>
+				Nouvel abonnement
+			</a>
+		</div>
+
+		<div class="card bg-dark border-0 shadow-lg">
+			<div class="card-body p-0">
+				<div class="table-responsive">
+					<table class="table table-dark table-hover align-middle mb-0">
+						<thead class="text-secondary text-uppercase small border-bottom border-primary border-opacity-25">
+							<tr>
+								<th class="ps-4">ID</th>
+								<th>Type</th>
+								<th>Prix</th>
+								<th class="text-end pe-4">Actions</th>
+							</tr>
+						</thead>
+
+						<tbody>
+							{% for abonnement in abonnements %}
+								<tr class="border-bottom border-secondary border-opacity-10">
+									<td class="ps-4 text-secondary">#{{ abonnement.id }}</td>
+
+									<td>
+										<span class="badge bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25 px-3 py-2">
+											<i class="bi bi-bookmark-star me-1"></i>
+											{{ abonnement.type }}
+										</span>
+									</td>
+
+									<td>
+										<span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25 px-3 py-2">
+											{{ abonnement.prix }} TND
+										</span>
+									</td>
+									<td class="text-end pe-4">
+										<div class="btn-group shadow-sm">
+											<a href="{{ path('app_abonnement_show', {'id': abonnement.id}) }}" class="btn btn-sm btn-outline-info">
+												<i class="bi bi-eye"></i>
+											</a>
+
+											<a href="{{ path('app_abonnement_edit', {'id': abonnement.id}) }}" class="btn btn-sm btn-outline-warning">
+												<i class="bi bi-pencil"></i>
+											</a>
+
+											<form method="post" action="{{ path('app_abonnement_delete', {'id': abonnement.id}) }}" onsubmit="return confirm('Confirmer la suppression ?');" class="d-inline">
+												<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ abonnement.id) }}">
+												<button class="btn btn-sm btn-outline-danger">
+													<i class="bi bi-trash"></i>
+												</button>
+											</form>
+										</div>
+									</td>
+								</tr>
+							{% else %}
+								<tr>
+									<td colspan="3" class="text-center py-5 text-secondary">
+										<i class="bi bi-inbox fs-1 d-block mb-2"></i>
+										Aucun abonnement trouvé
+									</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+
+					</table>
+				</div>
+			</div>
+		</div>
+
+	</div>
+{% endblock %}

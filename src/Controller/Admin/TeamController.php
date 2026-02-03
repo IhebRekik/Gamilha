@@ -39,6 +39,7 @@ final class TeamController extends AbstractController
         return $this->render('admin/team/new.html.twig', [
             'team' => $team,
             'form' => $form,
+            'edit' => false,
         ]);
     }
 
@@ -65,6 +66,7 @@ final class TeamController extends AbstractController
         return $this->render('admin/team/edit.html.twig', [
             'team' => $team,
             'form' => $form,
+            'edit' => true,
         ]);
     }
 

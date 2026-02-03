@@ -39,6 +39,7 @@ final class EventController extends AbstractController
         return $this->render('admin/event/new.html.twig', [
             'event' => $event,
             'form' => $form,
+            "edit"=>false
         ]);
     }
 
@@ -59,12 +60,13 @@ final class EventController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_admin_event_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('admin_event_index', [], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('admin/event/edit.html.twig', [
             'event' => $event,
             'form' => $form,
+            "edit"=>true
         ]);
     }
 

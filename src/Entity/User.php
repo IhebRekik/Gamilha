@@ -9,6 +9,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use App\Entity\Team as Team;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -29,7 +30,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255)]
     private ?string $name = null; // Added custom field
-    
+    // src/Entity/User.php
+
+
+
+
+
+
     // Getters and setters...
 
     public function getId(): ?int
@@ -93,35 +100,75 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
     #[ORM\ManyToMany(targetEntity: Team::class, mappedBy: 'members')]
-private Collection $teams;
+    private Collection $teams;
 
-public function __construct()
-{
-    $this->teams = new ArrayCollection();
-}
+   
 
-/**
- * @return Collection<int, Team>
- */
-public function getTeams(): Collection
-{
-    return $this->teams;
-}
+    /**
+     * @var Collection<int, UserAbonnement>
+     */
+    #[ORM\OneToMany(targetEntity: UserAbonnement::class, mappedBy: 'user')]
+    private Collection $userAbonnements;
 
-public function addTeam(Team $team): static
-{
-    if (!$this->teams->contains($team)) {
-        $this->teams->add($team);
-        $team->addMember($this);
+    public function __construct()
+    {
+        $this->teams = new ArrayCollection();
+        $this->userAbonnements = new ArrayCollection();
     }
-    return $this;
-}
 
-public function removeTeam(Team $team): static
-{
-    if ($this->teams->removeElement($team)) {
-        $team->removeMember($this);
+    /**
+     * @return Collection<int, Team>
+     */
+    public function getTeams(): Collection
+    {
+        return $this->teams;
     }
-    return $this;
-}
+
+    public function addTeam(Team $team): static
+    {
+        if (!$this->teams->contains($team)) {
+            $this->teams->add($team);
+            $team->addMember($this);
+        }
+        return $this;
+    }
+
+    public function removeTeam(Team $team): static
+    {
+        if ($this->teams->removeElement($team)) {
+            $team->removeMember($this);
+        }
+        return $this;
+    }
+
+
+    /**
+     * @return Collection<int, UserAbonnement>
+     */
+    public function getUserAbonnements(): Collection
+    {
+        return $this->userAbonnements;
+    }
+
+    public function addUserAbonnement(UserAbonnement $userAbonnement): static
+    {
+        if (!$this->userAbonnements->contains($userAbonnement)) {
+            $this->userAbonnements->add($userAbonnement);
+            $userAbonnement->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserAbonnement(UserAbonnement $userAbonnement): static
+    {
+        if ($this->userAbonnements->removeElement($userAbonnement)) {
+            // set the owning side to null (unless already changed)
+            if ($userAbonnement->getUser() === $this) {
+                $userAbonnement->setUser(null);
+            }
+        }
+
+        return $this;
+    }
 }
