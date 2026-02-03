@@ -3,7 +3,9 @@
 namespace App\Form;
 
 use App\Entity\Event;
+use DateTime;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -13,7 +15,8 @@ class Event1Type extends AbstractType
     {
         $builder
             ->add('name')
-            ->add('date')
+            ->add('date', DateTimeType::class, [
+                'widget' => 'single_text',])
             ->add('game')
         ;
     }

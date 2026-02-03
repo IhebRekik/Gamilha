@@ -1,39 +1,95 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Event index{% endblock %}
+{% block title %}Gamelha - Événements{% endblock %}
 
 {% block body %}
-    <h1>Event index</h1>
+<div class="container py-4">
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Name</th>
-                <th>Date</th>
-                <th>Game</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for event in events %}
-            <tr>
-                <td>{{ event.id }}</td>
-                <td>{{ event.name }}</td>
-                <td>{{ event.date ? event.date|date('Y-m-d H:i:s') : '' }}</td>
-                <td>{{ event.game }}</td>
-                <td>
-                    <a href="{{ path('admin_event_show', {'id': event.id}) }}">show</a>
-                    <a href="{{ path('admin_event_edit', {'id': event.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-white">
+            <i class="bi bi-calendar-event-fill text-primary me-2"></i>Gestion des événements
+        </h1>
 
-    <a href="{{ path('admin_event_new') }}">Create new</a>
+        <a href="{{ path('admin_event_new') }}" class="btn btn-success shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> Nouvel événement
+        </a>
+    </div>
+
+    <div class="card bg-dark border-0 shadow-lg">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                    <thead class="text-secondary text-uppercase small border-bottom border-primary border-opacity-25">
+                        <tr>
+                            <th class="ps-4">ID</th>
+                            <th>Nom</th>
+                            <th>Date</th>
+                            <th>Jeu</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for event in events %}
+                        <tr class="border-bottom border-secondary border-opacity-10">
+                            <td class="ps-4 text-secondary">#{{ event.id }}</td>
+
+                            <td class="fw-semibold text-white">
+                                {{ event.name }}
+                            </td>
+
+                            <td>
+                                <span class="badge bg-info border border-light border-opacity-25 px-3 py-2">
+                                    <i class="bi bi-clock-fill me-1"></i>
+                                    {{ event.date ? event.date|date('d/m/Y H:i') : '—' }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <span class="badge bg-secondary border border-light border-opacity-25 px-3 py-2">
+                                    <i class="bi bi-controller me-1"></i>
+                                    {{ event.game }}
+                                </span>
+                            </td>
+
+                            <td class="text-end pe-4">
+                                <div class="btn-group shadow-sm">
+                                    <a href="{{ path('admin_event_show', {'id': event.id}) }}"
+                                       class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+
+                                    <a href="{{ path('admin_event_edit', {'id': event.id}) }}"
+                                       class="btn btn-sm btn-outline-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+
+                                    <form method="post"
+                                          action="{{ path('admin_event_delete', {'id': event.id}) }}"
+                                          onsubmit="return confirm('Confirmer la suppression ?');"
+                                          class="d-inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-secondary">
+                                <i class="bi bi-calendar-x fs-1 d-block mb-2"></i>
+                                Aucun événement trouvé.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
 {% endblock %}

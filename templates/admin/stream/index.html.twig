@@ -1,39 +1,83 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Stream index{% endblock %}
+{% block title %}Gamelha - Streams{% endblock %}
 
 {% block body %}
-    <h1>Stream index</h1>
+<div class="container py-4">
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Title</th>
-                <th>Viewers</th>
-                <th>Url</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for stream in streams %}
-            <tr>
-                <td>{{ stream.id }}</td>
-                <td>{{ stream.title }}</td>
-                <td>{{ stream.viewers }}</td>
-                <td>{{ stream.url }}</td>
-                <td>
-                    <a href="{{ path('admin_stream_show', {'id': stream.id}) }}">show</a>
-                    <a href="{{ path('admin_stream_edit', {'id': stream.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-white">
+            <i class="bi bi-broadcast-pin text-primary me-2"></i>Gestion des streams
+        </h1>
+        <a href="{{ path('admin_stream_new') }}" class="btn btn-success shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> Nouveau stream
+        </a>
+    </div>
 
-    <a href="{{ path('admin_stream_new') }}">Create new</a>
+    <div class="card bg-dark border-0 shadow-lg">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                    <thead class="text-secondary text-uppercase small border-bottom border-primary border-opacity-25">
+                        <tr>
+                            <th class="ps-4">ID</th>
+                            <th>Titre</th>
+                            <th>Viewers</th>
+                            <th>URL</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for stream in streams %}
+                        <tr class="border-bottom border-secondary border-opacity-10">
+                            <td class="ps-4 text-secondary">#{{ stream.id }}</td>
+
+                            <td class="fw-semibold text-white">
+                                {{ stream.title }}
+                            </td>
+
+                            <td>
+                                <span class="badge bg-danger border border-light border-opacity-25 px-3 py-2">
+                                    <i class="bi bi-eye-fill me-1"></i>
+                                    {{ stream.viewers }}
+                                </span>
+                            </td>
+
+                            <td class="text-truncate" style="max-width: 260px;">
+                                <a href="{{ stream.url }}" target="_blank"
+                                   class="text-info text-decoration-none">
+                                    {{ stream.url }}
+                                </a>
+                            </td>
+
+                            <td class="text-end pe-4">
+                                <div class="btn-group shadow-sm">
+                                    <a href="{{ path('admin_stream_show', {'id': stream.id}) }}"
+                                       class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ path('admin_stream_edit', {'id': stream.id}) }}"
+                                       class="btn btn-sm btn-outline-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-secondary">
+                                <i class="bi bi-broadcast fs-1 d-block mb-2"></i>
+                                Aucun stream trouvé.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
 {% endblock %}

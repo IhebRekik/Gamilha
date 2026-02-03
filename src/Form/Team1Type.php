@@ -17,8 +17,11 @@ class Team1Type extends AbstractType
             ->add('name')
             ->add('members', EntityType::class, [
                 'class' => User::class,
-                'choice_label' => 'id',
+                'choice_label' => 'name',
                 'multiple' => true,
+                'attr' => [
+                    'class' => 'select2'
+                ],
             ])
         ;
     }
