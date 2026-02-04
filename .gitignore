@@ -18,8 +18,8 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
-<<<<<<< HEAD
-=======
+
+
 .env
-.env.*
->>>>>>> f35b6eb (feat: initial clean Symfony project)
+/.env.local.php
+/.env.*.local.php
