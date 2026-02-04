@@ -20,6 +20,6 @@
 ###< symfony/asset-mapper ###
 
 
-.env
-/.env.local.php
-/.env.*.local.php
+/.env
+/.env.local
+/.env.dev.local
