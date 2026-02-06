@@ -16,20 +16,20 @@ use Symfony\Component\Routing\Attribute\Route;
 final class UserController extends AbstractController
 {
     #[Route(name: 'admin_user_index', methods: ['GET'])]
-  public function index(UserRepository $userRepository, PaginatorInterface $paginator, Request $request): Response
-{
-    $queryBuilder = $userRepository->createQueryBuilder('u');
+    public function index(UserRepository $userRepository, PaginatorInterface $paginator, Request $request): Response
+    {
+        $queryBuilder = $userRepository->createQueryBuilder('u');
 
-    $pagination = $paginator->paginate(
-        $queryBuilder,
-        $request->query->getInt('page', 1),
-        15  // items per page
-    );
+        $pagination = $paginator->paginate(
+            $queryBuilder,
+            $request->query->getInt('page', 1),
+            15  // items per page
+        );
 
-    return $this->render('admin/user/index.html.twig', [
-    'pagination' => $pagination,   // ← change 'users' → 'pagination'
-]);
-}
+        return $this->render('admin/user/index.html.twig', [
+            'pagination' => $pagination,   // ← change 'users' → 'pagination'
+        ]);
+    }
 
     #[Route('/new', name: 'admin_user_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
@@ -50,6 +50,24 @@ final class UserController extends AbstractController
             'edit'         => false,
             'button_label' => 'Créer',
             'user'         => $user,           // useful for title
+        ]);
+    }
+    #[Route('/chat/users', name: 'chat_user_list')]
+    public function listUsers(
+        Request $request,
+        UserRepository $userRepository
+    ): Response {
+        $cookieUserId = $request->cookies->get('user_id');
+
+        // Récupérer tous les utilisateurs sauf celui dans le cookie
+        $users = $userRepository->createQueryBuilder('u')
+            ->andWhere('u.id != :cookieId')
+            ->setParameter('cookieId', $cookieUserId)
+            ->getQuery()
+            ->getResult();
+
+        return $this->render('chat/user_list.html.twig', [
+            'users' => $users,
         ]);
     }
 
