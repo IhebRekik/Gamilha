@@ -5,65 +5,103 @@
 {% block body %}
 <div class="container py-4">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1 class="text-white">
-            <i class="bi bi-calendar-event-fill text-primary me-2"></i>Gestion des événements
+    <!-- En-tête -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+        <h1 class="text-white d-flex align-items-center mb-0">
+            <i class="bi bi-calendar-event-fill text-primary me-2"></i>
+            Gestion des événements
         </h1>
 
-        <a href="{{ path('admin_event_new') }}" class="btn btn-success shadow-sm">
+        <a href="{{ path('admin_event_new') }}" class="btn btn-success shadow-sm px-3">
             <i class="bi bi-plus-lg me-1"></i> Nouvel événement
         </a>
     </div>
 
+    <!-- Barre de recherche + filtres -->
+    <div class="card bg-dark border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-center">
+                <!-- Recherche -->
+                <div class="col-12 col-md-5 col-lg-4">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text bg-secondary border-0 text-white">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input 
+                            id="searchInput" 
+                            type="text" 
+                            class="form-control bg-secondary text-white border-0 shadow-none" 
+                            placeholder="Rechercher un événement (nom, jeu, date...)" 
+                            aria-label="Rechercher">
+                    </div>
+                </div>
+
+                <!-- Filtres -->
+                <div class="col-12 col-md-7 col-lg-8">
+                    <div class="d-flex flex-wrap gap-3">
+                        <!-- Filtre par jeu -->
+                        <div class="flex-grow-1 flex-shrink-1" style="min-width: 180px;">
+                            <select id="filterGame" class="form-select bg-secondary text-white border-0 shadow-none">
+                                <option value="">Tous les jeux</option>
+                                {% for game in games %}
+                                    <option value="{{ game }}">{{ game }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Tri par date -->
+                        <div class="flex-grow-1 flex-shrink-1" style="min-width: 220px;">
+                            <select id="sortDate" class="form-select bg-secondary text-white border-0 shadow-none">
+                                <option value="">Tri par défaut</option>
+                                <option value="desc">Date : plus récent → plus ancien</option>
+                                <option value="asc">Date : plus ancien → plus récent</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau -->
     <div class="card bg-dark border-0 shadow-lg">
         <div class="card-body p-0">
             <div class="table-responsive">
-                <table class="table table-dark table-hover align-middle mb-0">
+                <table class="table table-dark table-hover align-middle mb-0" id="eventsTable">
                     <thead class="text-secondary text-uppercase small border-bottom border-primary border-opacity-25">
                         <tr>
-                            <th class="ps-4">ID</th>
                             <th>Nom</th>
                             <th>Date</th>
                             <th>Jeu</th>
                             <th class="text-end pe-4">Actions</th>
                         </tr>
                     </thead>
-
                     <tbody>
                     {% for event in events %}
                         <tr class="border-bottom border-secondary border-opacity-10">
-                            <td class="ps-4 text-secondary">#{{ event.id }}</td>
-
-                            <td class="fw-semibold text-white">
-                                {{ event.name }}
-                            </td>
-
-                            <td>
+                            <td class="name fw-semibold text-white">{{ event.name }}</td>
+                            <td class="date" data-timestamp="{{ event.date ? event.date.timestamp : '' }}">
                                 <span class="badge bg-info border border-light border-opacity-25 px-3 py-2">
                                     <i class="bi bi-clock-fill me-1"></i>
                                     {{ event.date ? event.date|date('d/m/Y H:i') : '—' }}
                                 </span>
                             </td>
-
-                            <td>
+                            <td class="game">
                                 <span class="badge bg-secondary border border-light border-opacity-25 px-3 py-2">
                                     <i class="bi bi-controller me-1"></i>
                                     {{ event.game }}
                                 </span>
                             </td>
-
                             <td class="text-end pe-4">
                                 <div class="btn-group shadow-sm">
                                     <a href="{{ path('admin_event_show', {'id': event.id}) }}"
                                        class="btn btn-sm btn-outline-info">
                                         <i class="bi bi-eye"></i>
                                     </a>
-
                                     <a href="{{ path('admin_event_edit', {'id': event.id}) }}"
                                        class="btn btn-sm btn-outline-warning">
                                         <i class="bi bi-pencil"></i>
                                     </a>
-
                                     <form method="post"
                                           action="{{ path('admin_event_delete', {'id': event.id}) }}"
                                           onsubmit="return confirm('Confirmer la suppression ?');"
@@ -85,11 +123,79 @@
                         </tr>
                     {% endfor %}
                     </tbody>
-
                 </table>
             </div>
         </div>
     </div>
 
 </div>
+
+<!-- JavaScript pour le filtrage et tri -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchInput');
+    const filterGame = document.getElementById('filterGame');
+    const sortDate = document.getElementById('sortDate');
+    const table = document.getElementById('eventsTable');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr:not(:has(td[colspan]))')); // exclure la ligne "aucun résultat"
+
+    function filterAndSort() {
+        const searchText = searchInput.value.toLowerCase().trim();
+        const selectedGame = filterGame.value.toLowerCase();
+        const sortOrder = sortDate.value;
+
+        // Filtrage
+        let filteredRows = rows.filter(row => {
+            const name = row.querySelector('.name')?.textContent.toLowerCase() || '';
+            const game = row.querySelector('.game')?.textContent.toLowerCase() || '';
+            const dateText = row.querySelector('.date')?.textContent.toLowerCase() || '';
+
+            const matchesSearch = 
+                name.includes(searchText) || 
+                game.includes(searchText) || 
+                dateText.includes(searchText);
+
+            const matchesGame = selectedGame === '' || game.includes(selectedGame);
+
+            return matchesSearch && matchesGame;
+        });
+
+        // Tri par date
+        if (sortOrder === 'asc' || sortOrder === 'desc') {
+            filteredRows.sort((a, b) => {
+                const timeA = parseInt(a.querySelector('.date')?.dataset.timestamp || 0);
+                const timeB = parseInt(b.querySelector('.date')?.dataset.timestamp || 0);
+                
+                if (sortOrder === 'asc') {
+                    return timeA - timeB;
+                } else {
+                    return timeB - timeA;
+                }
+            });
+        }
+
+        // Affichage
+        tbody.innerHTML = '';
+        filteredRows.forEach(row => tbody.appendChild(row));
+
+        // Message aucun résultat
+        if (filteredRows.length === 0 && rows.length > 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center py-5 text-secondary">
+                        <i class="bi bi-search fs-1 d-block mb-2"></i>
+                        Aucun événement ne correspond à votre recherche
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    // Événements
+    searchInput.addEventListener('input', filterAndSort);
+    filterGame.addEventListener('change', filterAndSort);
+    sortDate.addEventListener('change', filterAndSort);
+});
+</script>
 {% endblock %}
