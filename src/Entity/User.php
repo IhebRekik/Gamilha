@@ -110,10 +110,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: UserAbonnement::class, mappedBy: 'user')]
     private Collection $userAbonnements;
 
+    /**
+     * @var Collection<int, ChatMessage>
+     */
+    #[ORM\OneToMany(targetEntity: ChatMessage::class, mappedBy: 'sender')]
+    private Collection $messagesSent;
+
+    /**
+     * @var Collection<int, ChatMessage>
+     */
+    #[ORM\OneToMany(targetEntity: ChatMessage::class, mappedBy: 'recipient')]
+    private Collection $messagesRecipient;
+
     public function __construct()
     {
         $this->teams = new ArrayCollection();
         $this->userAbonnements = new ArrayCollection();
+        $this->messagesSent = new ArrayCollection();
+        $this->messagesRecipient = new ArrayCollection();
     }
 
     /**
@@ -166,6 +180,66 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($userAbonnement->getUser() === $this) {
                 $userAbonnement->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ChatMessage>
+     */
+    public function getMessagesSent(): Collection
+    {
+        return $this->messagesSent;
+    }
+
+    public function addMessagesSent(ChatMessage $messagesSent): static
+    {
+        if (!$this->messagesSent->contains($messagesSent)) {
+            $this->messagesSent->add($messagesSent);
+            $messagesSent->setSender($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMessagesSent(ChatMessage $messagesSent): static
+    {
+        if ($this->messagesSent->removeElement($messagesSent)) {
+            // set the owning side to null (unless already changed)
+            if ($messagesSent->getSender() === $this) {
+                $messagesSent->setSender(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ChatMessage>
+     */
+    public function getMessagesRecipient(): Collection
+    {
+        return $this->messagesRecipient;
+    }
+
+    public function addMessagesRecipient(ChatMessage $messagesRecipient): static
+    {
+        if (!$this->messagesRecipient->contains($messagesRecipient)) {
+            $this->messagesRecipient->add($messagesRecipient);
+            $messagesRecipient->setRecipient($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMessagesRecipient(ChatMessage $messagesRecipient): static
+    {
+        if ($this->messagesRecipient->removeElement($messagesRecipient)) {
+            // set the owning side to null (unless already changed)
+            if ($messagesRecipient->getRecipient() === $this) {
+                $messagesRecipient->setRecipient(null);
             }
         }
 

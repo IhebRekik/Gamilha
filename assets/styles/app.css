@@ -61,33 +61,3 @@ body {
     color: #fff;
     border: 1px solid rgba(13, 110, 253, 0.5);
 }
-.launch-stream-btn {
-    background: linear-gradient(135deg, #ff3b3b, #ff1f1f);
-    color: white;
-    border: none;
-    padding: 12px 22px;
-    border-radius: 999px;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    box-shadow: 0 8px 25px rgba(255, 59, 59, 0.35);
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.launch-stream-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 12px 30px rgba(255, 59, 59, 0.5);
-}
-
-.live-dot {
-    font-size: 14px;
-    animation: pulse 1.2s infinite;
-}
-
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.4; }
-    100% { opacity: 1; }
-}
