@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}SocialMedia index{% endblock %}
+
+{% block body %}
+    <h1>SocialMedia index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Platform</th>
+                <th>Content</th>
+                <th>Likes</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for social_media in social_media %}
+            <tr>
+                <td>{{ social_media.id }}</td>
+                <td>{{ social_media.platform }}</td>
+                <td>{{ social_media.content }}</td>
+                <td>{{ social_media.likes }}</td>
+                <td>
+                    <a href="{{ path('admin_social_media_show', {'id': social_media.id}) }}">show</a>
+                    <a href="{{ path('admin_social_media_edit', {'id': social_media.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('admin_social_media_new') }}">Create new</a>
+{% endblock %}

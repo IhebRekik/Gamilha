@@ -1,0 +1,20 @@
+{# templates/admin/dashboard/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Administrateur{% endblock %}
+
+{% block body %}
+
+    <!-- Header -->
+    <div class="text-center mb-5 pb-4">
+        <h1 class="display-4 fw-bold mb-2 text-white text-shadow" style="text-shadow: 0 0 15px rgba(160,32,240,0.6);">
+            Dashboard Administrateur
+        </h1>
+        <p class="lead text-white-75 opacity-75">
+            <i class="bi bi-speedometer2 me-2"></i>Vue d'ensemble de la plateforme en temps réel
+        </p>
+    </div>
+
+   
+      {{ component('dashboard_stats') }}
+{% endblock %}

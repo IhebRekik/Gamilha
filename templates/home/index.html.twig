@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accueil{% endblock %}
+
+{% block body %}
+    <h1>Bienvenue sur la plateforme !</h1>
+    <p>Ceci est la page d'accueil (route /)</p>
+
+    <a href="{{ path('admin_dashboard') }}" class="btn btn-primary">Aller au Dashboard Admin</a>
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Nouvelle playlist{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>➕ Nouvelle playlist</h1>
+
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+        <button class="btn btn-success mt-3">💾 Enregistrer</button>
+    {{ form_end(form) }}
+
+    <a href="{{ path('playlist_index') }}" class="btn btn-secondary mt-3">
+        ⬅️ Retour
+    </a>
+</div>
+{% endblock %}

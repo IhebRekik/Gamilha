@@ -1,0 +1,22 @@
+# yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
+
+parameters:
+     videos_directory: '%kernel.project_dir%/public/uploads/videos'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    # Services généraux
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    # 🔴 OBLIGATOIRE : déclarer les controllers comme services Symfony
+    App\Controller\:
+        resource: '../src/Controller/'
+        tags: ['controller.service_arguments']
