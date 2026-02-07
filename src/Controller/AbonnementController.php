@@ -19,6 +19,7 @@ final class AbonnementController extends AbstractController
     {
         return $this->render('admin/abonnement/index.html.twig', [
             'abonnements' => $abonnementRepository->findAll(),
+            'types' => $abonnementRepository->findDistinctTypes()
         ]);
     }
 

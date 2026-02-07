@@ -1,6 +1,16 @@
 {# templates/admin/user_abonnement/_form.html.twig #}
 {{ form_start(form) }}
 
+<script>
+    $(document).ready(function () {
+        $('.select2').select2({
+            style: 'text-white bg-dark border-secondary border-opacity-50',
+            width: '100%'
+        });
+    });
+</script>
+
+
 <div class="card bg-dark border-primary border-opacity-25 shadow-lg rounded-4">
     <div class="card-body p-4">
         <div class="row g-4">
@@ -13,8 +23,7 @@
                     }) }}
                     {{ form_widget(form.dateDebut, {
                         'attr': {
-                            'class': 'form-control bg-dark text-white border-secondary border-opacity-50',
-                            'placeholder': 'YYYY-MM-DD'
+                            'class': 'form-control bg-dark text-white border-secondary border-opacity-50'
                         }
                     }) }}
                     {{ form_errors(form.dateDebut, {'attr': {'class': 'text-danger small mt-1'}}) }}
@@ -29,36 +38,40 @@
                     }) }}
                     {{ form_widget(form.dateFin, {
                         'attr': {
-                            'class': 'form-control bg-dark text-white border-secondary border-opacity-50',
-                            'placeholder': 'YYYY-MM-DD'
+                            'class': 'form-control bg-dark text-white border-secondary border-opacity-50'
                         }
                     }) }}
                     {{ form_errors(form.dateFin, {'attr': {'class': 'text-danger small mt-1'}}) }}
                 </div>
             </div>
 
-            {# Utilisateur associé #}
-            <div class="col-12">
-                <div class="mb-3">
-                    {{ form_label(form.user, 'Utilisateur', {
+            {# Utilisateur associé avec Select2 #}
+            <div class="col-md-6">
+                 <div class="mb-3">
+                    {{ form_label(form.user, 'Utilisateurs', {
                         'label_attr': {'class': 'form-label text-white fw-semibold'}
                     }) }}
-                    {{ form_widget(form.user, {
-                        'attr': {
-                            'class': 'form-select bg-dark text-white border-secondary border-opacity-50'
-                        }
-                    }) }}
+                    <div class="input-group">
+                        
+                        {{ form_widget(form.user, {
+                            'attr': {
+                                'class': 'form-select select2 bg-dark text-white border-secondary border-opacity-50'
+                            }
+                        }) }}
+                    </div>
                     {{ form_errors(form.user, {'attr': {'class': 'text-danger small mt-1'}}) }}
                 </div>
             </div>
-             <div class="col-12">
-                <div class="mb-3">
-                    {{ form_label(form.abonnement, 'Abonnement', {
+
+            {# Type d'Abonnement avec Select2 #}
+            <div class="col-md-6">
+                <div class="mb-3 text-white">
+                    {{ form_label(form.abonnement, 'Type d\'offre', {
                         'label_attr': {'class': 'form-label text-white fw-semibold'}
                     }) }}
                     {{ form_widget(form.abonnement, {
                         'attr': {
-                            'class': 'form-select bg-dark text-white border-secondary border-opacity-50'
+                            'class': 'form-select select2 bg-dark text-white border-secondary border-opacity-50'
                         }
                     }) }}
                     {{ form_errors(form.abonnement, {'attr': {'class': 'text-danger small mt-1'}}) }}
@@ -75,7 +88,7 @@
                 <i class="bi bi-x-circle me-1"></i> Annuler
             </a>
             <button type="submit" class="btn btn-primary px-5 shadow">
-                <i class="bi bi-save-fill me-2"></i> {{ button_label|default('Enregistrer') }}
+                <i class="bi bi-save-fill me-2"></i> {{ button_label|default('Enregistrer l\'abonnement') }}
             </button>
         </div>
     </div>
