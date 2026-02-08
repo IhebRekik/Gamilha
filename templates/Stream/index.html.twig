@@ -3,122 +3,189 @@
 {% block body %}
 
 
-<a href="{{ path('stream_discover') }}"
-   class="btn btn-light rounded-pill me-2">
-   Découvrir
-</a>
+    <a href="{{ path('stream_index') }}"
+       class="btn btn-outline-secondary rounded-pill px-4">
+        Regarder un Stream
+    </a>
+</div>
 
-<form method="get" action="{{ path('stream_discover') }}" class="d-flex gap-2 mb-4">
+
+<div class="d-flex justify-content-end mb-3">
+    <button class="btn btn-danger rounded-pill px-3"
+            data-bs-toggle="modal"
+            data-bs-target="#launchStreamModal">
+        🔴 Lancer un Stream
+    </button>
+</div>
+<form method="get" action="{{ path('stream_index') }}" class="d-flex gap-2 mb-4">
     <input type="text" name="q" class="form-control"
            placeholder="Chercher un stream..."
-           value="{{ query|default('') }}"
->
+           value="{{ query|default('') }}">
 
     <select name="game" class="form-select">
         <option value="">Tous les jeux</option>
-        <option value="CS2">CS2</option>
-        <option value="Valorant">Valorant</option>
-        <option value="LoL">League of Legends</option>
-        <option value="LoL">Dota 2</option>
+        <option value="CS2" {{ game=='CS2' ? 'selected' : '' }}>CS2</option>
+        <option value="Valorant" {{ game=='Valorant' ? 'selected' : '' }}>Valorant</option>
+        <option value="LoL" {{ game=='LoL' ? 'selected' : '' }}>League of Legends</option>
+        <option value="Dota2" {{ game=='Dota2' ? 'selected' : '' }}>Dota 2</option>
     </select>
 
     <select name="sort" class="form-select">
         <option value="">Plus récents</option>
-        <option value="viewers">Plus regardés</option>
+        <option value="viewers" {{ sort=='viewers' ? 'selected' : '' }}>Plus regardés</option>
     </select>
 
     <button class="btn btn-primary">🔍</button>
 </form>
 
-<div class="d-flex justify-content-end mb-3">
-    <button class="btn btn-danger rounded-pill px-3 py-2"
-            data-bs-toggle="modal"
-            data-bs-target="#launchStreamModal">
-            <span class="live-dot">⦿</span>
-         Lancer un Stream
-    </button>
-</div>
-<h1>Liste des Streams</h1>
 
 <div class="row g-3">
     {% for stream in streams %}
         <div class="col-md-4">
-            <div class="card bg-dark border-0 h-100 rounded-4 overflow-hidden stream-card">
-                <div class="position-relative">
-                    {% if stream.thumbnail %}
-                        <img src="{{ stream.thumbnail }}" class="img-fluid rounded-top" style="height:180px; object-fit:cover;">
-                    {% else %}
-                        <img src="https://plus.unsplash.com/premium_photo-1664910441926-b86731baa43b?w=600&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8c3RyZWFtZXJ8ZW58MHx8MHx8fDA%3D" class="img-fluid rounded-top">
-                    {% endif %}
 
-                    <span class="badge bg-danger position-absolute top-0 start-0 m-2">LIVE</span>
-                    <span class="badge bg-dark position-absolute bottom-0 end-0 m-2">
-                        👁 {{ stream.viewers }}
-                    </span>
+            <a href="{{ path('stream_show', { id: stream.id }) }}"
+               class="text-decoration-none">
+
+                <div class="card bg-dark border-0 h-100 rounded-4 overflow-hidden stream-card">
+
+                    <div class="position-relative">
+                        <img src="{{ stream.thumbnail ?: 'https://placehold.co/600x400?text=LIVE+STREAM' }}"
+                             class="img-fluid rounded-top"
+                             style="height:180px; object-fit:cover;">
+
+                        <span class="badge bg-danger position-absolute top-0 start-0 m-2">
+                            LIVE
+                        </span>
+
+                        <span class="badge bg-dark position-absolute bottom-0 end-0 m-2">
+                            👁 {{ stream.viewers }}
+                        </span>
+                    </div>
+
+                    <div class="card-body">
+                        <h6 class="fw-bold text-white mb-1">
+                            {{ stream.title }}
+                        </h6>
+
+                        <small class="text-secondary">
+                            {{ stream.description ?: 'Live en cours' }}
+                        </small>
+
+                        <p class="text-info small mb-0">
+                            {{ stream.game }}
+                        </p>
+                    </div>
+
                 </div>
-                <div class="card-body">
-                    <h6 class="fw-bold text-white mb-1">{{ stream.title }}</h6>
-                    <small class="text-secondary d-block mb-1">{{ stream.description ? stream.description|slice(0, 60) ~ '…' : 'Live en cours' }}</small>
-                    <p class="text-info small mb-0">{{ stream.game }}</p>
-                </div>
-            </div>
+
+            </a>
+
         </div>
     {% endfor %}
 </div>
 
+
 <div class="modal fade" id="launchStreamModal" tabindex="-1">
-  <div class="modal-dialog">
-    <div class="modal-content bg-dark text-white">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content bg-dark text-white rounded-4">
 
-      {{ form_start(form) }}
+      {{ form_start(form, {
+        action: path('stream_index'),
+        method: 'POST'
+      }) }}
 
-      <div class="modal-header">
-        <h5 class="modal-title">Lancer un nouveau Stream</h5>
-        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      <!-- HEADER -->
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold">
+          🔴 Lancer un nouveau Stream
+        </h5>
+        <button type="button" class="btn-close btn-close-white"
+                data-bs-dismiss="modal"></button>
       </div>
 
-      <div class="modal-body">
+      <!-- BODY -->
+      <div class="modal-body pt-2">
 
-        <div class="mb-3">
+        <!-- SECTION 1 -->
+        <div class="mb-4">
+          <h6 class="text-uppercase text-secondary mb-3">
+            Informations du stream
+          </h6>
+
+          <div class="mb-3">
             {{ form_label(form.title) }}
-            {{ form_widget(form.title, {'attr': {'class': 'form-control'}}) }}
-            {{ form_errors(form.title) }}
-        </div>
+            {{ form_widget(form.title, {
+              attr: { class: 'form-control form-control-lg' }
+            }) }}
+          </div>
 
-        <div class="mb-3">
+          <div class="mb-3">
             {{ form_label(form.description) }}
-            {{ form_widget(form.description, {'attr': {'class': 'form-control'}}) }}
-            {{ form_errors(form.description) }}
+            {{ form_widget(form.description, {
+              attr: {
+                class: 'form-control',
+                rows: 3,
+                placeholder: 'Décrivez votre stream...'
+              }
+            }) }}
+          </div>
         </div>
 
-        <div class="mb-3">
+        <!-- SECTION 2 -->
+        <div class="mb-4">
+          <h6 class="text-uppercase text-secondary mb-3">
+            Jeu
+          </h6>
+
+          <div class="mb-3">
             {{ form_label(form.game) }}
-            {{ form_widget(form.game, {'attr': {'class': 'form-control'}}) }}
-            {{ form_errors(form.game) }}
+            {{ form_widget(form.game, {
+              attr: { class: 'form-select' }
+            }) }}
+          </div>
         </div>
 
-        <div class="mb-3">
+        <!-- SECTION 3 -->
+        <div class="mb-2">
+          <h6 class="text-uppercase text-secondary mb-3">
+            Visuel du stream
+          </h6>
+
+          <div class="mb-3">
             {{ form_label(form.thumbnail) }}
-            {{ form_widget(form.thumbnail, {'attr': {'class': 'form-control'}}) }}
-            {{ form_errors(form.thumbnail) }}
+            {{ form_widget(form.thumbnail, {
+              attr: {
+                class: 'form-control',
+                placeholder: 'https://image.jpg'
+              }
+            }) }}
+          </div>
+
+          <small class="text-muted">
+            L’image sera affichée comme miniature du stream
+          </small>
         </div>
 
       </div>
 
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-            Fermer
+      <!-- FOOTER -->
+      <div class="modal-footer border-0">
+        <button type="button"
+                class="btn btn-outline-secondary rounded-pill px-4"
+                data-bs-dismiss="modal">
+          Annuler
         </button>
-         <button type="submit"
-            class="btn btn-danger rounded-pill px-4">
-        🔴 Ajouter le Stream
-    </button>
+
+        <button type="submit"
+                class="btn btn-danger rounded-pill px-4">
+          🔴 Démarrer le Stream
+        </button>
+      </div>
 
       {{ form_end(form) }}
 
     </div>
   </div>
 </div>
-
 
 {% endblock %}

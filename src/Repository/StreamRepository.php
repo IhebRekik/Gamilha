@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Repository;
 
 use App\Entity\Stream;
@@ -15,18 +14,19 @@ class StreamRepository extends ServiceEntityRepository
 
     public function findLiveStreams(): array
     {
-        // Exemple si tu ajoutes un champ isLive:boolean
-        return $this->findBy(['isLive' => true], ['viewers' => 'DESC']);
+        return $this->createQueryBuilder('s')
+            ->where('s.status = :status')
+            ->setParameter('status', 'live')
+            ->orderBy('s.viewers', 'DESC')
+            ->getQuery()
+            ->getResult();
     }
 
-    public function countLive(): int
-    {
-        return $this->count(['isLive' => true]);
-    }
-
-    public function getTopStreams(int $limit = 5): array
+    public function getTopStreams(int $limit = 8): array
     {
         return $this->createQueryBuilder('s')
+            ->where('s.status = :status')
+            ->setParameter('status', 'live')
             ->orderBy('s.viewers', 'DESC')
             ->setMaxResults($limit)
             ->getQuery()
