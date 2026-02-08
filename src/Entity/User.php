@@ -9,6 +9,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use App\Entity\Team as Team;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use App\Entity\Stream;
+use App\Entity\Donation;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -32,9 +34,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $name = null; // Added custom field
     // src/Entity/User.php
 
+#[ORM\OneToMany(mappedBy: 'user', targetEntity: Stream::class)]
+private Collection $streams;
+#[ORM\OneToMany(mappedBy: 'user', targetEntity: Donation::class)]
+private Collection $donations;
 
 
 
+
+
+public function getStreams(): Collection
+{
+    return $this->streams;
+}
 
 
     // Getters and setters...
@@ -128,6 +140,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->userAbonnements = new ArrayCollection();
         $this->messagesSent = new ArrayCollection();
         $this->messagesRecipient = new ArrayCollection();
+        $this->donations = new ArrayCollection();
+        $this->streams = new ArrayCollection();
+
+     
     }
 
     /**
@@ -245,4 +261,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+    public function getDonations(): Collection
+{
+    return $this->donations;
+}
+
 }

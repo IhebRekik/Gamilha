@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+
+<div class="container mt-4">
+
+    <a href="{{ path('stream_index') }}"
+       class="btn btn-outline-secondary mb-3 rounded-pill">
+        ← Retour aux streams
+    </a>
+
+    <div class="card bg-dark text-white rounded-4 overflow-hidden">
+
+        <!-- STREAM IMAGE -->
+        <img src="{{ stream.thumbnail ?: 'https://placehold.co/1200x500?text=STREAM+EN+COURS' }}"
+             class="img-fluid"
+             style="object-fit:cover; max-height:450px;">
+
+        <!-- INFOS -->
+        <div class="card-body">
+
+            <h3 class="fw-bold">
+                🔴 {{ stream.title }}
+            </h3>
+
+            <p class="text-secondary">
+                {{ stream.description }}
+            </p>
+
+            <div class="d-flex gap-3 align-items-center">
+                <span class="badge bg-danger">LIVE</span>
+                <span class="text-muted">
+                    👁 {{ stream.viewers }} spectateurs
+                </span>
+                <span class="text-info">
+                    🎮 {{ stream.game }}
+                </span>
+            </div>
+
+            <hr class="border-secondary">
+
+            <!-- PLACEHOLDER FUTUR -->
+            <div class="text-center text-muted py-5">
+                🎥 Stream en cours  
+                <br>
+                (Dons & chat à venir)
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+<h2>Faire une donation</h2>
+<div>
+    <a href="{{ path('donation_emoji', {'streamId': stream.id, 'emoji': '🍩'}) }}" class="btn btn-light">🍩 1€</a>
+    <a href="{{ path('donation_emoji', {'streamId': stream.id, 'emoji': '🍕'}) }}" class="btn btn-warning">🍕 5€</a>
+    <a href="{{ path('donation_emoji', {'streamId': stream.id, 'emoji': '💎'}) }}" class="btn btn-info">💎 10€</a>
+    <a href="{{ path('donation_emoji', {'streamId': stream.id, 'emoji': '🚀'}) }}" class="btn btn-danger">🚀 50€</a>
+</div>
+
+<h3>Donations reçues</h3>
+<ul>
+    {% for donation in stream.donations %}
+        <li>{{ donation.donorName }} : €{{ donation.amount }} ({{ donation.createdAt|date('d/m/Y H:i') }})</li>
+    {% else %}
+        <li>Aucune donation pour le moment</li>
+    {% endfor %}
+</ul>
+
+
+{% endblock %}
