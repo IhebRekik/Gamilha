@@ -1,0 +1,4 @@
+<form method="post" action="{{ path('admin_bracket_delete', {'idBracket': bracket.idBracket}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce bracket ?');">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ bracket.idBracket) }}">
+    <button class="btn btn-outline-danger w-100"><i class="bi bi-trash3 me-2"></i>Supprimer définitivement</button>
+</form>

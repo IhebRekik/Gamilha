@@ -12,7 +12,6 @@ use Symfony\UX\LiveComponent\DefaultActionTrait;
 use Symfony\UX\Chartjs\Builder\ChartBuilderInterface;
 use Symfony\UX\Chartjs\Model\Chart;
 use App\Repository\UserRepository;
-use App\Repository\EventRepository;  // Tournois
 use App\Repository\StreamRepository;
 use Doctrine\ORM\EntityManagerInterface;
 
