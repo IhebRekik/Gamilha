@@ -6,9 +6,13 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use App\Entity\Team as Team;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use App\Entity\Team;
+use App\Entity\Friend;
+use App\Entity\Post;
+use App\Entity\Commentaire;
+use App\Entity\UserAbonnement;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -29,15 +33,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $name = null; // Added custom field
-    // src/Entity/User.php
+    private ?string $name = null;
 
+    /* ===================== RELATIONS ===================== */
 
+    #[ORM\ManyToMany(targetEntity: Team::class, mappedBy: 'members')]
+    private Collection $teams;
 
+    #[ORM\OneToMany(targetEntity: UserAbonnement::class, mappedBy: 'user')]
+    private Collection $userAbonnements;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Post::class, orphanRemoval: true)]
+    private Collection $posts;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Commentaire::class, orphanRemoval: true)]
+    private Collection $commentaires;
 
-    // Getters and setters...
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Friend::class, orphanRemoval: true)]
+    private Collection $friends;
+
+    /* ===================== CONSTRUCTOR ===================== */
+
+    public function __construct()
+    {
+        $this->teams = new ArrayCollection();
+        $this->userAbonnements = new ArrayCollection();
+        $this->posts = new ArrayCollection();
+        $this->commentaires = new ArrayCollection();
+        $this->friends = new ArrayCollection();
+    }
+
+    /* ===================== GETTERS / SETTERS ===================== */
 
     public function getId(): ?int
     {
@@ -84,10 +110,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function eraseCredentials(): void
-    {
-        // If you store any temporary, sensitive data on the user, clear it here
-    }
+    public function eraseCredentials(): void {}
 
     public function getName(): ?string
     {
@@ -99,26 +122,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->name = $name;
         return $this;
     }
-    #[ORM\ManyToMany(targetEntity: Team::class, mappedBy: 'members')]
-    private Collection $teams;
 
-   
+    /* ===================== POSTS ===================== */
 
-    /**
-     * @var Collection<int, UserAbonnement>
-     */
-    #[ORM\OneToMany(targetEntity: UserAbonnement::class, mappedBy: 'user')]
-    private Collection $userAbonnements;
-
-    public function __construct()
+    public function getPosts(): Collection
     {
-        $this->teams = new ArrayCollection();
-        $this->userAbonnements = new ArrayCollection();
+        return $this->posts;
     }
 
-    /**
-     * @return Collection<int, Team>
-     */
+    /* ===================== COMMENTAIRES ===================== */
+
+    public function getCommentaires(): Collection
+    {
+        return $this->commentaires;
+    }
+
+    /* ===================== TEAMS ===================== */
+
     public function getTeams(): Collection
     {
         return $this->teams;
@@ -141,34 +161,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /* ===================== ABONNEMENTS ===================== */
 
-    /**
-     * @return Collection<int, UserAbonnement>
-     */
     public function getUserAbonnements(): Collection
     {
         return $this->userAbonnements;
     }
 
-    public function addUserAbonnement(UserAbonnement $userAbonnement): static
-    {
-        if (!$this->userAbonnements->contains($userAbonnement)) {
-            $this->userAbonnements->add($userAbonnement);
-            $userAbonnement->setUser($this);
-        }
+    /* ===================== FRIENDS ===================== */
 
+    public function getFriends(): Collection
+    {
+        return $this->friends;
+    }
+
+    public function addFriend(Friend $friend): static
+    {
+        if (!$this->friends->contains($friend)) {
+            $this->friends->add($friend);
+            $friend->setUser($this);
+        }
         return $this;
     }
 
-    public function removeUserAbonnement(UserAbonnement $userAbonnement): static
-    {
-        if ($this->userAbonnements->removeElement($userAbonnement)) {
-            // set the owning side to null (unless already changed)
-            if ($userAbonnement->getUser() === $this) {
-                $userAbonnement->setUser(null);
-            }
-        }
+   public function removeFriend(Friend $friend): static
+{
+    $this->friends->removeElement($friend);
+    return $this;
+}
 
-        return $this;
-    }
 }

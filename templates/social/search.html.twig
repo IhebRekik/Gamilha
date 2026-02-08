@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Recherche Utilisateurs{% endblock %}
+
+{% block body %}
+
+<div class="social-wrapper p-4">
+
+    
+    {# ================= HEADER ================= #}
+<div class="mb-4">
+    <h3 class="text-white fw-bold">Social</h3>
+    <p class="text-secondary mb-3">Connectez-vous avec la communauté esports</p>
+
+  <div class="social-tabs">
+    <a href="{{ path('social_index') }}"
+       class="tab {{ app.request.attributes.get('_route') == 'social_index' ? 'active' : '' }}">
+        Fil d’actualité
+    </a>
+
+    <a href="#"
+       class="tab {{ app.request.attributes.get('_route') == 'social_friends' ? 'active' : '' }}">
+        Amis
+    </a>
+
+    <a href="{{ path('social_search') }}"
+       class="tab {{ app.request.attributes.get('_route') == 'social_search' ? 'active' : '' }}">
+        Rechercher
+    </a>
+</div>
+
+</div>
+
+
+    <div class="card bg-dark text-white p-3 rounded-4 shadow-sm">
+
+        <form method="GET" action="{{ path('social_search') }}" class="d-flex gap-2 mb-3">
+            <input type="text"
+                   name="q"
+                   value="{{ term }}"
+                   class="form-control bg-dark text-white border-secondary"
+                   placeholder="Rechercher un utilisateur...">
+            <button type="submit" class="btn btn-purple">
+                <i class="bi bi-search"></i>
+            </button>
+        </form>
+
+        <h6 class="text-white mb-2">Résultats de recherche</h6>
+
+        {% if users is empty %}
+            <p class="text-secondary">Aucun utilisateur trouvé.</p>
+        {% else %}
+            {% for user in users %}
+                <div class="d-flex justify-content-between align-items-center bg-secondary bg-opacity-25 rounded-3 p-2 mb-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="avatar avatar-purple">{{ user.name|slice(0,1)|upper }}{{ user.name|split(' ')[1]|default('')|slice(0,1)|upper }}</div>
+                        <div>
+                            <div class="fw-semibold text-white">{{ user.name }}</div>
+                        </div>
+                    </div>
+<button class="btn btn-sm btn-purple" disabled>
+    Voir profil
+</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}
