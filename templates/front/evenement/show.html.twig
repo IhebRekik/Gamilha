@@ -1,0 +1,83 @@
+{% extends 'base_front.html.twig' %}
+
+{% block title %}{{ evenement.nom }} — Gamilha{% endblock %}
+
+{% block body %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb text-muted">
+        <li class="breadcrumb-item"><a href="{{ path('app_homepage') }}" class="text-muted text-decoration-none">Accueil</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('front_evenement_index') }}" class="text-muted text-decoration-none">Événements</a></li>
+        <li class="breadcrumb-item active text-white">{{ evenement.nom }}</li>
+    </ol>
+</nav>
+
+<div class="card card-front mb-4 overflow-hidden">
+    {% if evenement.image %}
+    <img src="{{ evenement.image }}" alt="{{ evenement.nom }}" class="card-img-top w-100" style="max-height: 320px; object-fit: cover;">
+    {% endif %}
+    <div class="card-body p-4 p-md-5">
+        <div class="d-flex flex-wrap gap-2 mb-3">
+            <span class="badge badge-gamilha">{{ evenement.jeu }}</span>
+            <span class="badge bg-dark text-info border border-info">{{ evenement.statut }}</span>
+            <span class="badge bg-dark text-secondary border border-secondary">{{ evenement.typeEvenement }}</span>
+        </div>
+        <h1 class="h2 fw-bold text-white mb-3">{{ evenement.nom }}</h1>
+        <p class="text-muted mb-4">{{ evenement.description ?? 'Aucune description.' }}</p>
+        <div class="row g-3 text-muted small">
+            <div class="col-auto"><i class="bi bi-calendar3 me-1"></i>Début : {{ evenement.dateDebut ? evenement.dateDebut|date('d/m/Y') : '—' }}</div>
+            <div class="col-auto"><i class="bi bi-calendar3-event me-1"></i>Fin : {{ evenement.dateFin ? evenement.dateFin|date('d/m/Y') : '—' }}</div>
+        </div>
+        {% if evenement.regles %}
+        <div class="mt-4 pt-3 border-top border-secondary">
+            <h6 class="text-white fw-semibold mb-2">Règles</h6>
+            <p class="text-muted small mb-0">{{ evenement.regles }}</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% set brackets = evenement.brackets %}
+{% if brackets|length > 0 %}
+<h2 class="section-title mt-5 mb-3">
+    <i class="bi bi-diagram-3-fill text-warning me-2"></i>Brackets & matchs
+</h2>
+{% for bracket in brackets %}
+<div class="card card-front mb-4">
+    <div class="card-header bg-transparent border-bottom border-secondary py-3 d-flex flex-wrap align-items-center gap-2">
+        <span class="fw-semibold text-white">{{ bracket.typeBracket }}</span>
+        <span class="badge badge-gamilha">{{ bracket.nombreTours }} tour(s)</span>
+        <span class="badge bg-dark text-info border border-info">{{ bracket.statut }}</span>
+    </div>
+    <div class="card-body p-0">
+        {% set matchs = bracket.matchs %}
+        {% if matchs|length > 0 %}
+        <ul class="list-group list-group-flush">
+            {% for match in matchs %}
+            <li class="list-group-item bg-transparent border-secondary d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 py-3 match-card">
+                <div class="d-flex align-items-center gap-3 flex-grow-1">
+                    <span class="text-muted small">Tour {{ match.tour }}</span>
+                    <span class="text-white fw-semibold">{{ match.equipeA.nomEquipe }}</span>
+                    <span class="badge bg-dark px-3">{{ match.scoreEquipeA }} - {{ match.scoreEquipeB }}</span>
+                    <span class="text-white fw-semibold">{{ match.equipeB.nomEquipe }}</span>
+                </div>
+                <span class="badge bg-secondary">{{ match.statut }}</span>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <div class="card-body text-center text-muted py-4">
+            <i class="bi bi-trophy me-2"></i>Aucun match dans ce bracket pour le moment.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="card card-front">
+    <div class="card-body text-center py-5 text-muted">
+        <i class="bi bi-diagram-3 display-6 mb-2"></i>
+        <p class="mb-0">Aucun bracket associé à cet événement.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
