@@ -33,31 +33,38 @@ class SocialController extends AbstractController
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
+      if ($form->isSubmitted()) {
 
-            // Utilisateur par défaut
-            $user = $em->getRepository(User::class)->find(1);
-            if (!$user) {
-                throw $this->createNotFoundException('Utilisateur par défaut introuvable');
-            }
-            $post->setUser($user);
+    if ($form->isValid()) {
 
-            // Image
-            $imageFile = $form->get('imageFile')->getData();
-            if ($imageFile) {
-                $fileName = uniqid() . '.' . $imageFile->guessExtension();
-                $imageFile->move(
-                    $this->getParameter('kernel.project_dir') . '/public/uploads',
-                    $fileName
-                );
-                $post->setImage($fileName);
-            }
-
-            $em->persist($post);
-            $em->flush();
-
-            return $this->redirectToRoute('social_index');
+        $user = $em->getRepository(User::class)->find(1);
+        if (!$user) {
+            throw $this->createNotFoundException('Utilisateur par défaut introuvable');
         }
+        $post->setUser($user);
+
+        // Image
+        $imageFile = $form->get('imageFile')->getData();
+        if ($imageFile) {
+            $fileName = uniqid() . '.' . $imageFile->guessExtension();
+            $imageFile->move(
+                $this->getParameter('kernel.project_dir') . '/public/uploads',
+                $fileName
+            );
+            $post->setImage($fileName);
+        }
+
+        $em->persist($post);
+        $em->flush();
+
+        $this->addFlash('success', 'Publication ajoutée avec succès');
+        return $this->redirectToRoute('social_index');
+
+    } else {
+        // 👇 PAS DE PAGE ROUGE
+        $this->addFlash('error', 'Veuillez corriger les erreurs du formulaire');
+    }
+}
 
       // === NOUVEAU : formulaires d'édition pour chaque post (pour les modals) ===
     $posts = $postRepo->findBy([], ['createdAt' => 'DESC']);
@@ -81,7 +88,6 @@ $suggestedUsers = $em->getRepository(User::class)->createQueryBuilder('u')
     ->setMaxResults(4)
     ->getQuery()
     ->getResult();
-    
 
     return $this->render('social/index.html.twig', [
         'posts' => $posts,
