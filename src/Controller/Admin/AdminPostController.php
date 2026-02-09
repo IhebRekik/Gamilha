@@ -17,12 +17,20 @@ use Symfony\Component\Routing\Attribute\Route;
 final class AdminPostController extends AbstractController
 {
     #[Route('/', name: 'admin_post_index', methods: ['GET'])]
-    public function index(PostRepository $postRepository): Response
-    {
-        return $this->render('admin/post/index.html.twig', [
-            'posts' => $postRepository->findBy([], ['createdAt' => 'DESC']),
-        ]);
-    }
+public function index(Request $request, PostRepository $postRepository): Response
+{
+    $search = $request->query->get('q');
+    $userSearch = $request->query->get('user');
+
+    $posts = $postRepository->search($search, $userSearch);
+
+    return $this->render('admin/post/index.html.twig', [
+        'posts' => $posts,
+        'search' => $search,
+        'userSearch' => $userSearch,
+    ]);
+}
+
 
     #[Route('/new', name: 'admin_post_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $em): Response

@@ -16,6 +16,34 @@
             Nouveau post
         </a>
     </div>
+{# ================= Search Form ================= #}
+  <form method="get" action="{{ path('admin_post_index') }}" class="mb-4">
+    <div class="row g-2">
+        <div class="col-md-6">
+            <input
+                type="text"
+                name="q"
+                value="{{ search }}"
+                class="form-control bg-dark text-white border-secondary"
+                placeholder="Rechercher par contenu du post..."
+            >
+        </div>
+        <div class="col-md-4">
+            <input
+                type="text"
+                name="user"
+                value="{{ userSearch }}"
+                class="form-control bg-dark text-white border-secondary"
+                placeholder="Rechercher par utilisateur..."
+            >
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-primary w-100">
+                <i class="bi bi-search"></i> Rechercher
+            </button>
+        </div>
+    </div>
+</form>
 
     <div class="card bg-dark border-0 shadow-lg">
         <div class="card-body p-0">

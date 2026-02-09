@@ -15,4 +15,25 @@ class PostRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Post::class);
     }
+   public function search(?string $term, ?string $user = null): array
+{
+    $qb = $this->createQueryBuilder('p')
+        ->leftJoin('p.user', 'u') // pour accéder aux infos de l'utilisateur
+        ->addSelect('u')
+        ->orderBy('p.createdAt', 'DESC');
+
+    if ($term) {
+        $qb->andWhere('p.content LIKE :term')
+           ->setParameter('term', '%' . $term . '%');
+    }
+
+    if ($user) {
+        $qb->andWhere('u.name LIKE :user')
+           ->setParameter('user', '%' . $user . '%');
+    }
+
+    return $qb->getQuery()->getResult();
+}
+
+
 }

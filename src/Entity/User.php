@@ -54,14 +54,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /* ===================== CONSTRUCTOR ===================== */
 
-    public function __construct()
-    {
-        $this->teams = new ArrayCollection();
-        $this->userAbonnements = new ArrayCollection();
-        $this->posts = new ArrayCollection();
-        $this->commentaires = new ArrayCollection();
-        $this->friends = new ArrayCollection();
-    }
 
     /* ===================== GETTERS / SETTERS ===================== */
 
@@ -122,19 +114,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->name = $name;
         return $this;
     }
+  
 
-    /* ===================== POSTS ===================== */
+   
 
-    public function getPosts(): Collection
+  
+    public function __construct()
     {
-        return $this->posts;
-    }
-
-    /* ===================== COMMENTAIRES ===================== */
-
-    public function getCommentaires(): Collection
-    {
-        return $this->commentaires;
+        $this->teams = new ArrayCollection();
+        $this->userAbonnements = new ArrayCollection();
     }
 
     /* ===================== TEAMS ===================== */
@@ -183,11 +171,4 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
         return $this;
     }
-
-   public function removeFriend(Friend $friend): static
-{
-    $this->friends->removeElement($friend);
-    return $this;
-}
-
 }

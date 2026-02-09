@@ -18,10 +18,7 @@
         Fil d’actualité
     </a>
 
-    <a href="#"
-       class="tab {{ app.request.attributes.get('_route') == 'social_friends' ? 'active' : '' }}">
-        Amis
-    </a>
+   <a href="{{ path('social_friends') }}" class="tab">Amis</a>
 
     <a href="{{ path('social_search') }}"
        class="tab {{ app.request.attributes.get('_route') == 'social_search' ? 'active' : '' }}">

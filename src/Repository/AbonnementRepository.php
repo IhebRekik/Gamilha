@@ -15,7 +15,14 @@ class AbonnementRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Abonnement::class);
     }
+ public function findDistinctTypes(): array
+    {
+        $qb = $this->createQueryBuilder('a')
+            ->select('DISTINCT a.type')
+            ->orderBy('a.type', 'ASC');
 
+        return array_map(fn($row) => $row['type'], $qb->getQuery()->getArrayResult());
+    }
 //    /**
 //     * @return Abonnement[] Returns an array of Abonnement objects
 //     */
