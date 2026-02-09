@@ -20,7 +20,7 @@ class EvenementType extends AbstractType
             ->add('jeu', null, ['label' => 'Jeu', 'attr' => ['maxlength' => 50]])
             ->add('typeEvenement', ChoiceType::class, [
                 'label' => 'Type',
-                'choices' => ['En ligne' => 'online', 'Présentiel' => 'offline'],
+                'choices' => [ '' => '' , 'En ligne' => 'online', 'Présentiel' => 'offline' ],
             ])
             ->add('dateDebut', DateType::class, ['label' => 'Date de début', 'widget' => 'single_text'])
             ->add('dateFin', DateType::class, ['label' => 'Date de fin', 'widget' => 'single_text'])
