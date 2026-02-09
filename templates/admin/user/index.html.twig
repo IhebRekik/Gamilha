@@ -1,74 +1,196 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Gérer les Utilisateurs
-{% endblock %}
+{% block title %}Gérer les Utilisateurs{% endblock %}
 
 {% block body %}
-	<div class="container py-4">
-		<div class="d-flex justify-content-between align-items-center mb-4">
-			<h1 class="text-white">
-				<i class="bi bi-share-fill text-primary me-2"></i>Les Utilisateurs
-			</h1>
-			<a href="{{ path('admin_user_new') }}" class="btn btn-success shadow-sm">
-				<i class="bi bi-plus-lg me-1"></i>
-				Créer un utilisateur
-			</a>
-		</div>
+<div class="container py-4">
 
-		<div class="card bg-dark border-0 shadow-lg">
-			<div class="card-body p-0">
-				<div class="table-responsive">
-					<table class="table table-dark table-hover align-middle mb-0">
-						<thead class="text-secondary text-uppercase small border-bottom border-primary border-opacity-25">
-							<tr>
-								<th class="ps-4">ID</th>
-								<th>Nom</th>
-								<th>Email</th>
-								<th class="text-end pe-4">Actions</th>
-							</tr>
-						</thead>
-						<tbody>
-							{% for sm in pagination %}
-								<tr class="border-bottom border-secondary border-opacity-10">
-									<td class="ps-4 text-secondary">#{{ sm.id }}</td>
-									<td>
-										<span class="badge bg-primary border border-light border-opacity-25 px-3 py-2">
-											{{ sm.name }}
-										</span>
-									</td>
-									<td>
-										{{ sm.email }}
-									</td>
-									<td class="text-end pe-4">
-										<div class="btn-group shadow-sm">
-											<a href="{{ path('admin_user_show', {'id': sm.id}) }}" class="btn btn-sm btn-outline-info">
-												<i class="bi bi-eye"></i>
-											</a>
+    <!-- En-tête -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+        <h1 class="text-white d-flex align-items-center mb-0">
+            <i class="bi bi-people-fill text-primary me-2"></i>
+            Gestion des utilisateurs
+        </h1>
 
-										
+        <a href="{{ path('admin_user_new') }}" class="btn btn-success shadow-sm px-3">
+            <i class="bi bi-plus-lg me-1"></i> Créer un utilisateur
+        </a>
+    </div>
 
-											<form method="post" action="{{ path('admin_user_delete', {'id': sm.id}) }}" onsubmit="return confirm('Confirmer la suppression ?');" class="d-inline">
-												<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ sm.id) }}">
-												<button class="btn btn-sm btn-outline-danger">
-													<i class="bi bi-trash"></i>
-												</button>
-											</form>
-										</div>
-									</td>
-								</tr>
-							{% else %}
-								<tr>
-									<td colspan="5" class="text-center py-5 text-secondary">
-										<i class="bi bi-cloud-slash fs-1 d-block mb-2"></i>
-										Aucun enregistrement trouvé dans la base Gamelha.
-									</td>
-								</tr>
-							{% endfor %}
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-	</div>
+    <!-- Barre de recherche + filtres -->
+    <div class="card bg-dark border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-center">
+                <!-- Recherche -->
+                <div class="col-12 col-md-5 col-lg-4">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text bg-secondary border-0 text-white">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input 
+                            id="searchInput" 
+                            type="text" 
+                            class="form-control bg-secondary text-white border-0 shadow-none" 
+                            placeholder="Rechercher (nom, email...)" 
+                            aria-label="Rechercher">
+                    </div>
+                </div>
 
+                <!-- Filtres -->
+                <div class="col-12 col-md-7 col-lg-8">
+                    <div class="d-flex flex-wrap gap-3">
+                        <!-- Filtre par rôle (à activer si tu passes les rôles) -->
+                        <div class="flex-grow-1 flex-shrink-1" style="min-width: 180px;">
+                            <select id="filterRole" class="form-select bg-secondary text-white border-0 shadow-none">
+                                <option value="">Tous les rôles</option>
+                                <option value="ROLE_USER">Utilisateur</option>
+                                <option value="ROLE_ADMIN">Administrateur</option>
+                                <option value="ROLE_MODERATOR">Modérateur</option>
+                                {# Ajoute d'autres rôles selon ta configuration #}
+                            </select>
+                        </div>
+
+                        <!-- Tri par nom -->
+                        <div class="flex-grow-1 flex-shrink-1" style="min-width: 180px;">
+                            <select id="sortName" class="form-select bg-secondary text-white border-0 shadow-none">
+                                <option value="">Tri par défaut</option>
+                                <option value="asc">Nom : A → Z</option>
+                                <option value="desc">Nom : Z → A</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau -->
+    <div class="card bg-dark border-0 shadow-lg">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0" id="usersTable">
+                    <thead class="text-secondary text-uppercase small border-bottom border-primary border-opacity-25">
+                        <tr>
+                            <th>Nom</th>
+                            <th>Email</th>
+                            <th>Rôle(s)</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for user in pagination %}
+                        <tr class="border-bottom border-secondary border-opacity-10">
+                            <td class="name">
+                                <span class="fw-semibold text-white">{{ user.name ?: user.username ?: '—' }}</span>
+                            </td>
+                            <td class="email">{{ user.email }}</td>
+                            <td class="roles">
+                                {% for role in user.roles %}
+                                    <span class="badge bg-secondary me-1 mb-1">{{ role|replace({'ROLE_': ''}) }}</span>
+                                {% else %}
+                                    <span class="badge bg-dark text-muted">Aucun rôle</span>
+                                {% endfor %}
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group shadow-sm">
+                                    <a href="{{ path('admin_user_show', {'id': user.id}) }}"
+                                       class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ path('admin_user_edit', {'id': user.id}) }}"
+                                       class="btn btn-sm btn-outline-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form method="post"
+                                          action="{{ path('admin_user_delete', {'id': user.id}) }}"
+                                          onsubmit="return confirm('Confirmer la suppression ?');"
+                                          class="d-inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-secondary">
+                                <i class="bi bi-search fs-1 d-block mb-2"></i>
+                                Aucun utilisateur trouvé
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination (Knplabs ou autre) -->
+    <div class="d-flex justify-content-center mt-4">
+        {{ knp_pagination_render(pagination) }}
+    </div>
+
+</div>
+
+<!-- JavaScript pour recherche, filtre et tri côté client -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchInput');
+    const filterRole  = document.getElementById('filterRole');
+    const sortName    = document.getElementById('sortName');
+    const table       = document.getElementById('usersTable');
+    const tbody       = table.querySelector('tbody');
+    const rows        = Array.from(tbody.querySelectorAll('tr:not(:has(td[colspan]))'));
+
+    function filterAndSort() {
+        const searchText = searchInput.value.toLowerCase().trim();
+        const selectedRole = filterRole.value;
+        const sortOrder  = sortName.value;
+
+        let filteredRows = rows.filter(row => {
+            const name  = row.querySelector('.name')?.textContent.toLowerCase() || '';
+            const email = row.querySelector('.email')?.textContent.toLowerCase() || '';
+            const roles = row.querySelector('.roles')?.textContent.toLowerCase() || '';
+
+            const matchesSearch = name.includes(searchText) || email.includes(searchText);
+            const matchesRole   = !selectedRole || roles.includes(selectedRole.toLowerCase());
+
+            return matchesSearch && matchesRole;
+        });
+
+        // Tri par nom
+        if (sortOrder === 'asc' || sortOrder === 'desc') {
+            filteredRows.sort((a, b) => {
+                const nameA = a.querySelector('.name')?.textContent.trim().toLowerCase() || '';
+                const nameB = b.querySelector('.name')?.textContent.trim().toLowerCase() || '';
+                return sortOrder === 'asc' 
+                    ? nameA.localeCompare(nameB)
+                    : nameB.localeCompare(nameA);
+            });
+        }
+
+        // Affichage
+        tbody.innerHTML = '';
+        filteredRows.forEach(row => tbody.appendChild(row));
+
+        // Message aucun résultat
+        if (filteredRows.length === 0 && rows.length > 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="text-center py-5 text-secondary">
+                        <i class="bi bi-search fs-1 d-block mb-2"></i>
+                        Aucun utilisateur ne correspond à votre recherche
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    searchInput.addEventListener('input', filterAndSort);
+    filterRole.addEventListener('change', filterAndSort);
+    sortName.addEventListener('change', filterAndSort);
+});
+</script>
 {% endblock %}
