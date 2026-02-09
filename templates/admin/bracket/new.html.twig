@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+{% block title %}Gamilha - Nouveau bracket{% endblock %}
+{% block body %}
+<div class="container py-4">
+    <h1 class="mb-4 text-white"><i class="bi bi-diagram-3 me-2"></i>Créer un bracket</h1>
+    <div class="card bg-dark border-0 shadow-lg p-4">
+        {% include 'admin/bracket/_form.html.twig' %}
+    </div>
+</div>
+{% endblock %}
