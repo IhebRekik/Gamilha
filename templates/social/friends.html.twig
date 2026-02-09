@@ -1,7 +1,5 @@
 {% extends 'base.html.twig' %}
-
 {% block title %}Amis{% endblock %}
-
 {% block body %}
 <div class="social-wrapper p-4">
     <div class="container">
@@ -16,21 +14,23 @@
             </a>
             <a href="{{ path('social_friends') }}"
                class="tab {{ app.request.attributes.get('_route') == 'social_friends' ? 'active' : '' }}">
-                Amis
-            </a>       
+                <!-- Option la plus propre -->
+Amis
+{% if app.user %}
+    <span class="badge bg-purple ms-1 px-2 py-1" style="font-size:0.75rem;">{{ app.user.friends|length }}</span>
+{% endif %}
+            </a>
             <a href="{{ path('social_search') }}"
                class="tab {{ app.request.attributes.get('_route') == 'social_search' ? 'active' : '' }}">
                 Rechercher
             </a>
         </div>
     </div>
-
       {# Liste d’amis #}
 <div class="card bg-dark border-0 shadow-lg rounded-4 overflow-hidden">
     <div class="card-header bg-dark border-bottom border-secondary text-white fw-bold p-3">
         Liste d’amis
     </div>
-
     <div class="card-body p-0">
         {% for friend in friends %}
         {% set fUser = friend.friend %}
@@ -48,12 +48,10 @@
                         <small class="text-secondary">{{ fUser.friends|length }} amis en commun</small>
                     </div>
                 </div>
-
                 <button class="btn btn-message btn-sm rounded-pill px-4 py-1">
                     Message
                 </button>
             </div>
-
             {# ===== STATUT ORANGE / VERT ===== #}
             <div class="mt-3">
                 {% if fUser.status is defined and fUser.status == 'away' %}
@@ -68,33 +66,27 @@
         {% endfor %}
     </div>
 </div>
-
     </div>
 </div>
 {% endblock %}
-
 {% block stylesheets %}
     {{ parent() }}
     <style>
         .friend-card { transition: background 0.2s ease; }
         .friend-card:hover { background-color: rgba(255, 255, 255, 0.035) !important; }
-
         .avatar-lg {
             width: 60px; height: 60px; font-size: 1.4rem; font-weight: bold;
             line-height: 60px; text-align: center; border-radius: 50%;
             background: linear-gradient(135deg, #667eea, #764ba2); color: white; flex-shrink: 0;
         }
-
         .status-dot { position: absolute; bottom: 4px; right: 4px; width: 14px; height: 14px;
             border-radius: 50%; border: 3px solid #0d1117; box-shadow: 0 0 6px rgba(0,0,0,0.5); }
-        .online  { background: #00ff9d; box-shadow: 0 0 8px #00ff9d; }
-        .away    { background: #ffaa00; box-shadow: 0 0 8px #ffaa00; }
+        .online { background: #00ff9d; box-shadow: 0 0 8px #00ff9d; }
+        .away { background: #ffaa00; box-shadow: 0 0 8px #ffaa00; }
         .offline { background: #6c757d; box-shadow: 0 0 6px #6c757d; }
-
         .btn-message { background: #9f7aea !important; border: none !important; color: white !important;
             font-weight: 500; padding: 6px 18px; min-width: 100px; transition: all 0.2s; }
         .btn-message:hover { background: #7e56d6 !important; transform: translateY(-1px); }
-
         .game-status { font-size: 0.85rem; padding: 5px 14px;
             background: rgba(255, 193, 7, 0.15); color: #ffc107; border-radius: 20px; font-weight: 500; display: inline-block; }
     </style>
