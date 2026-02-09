@@ -1,0 +1,65 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gamilha - Équipes{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-white">
+            <i class="bi bi-people-fill text-primary me-2"></i>Gestion des équipes (tournoi)
+        </h1>
+        <a href="{{ path('admin_equipe_new') }}" class="btn btn-success shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> Nouvelle équipe
+        </a>
+    </div>
+
+    <div class="card bg-dark border-0 shadow-lg">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                    <thead class="text-secondary text-uppercase small border-bottom border-primary border-opacity-25">
+                        <tr>
+                            <th class="ps-4">ID</th>
+                            <th>Nom</th>
+                            <th>Tag</th>
+                            <th>Pays</th>
+                            <th>Niveau</th>
+                            <th>Date création</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for equipe in equipes %}
+                        <tr class="border-bottom border-secondary border-opacity-10">
+                            <td class="ps-4 text-secondary">#{{ equipe.idEquipe }}</td>
+                            <td class="fw-semibold text-white">{{ equipe.nomEquipe }}</td>
+                            <td><span class="badge bg-info px-2">{{ equipe.tag ?? '—' }}</span></td>
+                            <td>{{ equipe.pays ?? '—' }}</td>
+                            <td><span class="badge bg-secondary px-2">{{ equipe.niveau }}</span></td>
+                            <td>{{ equipe.dateCreation ? equipe.dateCreation|date('d/m/Y') : '—' }}</td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group shadow-sm">
+                                    <a href="{{ path('admin_equipe_show', {'idEquipe': equipe.idEquipe}) }}" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
+                                    <a href="{{ path('admin_equipe_edit', {'idEquipe': equipe.idEquipe}) }}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                                    <form method="post" action="{{ path('admin_equipe_delete', {'idEquipe': equipe.idEquipe}) }}" onsubmit="return confirm('Confirmer la suppression ?');" class="d-inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ equipe.idEquipe) }}">
+                                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-secondary">
+                                <i class="bi bi-people fs-1 d-block mb-2"></i>
+                                Aucune équipe trouvée.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

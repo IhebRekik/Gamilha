@@ -1,0 +1,10 @@
+{% extends 'base.html.twig' %}
+{% block title %}Gamilha - Nouveau match{% endblock %}
+{% block body %}
+<div class="container py-4">
+    <h1 class="mb-4 text-white"><i class="bi bi-trophy me-2"></i>Créer un match</h1>
+    <div class="card bg-dark border-0 shadow-lg p-4">
+        {% include 'admin/match/_form.html.twig' %}
+    </div>
+</div>
+{% endblock %}
