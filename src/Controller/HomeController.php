@@ -33,15 +33,18 @@ class HomeController extends AbstractController
                 if (in_array('ROLE_ADMIN', $user->getRoles())) {
                     print_r($user->getRoles());
                     return $this->redirectToRoute('admin_dashboard');
-                } else {
+                } else if(in_array('ROLE_USER', $user->getRoles())) {
                     $evenements = #$evenementRepository->findBy([], ['dateDebut' => 'DESC'], 6); 
                         [];
 
                     return $this->render('home/index.html.twig', [
                         'evenements' => $evenements,
                     ]);
+                    }else {
+                        // Rôle inconnu, rediriger vers login
+                        return $this->redirectToRoute('app_login');
+                    }
                 }
-            }
         }
         return $this->redirectToRoute('app_login');
 
