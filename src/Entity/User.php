@@ -9,6 +9,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use App\Entity\Team as Team;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -20,19 +21,36 @@ class User implements  PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    #[Assert\NotBlank(message: "L'adresse email est obligatoire.")]
+    #[Assert\Email(message: "Veuillez saisir une adresse email valide.")]
     private ?string $email = null;
+
 
     #[ORM\Column]
     private ?string $roles = null;
 
-    #[ORM\Column]
-    private ?string $password = null;
+            #[ORM\Column]
+            #[Assert\NotBlank(message: "Le mot de passe est obligatoire.")]
+            #[Assert\Length(
+                min: 8,
+                minMessage: "Le mot de passe doit contenir au moins {{ limit }} caractères."
+            )]
+            #[Assert\Regex(
+                pattern: "/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/",
+                message: "Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre."
+            )]
+            private ?string $password = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $name = null; // Added custom field
-    // src/Entity/User.php
 
-
+            #[ORM\Column(length: 255)]
+            #[Assert\NotBlank(message: "Le nom est obligatoire.")]
+            #[Assert\Length(
+                min: 3,
+                minMessage: "Le nom doit contenir au moins {{ limit }} caractères.",
+                max: 50,
+                maxMessage: "Le nom ne doit pas dépasser {{ limit }} caractères."
+            )]
+            private ?string $name = null;
 
 
 
