@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
 #[Route('/admin/user')]
 final class UserController extends AbstractController
@@ -52,24 +53,7 @@ final class UserController extends AbstractController
             'user'         => $user,           // useful for title
         ]);
     }
-    #[Route('/chat/users', name: 'chat_user_list')]
-    public function listUsers(
-        Request $request,
-        UserRepository $userRepository
-    ): Response {
-        $cookieUserId = $request->cookies->get('user_id');
-
-        // Récupérer tous les utilisateurs sauf celui dans le cookie
-        $users = $userRepository->createQueryBuilder('u')
-            ->andWhere('u.id != :cookieId')
-            ->setParameter('cookieId', $cookieUserId)
-            ->getQuery()
-            ->getResult();
-
-        return $this->render('chat/user_list.html.twig', [
-            'users' => $users,
-        ]);
-    }
+    
 
     #[Route('/{id}', name: 'admin_user_show', methods: ['GET'])]
     public function show(User $user): Response
@@ -109,4 +93,5 @@ final class UserController extends AbstractController
 
         return $this->redirectToRoute('admin_user_index', [], Response::HTTP_SEE_OTHER);
     }
+   
 }

@@ -48,7 +48,6 @@ public function createMessage(
     $chatMessage->setRecipient($recipient);
     $chatMessage->setContent(''); // contenu vide, tu peux rediriger vers un form si besoin
     $chatMessage->setCreatedAt(new \DateTime());
-    $chatMessage->setIsRead(false);
 
     $entityManager->persist($chatMessage);
     $entityManager->flush();
