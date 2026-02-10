@@ -8,7 +8,13 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use App\Entity\Team;
+use App\Entity\Friend;
+use App\Entity\Post;
+use App\Entity\Commentaire;
+use App\Entity\UserAbonnement;
 use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -50,8 +56,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     )]
     private ?string $name = null;
 
+    /**
+     * @var Collection<int, Team>
+     */
+    #[ORM\ManyToMany(targetEntity: Team::class, inversedBy: 'members')]
+    private Collection $teams;
 
-
+    /**
+     * @var Collection<int, Friend>
+     */
+    #[ORM\OneToMany(targetEntity: Friend::class, mappedBy: 'user')]
+    private Collection $friends;
 
     // Getters and setters...
 
