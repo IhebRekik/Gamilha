@@ -21,7 +21,6 @@ security:
                 enable_csrf: true
             logout:
                 path: app_logout
-            custom_authenticator: App\Security\LoginFormAuthenticator
 
             remember_me:
                 secret: '%kernel.secret%'
