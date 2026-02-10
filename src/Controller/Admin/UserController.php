@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 final class UserController extends AbstractController
 {
     #[Route(name: 'admin_user_index', methods: ['GET'])]
+<<<<<<< HEAD
     public function index(UserRepository $userRepository, PaginatorInterface $paginator, Request $request): Response
     {
         $queryBuilder = $userRepository->createQueryBuilder('u');
@@ -30,6 +31,22 @@ final class UserController extends AbstractController
             'pagination' => $pagination,   // ← change 'users' → 'pagination'
         ]);
     }
+=======
+  public function index(UserRepository $userRepository, PaginatorInterface $paginator, Request $request): Response
+{
+    $queryBuilder = $userRepository->createQueryBuilder('u');
+
+    $pagination = $paginator->paginate(
+        $queryBuilder,
+        $request->query->getInt('page', 1),
+        15  // items per page
+    );
+
+    return $this->render('admin/user/index.html.twig', [
+    'pagination' => $pagination,   // ← change 'users' → 'pagination'
+]);
+}
+>>>>>>> origin/Gestion_Vedio_List
 
     #[Route('/new', name: 'admin_user_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response
@@ -52,7 +69,10 @@ final class UserController extends AbstractController
             'user'         => $user,           // useful for title
         ]);
     }
+<<<<<<< HEAD
     
+=======
+>>>>>>> origin/Gestion_Vedio_List
 
     #[Route('/{id}', name: 'admin_user_show', methods: ['GET'])]
     public function show(User $user): Response

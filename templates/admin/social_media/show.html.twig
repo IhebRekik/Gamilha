@@ -1,5 +1,6 @@
 {% extends 'base.html.twig' %}
 
+<<<<<<< HEAD
 {% block title %}Gamelha - {{ social_media.platform }} Post{% endblock %}
 
 {% block body %}
@@ -65,3 +66,37 @@
     </div>
 </div>
 {% endblock %}
+=======
+{% block title %}SocialMedia{% endblock %}
+
+{% block body %}
+    <h1>SocialMedia</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ social_media.id }}</td>
+            </tr>
+            <tr>
+                <th>Platform</th>
+                <td>{{ social_media.platform }}</td>
+            </tr>
+            <tr>
+                <th>Content</th>
+                <td>{{ social_media.content }}</td>
+            </tr>
+            <tr>
+                <th>Likes</th>
+                <td>{{ social_media.likes }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('admin_social_media_index') }}">back to list</a>
+
+    <a href="{{ path('admin_social_media_edit', {'id': social_media.id}) }}">edit</a>
+
+    {{ include('admin/social_media/_delete_form.html.twig') }}
+{% endblock %}
+>>>>>>> origin/Gestion_Vedio_List

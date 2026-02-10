@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {# templates/user/_form.html.twig #}
 
 {{ form_start(form, {
@@ -108,3 +109,73 @@
 </div>
 
 {{ form_end(form) }}
+=======
+{{ form_start(form, { 'attr': { 'class': 'needs-validation' } }) }}
+
+<div class="row g-4">
+    <!-- Nom -->
+    <div class="col-md-6">
+        <div class="mb-3">
+            {{ form_label(form.name, null, {
+                'label_attr': {'class': 'form-label text-white fw-semibold'}
+            }) }}
+            {{ form_widget(form.name, {
+                'attr': {
+                    'class': 'form-control bg-dark text-white border-primary border-opacity-50',
+                    'placeholder': 'Entrez le nom complet'
+                }
+            }) }}
+            {{ form_errors(form.name, { 'attr': {'class': 'text-danger small mt-1'} }) }}
+        </div>
+    </div>
+
+    <!-- Email -->
+    <div class="col-md-6">
+        <div class="mb-3">
+            {{ form_label(form.email, null, {
+                'label_attr': {'class': 'form-label text-white fw-semibold'}
+            }) }}
+            {{ form_widget(form.email, {
+                'attr': {
+                    'class': 'form-control bg-dark text-white border-primary border-opacity-50',
+                    'placeholder': 'exemple@domaine.com'
+                }
+            }) }}
+            {{ form_errors(form.email, { 'attr': {'class': 'text-danger small mt-1'} }) }}
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Mot de passe -->
+    <div class="col-md-6">
+        <div class="mb-3">
+            {{ form_label(form.password, null, {
+                'label_attr': {'class': 'form-label text-white fw-semibold'}
+            }) }}
+            {{ form_widget(form.password, {
+                'attr': {
+                    'class': 'form-control bg-dark text-white border-primary border-opacity-50',
+                    'placeholder': '••••••••••••'
+                }
+            }) }}
+            {{ form_errors(form.password, { 'attr': {'class': 'text-danger small mt-1'} }) }}
+        </div>
+    </div>
+
+    {# Si tu veux ajouter les rôles plus tard, tu peux mettre ici #}
+    {# <div class="col-md-6"> ... form_row(form.roles) avec label text-white ... </div> #}
+</div>
+
+<div class="mt-4 pt-2 border-top border-secondary border-opacity-25 d-flex align-items-center justify-content-center">
+    <button type="submit" class="btn btn-primary px-5 py-2">
+        <i class="bi bi-save-fill me-2"></i> Enregistrer
+    </button>
+
+    <a href="{{ path('admin_user_index') }}" class="btn btn-outline-secondary ms-3">
+        <i class="bi bi-arrow-left-circle me-2"></i> Retour à la liste
+    </a>
+</div>
+
+{{ form_end(form) }}
+>>>>>>> origin/Gestion_Vedio_List

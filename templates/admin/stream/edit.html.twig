@@ -1,5 +1,6 @@
 {% extends 'base.html.twig' %}
 
+<<<<<<< HEAD
 {% block title %}Modifier le Stream{% endblock %}
 
 {% block body %}
@@ -7,6 +8,16 @@
 
     {{ include('admin/stream/_form.html.twig', {'button_label': 'Update'}) }}
 
+=======
+{% block title %}Edit Stream{% endblock %}
+
+{% block body %}
+    <h1>Edit Stream</h1>
+
+    {{ include('admin/stream/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('admin_stream_index') }}">back to list</a>
+>>>>>>> origin/Gestion_Vedio_List
 
     {{ include('admin/stream/_delete_form.html.twig') }}
 {% endblock %}

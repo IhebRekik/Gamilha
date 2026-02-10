@@ -18,8 +18,13 @@
 /public/assets/
 /assets/vendor/
 ###< symfony/asset-mapper ###
+<<<<<<< HEAD
 
 
 /.env
 /.env.local
 /.env.dev.local
+=======
+.env
+.env.*
+>>>>>>> origin/Gestion_Vedio_List
