@@ -1,0 +1,171 @@
+.social-wrapper {
+    background: radial-gradient(circle at top, #0b1220, #020617);
+    min-height: 100vh;
+    padding: 30px;
+}
+
+.social-tabs {
+    display: flex;
+    gap: 12px;
+}
+
+.tab {
+    background: #020617;
+    border: 1px solid #1e293b;
+    padding: 6px 14px;
+    border-radius: 20px;
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+.tab.active {
+    background: #fff;
+    color: #020617;
+    font-weight: 600;
+}
+
+.avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: #334155;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.avatar-small {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+}
+
+.avatar-purple {
+    background: #7c3aed;
+}
+
+.bg-purple {
+    background: #7c3aed;
+}
+
+.dots {
+    cursor: pointer;
+    color: #94a3b8;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.dropdown-item i {
+    width: 18px;
+}
+
+.bi {
+    vertical-align: middle;
+}
+
+.avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.avatar-purple {
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+}
+
+.avatar-green {
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+}
+
+.edit-post-form {
+    display: none;
+}
+
+.edit-post-form:target {
+    display: block;
+}
+
+.edit-post-form:target~.post-text {
+    display: none;
+}
+
+.form-control-sm.border-0 {
+    border: none !important;
+}
+
+.form-control-sm:focus {
+    box-shadow: none !important;
+}
+
+.btn-purple {
+    background-color: #7c4dff;
+    color: white;
+}
+
+.avatar {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+}
+
+.avatar-purple {
+    background-color: #7c4dff;
+    color: white;
+}
+
+.post-content {
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+}
+
+.post-content a {
+    color: #38bdf8;
+    /* bleu clair */
+    text-decoration: none;
+    word-break: break-all;
+}
+
+.post-content a:hover {
+    text-decoration: underline;
+}
+
+.btn-purple {
+    background-color: #7c4dff;
+    color: white;
+    border-radius: 12px;
+    padding: 6px 14px;
+    font-weight: 500;
+}
+
+.btn-purple:hover {
+    background-color: #6a3df0;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.avatar-purple {
+    background-color: #7c4dff;
+    color: white;
+}

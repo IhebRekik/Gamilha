@@ -17,8 +17,19 @@ final class EventController extends AbstractController
     #[Route(name: 'admin_event_index', methods: ['GET'])]
     public function index(EventRepository $eventRepository): Response
     {
+        $games = $eventRepository->createQueryBuilder('e')
+            ->select('DISTINCT e.game')
+            ->orderBy('e.game', 'ASC')
+            ->getQuery()
+            ->getResult();
+        $games = array_column($games, 'game');
+        $events = $eventRepository->findAll();
+
+
+        // ou plus simple si tu as déjà tous les events :
         return $this->render('admin/event/index.html.twig', [
-            'events' => $eventRepository->findAll(),
+            'events' => $events,
+            'games' => $games
         ]);
     }
 
@@ -71,7 +82,7 @@ final class EventController extends AbstractController
     #[Route('/{id}', name: 'admin_event_delete', methods: ['POST'])]
     public function delete(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$event->getId(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $event->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($event);
             $entityManager->flush();
         }

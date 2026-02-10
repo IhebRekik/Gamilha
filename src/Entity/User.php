@@ -6,7 +6,6 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use App\Entity\Team as Team;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -99,10 +98,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function eraseCredentials(): void
-    {
-        // If you store any temporary, sensitive data on the user, clear it here
-    }
+    public function eraseCredentials(): void {}
 
     public function getName(): ?string
     {
@@ -114,8 +110,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->name = $name;
         return $this;
     }
-    #[ORM\ManyToMany(targetEntity: Team::class, mappedBy: 'members')]
-    private Collection $teams;
+  
 
 
 
@@ -145,9 +140,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->messagesRecipient = new ArrayCollection();
     }
 
-    /**
-     * @return Collection<int, Team>
-     */
+    /* ===================== TEAMS ===================== */
+
     public function getTeams(): Collection
     {
         return $this->teams;
@@ -170,34 +164,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /* ===================== ABONNEMENTS ===================== */
 
-    /**
-     * @return Collection<int, UserAbonnement>
-     */
     public function getUserAbonnements(): Collection
     {
         return $this->userAbonnements;
     }
 
-    public function addUserAbonnement(UserAbonnement $userAbonnement): static
-    {
-        if (!$this->userAbonnements->contains($userAbonnement)) {
-            $this->userAbonnements->add($userAbonnement);
-            $userAbonnement->setUser($this);
-        }
+    /* ===================== FRIENDS ===================== */
 
-        return $this;
+    public function getFriends(): Collection
+    {
+        return $this->friends;
     }
 
-    public function removeUserAbonnement(UserAbonnement $userAbonnement): static
+    public function addFriend(Friend $friend): static
     {
-        if ($this->userAbonnements->removeElement($userAbonnement)) {
-            // set the owning side to null (unless already changed)
-            if ($userAbonnement->getUser() === $this) {
-                $userAbonnement->setUser(null);
-            }
+        if (!$this->friends->contains($friend)) {
+            $this->friends->add($friend);
+            $friend->setUser($this);
         }
-
         return $this;
     }
 
