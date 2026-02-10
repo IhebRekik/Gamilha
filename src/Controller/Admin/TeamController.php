@@ -39,7 +39,10 @@ final class TeamController extends AbstractController
         return $this->render('admin/team/new.html.twig', [
             'team' => $team,
             'form' => $form,
+<<<<<<< HEAD
             'edit' => false,
+=======
+>>>>>>> origin/Gestion_Vedio_List
         ]);
     }
 
@@ -66,7 +69,10 @@ final class TeamController extends AbstractController
         return $this->render('admin/team/edit.html.twig', [
             'team' => $team,
             'form' => $form,
+<<<<<<< HEAD
             'edit' => true,
+=======
+>>>>>>> origin/Gestion_Vedio_List
         ]);
     }
 

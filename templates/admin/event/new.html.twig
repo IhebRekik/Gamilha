@@ -1,5 +1,6 @@
 {% extends 'base.html.twig' %}
 
+<<<<<<< HEAD
 {% block body %}
  
     <div class="container py-4">
@@ -11,3 +12,14 @@
 </div>
     
 {% endblock %}
+=======
+{% block title %}New Event{% endblock %}
+
+{% block body %}
+    <h1>Create new Event</h1>
+
+    {{ include('admin/event/_form.html.twig') }}
+
+    <a href="{{ path('admin_event_index') }}">back to list</a>
+{% endblock %}
+>>>>>>> origin/Gestion_Vedio_List

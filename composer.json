@@ -7,19 +7,32 @@
         "php": ">=8.2",
         "ext-ctype": "*",
         "ext-iconv": "*",
+<<<<<<< HEAD
         "doctrine/doctrine-bundle": "^2.18",
         "doctrine/doctrine-migrations-bundle": "^3.7",
         "doctrine/orm": "^3.6",
         "knplabs/knp-paginator-bundle": "^6.10",
         "phpdocumentor/reflection-docblock": "^5.6",
         "phpstan/phpdoc-parser": "^2.3",
+=======
+        "doctrine/doctrine-bundle": "^2.18.2",
+        "doctrine/doctrine-migrations-bundle": "^3.7",
+        "doctrine/orm": "^3.6.2",
+        "knplabs/knp-paginator-bundle": "^6.10",
+        "phpdocumentor/reflection-docblock": "^5.6.6",
+        "phpstan/phpdoc-parser": "^2.3.2",
+>>>>>>> origin/Gestion_Vedio_List
         "symfony/asset": "7.4.*",
         "symfony/asset-mapper": "7.4.*",
         "symfony/console": "7.4.*",
         "symfony/doctrine-messenger": "7.4.*",
         "symfony/dotenv": "7.4.*",
         "symfony/expression-language": "7.4.*",
+<<<<<<< HEAD
         "symfony/flex": "^2",
+=======
+        "symfony/flex": "^2.10",
+>>>>>>> origin/Gestion_Vedio_List
         "symfony/form": "7.4.*",
         "symfony/framework-bundle": "7.4.*",
         "symfony/http-client": "7.4.*",
@@ -27,7 +40,11 @@
         "symfony/mailer": "7.4.*",
         "symfony/mercure-bundle": "^0.4.2",
         "symfony/mime": "7.4.*",
+<<<<<<< HEAD
         "symfony/monolog-bundle": "^3.0|^4.0",
+=======
+        "symfony/monolog-bundle": "^3.0|^4.0.1",
+>>>>>>> origin/Gestion_Vedio_List
         "symfony/notifier": "7.4.*",
         "symfony/process": "7.4.*",
         "symfony/property-access": "7.4.*",
@@ -46,8 +63,13 @@
         "symfony/validator": "7.4.*",
         "symfony/web-link": "7.4.*",
         "symfony/yaml": "7.4.*",
+<<<<<<< HEAD
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/twig": "^2.12|^3.0"
+=======
+        "twig/extra-bundle": "^2.12|^3.23",
+        "twig/twig": "^2.12|^3.23"
+>>>>>>> origin/Gestion_Vedio_List
     },
     "config": {
         "allow-plugins": {
@@ -101,11 +123,19 @@
         }
     },
     "require-dev": {
+<<<<<<< HEAD
         "phpunit/phpunit": "^11.5",
         "symfony/browser-kit": "7.4.*",
         "symfony/css-selector": "7.4.*",
         "symfony/debug-bundle": "7.4.*",
         "symfony/maker-bundle": "^1.0",
+=======
+        "phpunit/phpunit": "^11.5.51",
+        "symfony/browser-kit": "7.4.*",
+        "symfony/css-selector": "7.4.*",
+        "symfony/debug-bundle": "7.4.*",
+        "symfony/maker-bundle": "^1.65.1",
+>>>>>>> origin/Gestion_Vedio_List
         "symfony/stopwatch": "7.4.*",
         "symfony/web-profiler-bundle": "7.4.*"
     }
