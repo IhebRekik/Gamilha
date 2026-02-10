@@ -16,20 +16,7 @@ use Symfony\UX\Chartjs\Model\Chart;
 class DashboardController extends AbstractController
 {
 
-    public function setCookie(): Response
-    {
-        $response = new Response('User ID saved in cookie');
-
-        $userId = 4; // example user id
-
-        $cookie = Cookie::create('user_id')
-            ->withValue($userId)
-            ->withExpires(strtotime('+1 day'));
-
-        $response->headers->setCookie($cookie);
-
-        return $response;
-    }
+   
 
 
    
@@ -51,13 +38,7 @@ public function index(Request $request, ChartBuilderInterface $chartBuilder): Re
         'subChart'     => $subChart,
     ]);
 
-    // Create cookie
-    $cookie = Cookie::create('user_id')
-        ->withValue($userId)
-        ->withExpires(strtotime('+1 day'))
-        ->withHttpOnly(true);
-
-    $response->headers->setCookie($cookie);
+    
 
     return $response;
 }
