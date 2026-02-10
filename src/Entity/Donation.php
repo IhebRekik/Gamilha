@@ -41,6 +41,12 @@ private ?Stream $stream = null;
     public function setAmount(float $amount): self { $this->amount = $amount; return $this; }
     public function getDonorName(): string { return $this->donorName; }
     public function setDonorName(string $donorName): self { $this->donorName = $donorName; return $this; }
+    public function setCreatedAt(\DateTimeInterface $createdAt): self
+{
+    $this->createdAt = $createdAt;
+    return $this;
+}
+
     public function getCreatedAt(): \DateTime { return $this->createdAt; }
     public function getStream(): Stream { return $this->stream; }
     public function setStream(Stream $stream): self { $this->stream = $stream; return $this; }

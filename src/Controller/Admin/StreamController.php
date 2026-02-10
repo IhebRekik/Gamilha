@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\Stream;
 use App\Form\StreamType;
 use App\Repository\StreamRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -23,13 +24,23 @@ final class StreamController extends AbstractController
     }
 
     #[Route('/new', name: 'admin_stream_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, UserRepository $userRepository, EntityManagerInterface $entityManager): Response
     {
         $stream = new Stream();
         $form = $this->createForm(StreamType::class, $stream);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+             $cookieUserId = $request->cookies->get('user_id');
+
+            // Récupérer tous les utilisateurs sauf celui dans le cookie
+            $user = $userRepository->createQueryBuilder('u')
+                ->andWhere('u.id != :cookieId')
+                ->setParameter('cookieId', $cookieUserId)
+                ->setMaxResults(1)
+                ->getQuery()
+                ->getOneOrNullResult();
+            $stream->setUser($user);
             $entityManager->persist($stream);
             $entityManager->flush();
 

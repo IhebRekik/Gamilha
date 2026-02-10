@@ -32,4 +32,23 @@ class StreamRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+
+public function searchByTitleOrId(?string $query): array
+{
+    $qb = $this->createQueryBuilder('s');
+
+    if ($query) {
+        $qb
+            ->andWhere('s.title LIKE :q OR s.id = :id')
+            ->setParameter('q', '%' . $query . '%')
+            ->setParameter('id', ctype_digit($query) ? (int)$query : 0);
+    }
+
+    return $qb
+        ->orderBy('s.createdAt', 'DESC')
+        ->getQuery()
+        ->getResult();
+}
+
 }

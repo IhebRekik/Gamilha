@@ -26,7 +26,7 @@
         </tbody>
     </table>
 
-    <a href="{{ path('app_donation_index') }}">back to list</a>
+    <a href="{{ path('app_donation_index', {'id': donation.stream.id}) }}">back to list</a>
 
     <a href="{{ path('app_donation_edit', {'id': donation.id}) }}">edit</a>
 

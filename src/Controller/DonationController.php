@@ -82,7 +82,7 @@ public function new(Request $request, EntityManagerInterface $em, int $streamId,
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
 
-            return $this->redirectToRoute('app_donation_index', [], Response::HTTP_SEE_OTHER);
+            return $this->redirectToRoute('app_donation_index', ["id" => $donation->getStream()->getId()], Response::HTTP_SEE_OTHER);
         }
 
         return $this->render('donation/edit.html.twig', [
@@ -99,7 +99,7 @@ public function new(Request $request, EntityManagerInterface $em, int $streamId,
             $entityManager->flush();
         }
 
-        return $this->redirectToRoute('app_donation_index', [], Response::HTTP_SEE_OTHER);
+        return $this->redirectToRoute('app_donation_index', ["id" => $donation->getStream()->getId()], Response::HTTP_SEE_OTHER);
     }
     #[Route('/stream/{streamId}/donate/{emoji}', name:'donation_emoji')]
 public function donateByEmoji(int $streamId, string $emoji, EntityManagerInterface $em, StreamRepository $streamRepo,UserRepository $userRepository): Response
@@ -136,12 +136,32 @@ public function donateByEmoji(int $streamId, string $emoji, EntityManagerInterfa
     return $this->redirectToRoute('stream_show', ['id' => $streamId]);
 }
 #[Route('/admin/donation', name:'admin_donation_index')]
-public function allDonations(DonationRepository $donationRepo): Response
-{
-    $donations = $donationRepo->findAll();
+// LISTE DES STREAMS (ADMIN)
+#[Route('/admin/donations', name: 'admin_donation_streams')]
+public function adminStreams(Request $request,StreamRepository $streamRepository): Response
 
+    {
+    $search = $request->query->get('q');
+
+    $streams = $streamRepository->searchByTitleOrId($search);
+
+    return $this->render('admin/donation/streams.html.twig', [
+        'streams' => $streams,
+        'search' => $search,
+    ]);
+}
+// DONATIONS D’UN STREAM (ADMIN)
+#[Route('/admin/donations/stream/{id}', name: 'admin_donation_by_stream')]
+public function adminDonationsByStream(
+    Stream $stream,
+    DonationRepository $donationRepository
+): Response {
     return $this->render('admin/donation/index.html.twig', [
-        'donations' => $donations,
+        'stream' => $stream,
+        'donations' => $donationRepository->findBy(
+            ['stream' => $stream],
+            ['createdAt' => 'DESC']
+        ),
     ]);
 }
 
