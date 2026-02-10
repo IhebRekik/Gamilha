@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+{% block title %}Gamilha - Détails du bracket{% endblock %}
+{% block body %}
+<div class="container py-5">
+    <div class="d-flex align-items-center mb-4">
+        <a href="{{ path('admin_bracket_index') }}" class="btn btn-outline-secondary btn-sm me-3"><i class="bi bi-arrow-left"></i></a>
+        <h1 class="text-white h3 mb-0">Détails du bracket</h1>
+    </div>
+    <div class="card bg-dark border border-primary border-opacity-25 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-body py-4">
+            <dl class="row mb-0">
+                <dt class="col-sm-4 text-white">ID Bracket</dt>
+                <dd class="col-sm-8 text-white">{{ bracket.idBracket }}</dd>
+                <dt class="col-sm-4 text-white">Type</dt>
+                <dd class="col-sm-8 text-white">{{ bracket.typeBracket }}</dd>
+                <dt class="col-sm-4 text-white">Nombre de tours</dt>
+                <dd class="col-sm-8 text-white">{{ bracket.nombreTours }}</dd>
+                <dt class="col-sm-4 text-white">Statut</dt>
+                <dd class="col-sm-8 text-white">{{ bracket.statut }}</dd>
+                <dt class="col-sm-4 text-white">Événement</dt>
+                <dd class="col-sm-8 text-white">{{ bracket.evenement ? bracket.evenement.nom : '—' }}</dd>
+            </dl>
+        </div>
+        <div class="card-footer bg-dark border-top border-secondary border-opacity-10 d-flex justify-content-between">
+            <a href="{{ path('admin_bracket_index') }}" class="btn btn-secondary"><i class="bi bi-arrow-left-circle-fill me-2"></i>Retour</a>
+            <div class="d-flex">
+                <a href="{{ path('admin_bracket_edit', {'idBracket': bracket.idBracket}) }}" class="btn btn-warning me-2"><i class="bi bi-pencil-fill me-1"></i>Modifier</a>
+                {{ include('admin/bracket/_delete_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
