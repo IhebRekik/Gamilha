@@ -16,6 +16,7 @@
 		<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 		
 
+
 		<link rel="icon" type="image/x-icon" href="{{ asset('images/gamilha.png') }}">
 		<link rel="stylesheet" href="{{ asset('styles/app.css') }}">
 	</head>
@@ -91,30 +92,70 @@
 						</li>
 						
 
-						<!-- Dropdown utilisateur (optionnel) -->
+						<!-- Dropdown utilisateur -->
 						<li class="nav-item dropdown ms-3">
-							<a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							<a class="nav-link dropdown-toggle d-flex align-items-center"
+							href="#"
+							id="userDropdown"
+							role="button"
+							data-bs-toggle="dropdown"
+							aria-expanded="false">
+
 								<i class="bi bi-person-circle fs-4 me-2"></i>
-								<span>Iheb</span>
+
+								{% if app.user %}
+									<span>{{ app.user.name }}</span>
+								{% else %}
+									<span>Compte</span>
+								{% endif %}
 							</a>
 
-							<ul class="dropdown-menu dropdown-menu-end bg-dark border-primary shadow" aria-labelledby="userDropdown">
-								<li>
-									<a class="dropdown-item text-white" href="#">
-										<i class="bi bi-person me-2"></i>
-										Mon profil
-									</a>
-								</li>
-								<li><hr class="dropdown-divider bg-secondary"></li>
-								<li>
-									<a class="dropdown-item text-white" href="#">
-										<i class="bi bi-box-arrow-right me-2"></i>
-										Déconnexion
-									</a>
-								</li>
-							</ul>
+							<ul class="dropdown-menu dropdown-menu-end bg-dark border-primary shadow"
+								aria-labelledby="userDropdown">
 
+								{% if app.user %}
+									<!-- PROFIL -->
+									<li>
+										<a class="dropdown-item text-white" href="{{ path('app_profile') }}">
+											<i class="bi bi-person me-2"></i>
+											Mon profil
+										</a>
+									</li>
+
+									<li><hr class="dropdown-divider bg-secondary"></li>
+
+									<!-- LOGOUT -->
+									<li>
+										<a class="dropdown-item text-white" href="{{ path('app_logout') }}">
+											<i class="bi bi-box-arrow-right me-2"></i>
+											Déconnexion
+										</a>
+									</li>
+								{% else %}
+									<!-- LOGIN -->
+									<li>
+										<a class="dropdown-item text-white" href="{{ path('app_login') }}">
+											<i class="bi bi-box-arrow-in-right me-2"></i>
+											Connexion
+										</a>
+									</li>
+
+									<!-- REGISTER -->
+									<li>
+										<a class="dropdown-item text-white" href="{{ path('app_register') }}">
+											<i class="bi bi-person-plus me-2"></i>
+											Inscription
+										</a>
+									</li>
+								{% endif %}
+
+							</ul>
 						</li>
+						
+
+
+
+
 
 					</ul>
 				</div>
