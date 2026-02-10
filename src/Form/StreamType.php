@@ -3,6 +3,8 @@
 namespace App\Form;
 
 use App\Entity\Stream;
+use App\Entity\User;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -30,13 +32,13 @@ class StreamType extends AbstractType
                 'placeholder' => 'Choisir un jeu'
             ])
             ->add('viewers', IntegerType::class, [
-        'label' => 'Viewers',
-        'required' => false,
-    ])
-    ->add('url', TextType::class, [
-        'label' => 'URL du stream',
-        'required' => true,
-    ])
+                'label' => 'Viewers',
+                'required' => false,
+            ])
+            ->add('url', TextType::class, [
+                'label' => 'URL du stream',
+                'required' => false,
+            ])
             ->add('thumbnail', TextType::class, [
                 'required' => false,
                 'label' => 'Image (URL)',
@@ -44,6 +46,7 @@ class StreamType extends AbstractType
                     'placeholder' => 'https://example.com/image.jpg'
                 ]
             ]);
+           
     }
 
     public function configureOptions(OptionsResolver $resolver): void

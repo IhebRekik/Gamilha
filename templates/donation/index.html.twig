@@ -23,10 +23,11 @@
                 <td>{{ donation.donorName }}</td>
                 <td>{{ donation.createdAt ? donation.createdAt|date('Y-m-d H:i:s') : '' }}</td>
                 <td>
-                    <a href="{{ path('app_donation_show', {'id': donation.id}) }}">show</a>
-                    <a href="{{ path('app_donation_edit', {'id': donation.id}) }}">edit</a>
+                    <a href="{{ path('app_donation_show', {'id': donation.stream.id}) }}">show</a>
+                    <a href="{{ path('app_donation_edit', {'id': donation.stream.id}) }}">edit</a>
                 </td>
             </tr>
+            
         {% else %}
             <tr>
                 <td colspan="5">no records found</td>

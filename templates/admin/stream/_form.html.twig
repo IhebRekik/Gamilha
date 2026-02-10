@@ -60,6 +60,23 @@
 
         </div>
     </div>
+     <div class="col-12">
+                <div class="mb-3">
+                    {{ form_label(form.url, 'Lien du Stream', {
+                        'label_attr': {'class': 'form-label text-white fw-semibold'}
+                    }) }}
+                    {{ form_widget(form.url, {
+                        'attr': {
+                            'class': 'form-control bg-dark text-white border-secondary border-opacity-50',
+                            'placeholder': 'https://...'
+                        }
+                    }) }}
+                    {{ form_errors(form.url, {'attr': {'class': 'text-danger small mt-1'}}) }}
+                </div>
+            </div>
+
+        </div>
+    </div>
 
     {# Footer avec actions #}
     <div class="card-footer bg-black bg-opacity-25 border-top border-secondary border-opacity-10 p-3">

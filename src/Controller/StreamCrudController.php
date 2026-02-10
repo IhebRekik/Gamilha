@@ -10,7 +10,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-
+use App\Repository\UserRepository;
+use App\Entity\User;
 #[Route('/stream/crud')]
 final class StreamCrudController extends AbstractController
 {
@@ -23,13 +24,25 @@ final class StreamCrudController extends AbstractController
     }
 
     #[Route('/new', name: 'app_stream_crud_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository): Response
     {
         $stream = new Stream();
         $form = $this->createForm(Stream1Type::class, $stream);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+               $user = $userRepository->find(7);
+
+    if (!$user) {
+        $user = new User();
+        $user->setEmail('admin@test.com');
+        $user->setPassword('test'); // temporaire
+        $entityManager->persist($user);
+        $entityManager->flush();
+    }
+
+    $stream->setUser($user);
+
             $entityManager->persist($stream);
             $entityManager->flush();
 
@@ -51,12 +64,14 @@ final class StreamCrudController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'app_stream_crud_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Stream $stream, EntityManagerInterface $entityManager): Response
+    public function edit(Request $request, Stream $stream, EntityManagerInterface $entityManager,UserRepository $userRepository): Response
     {
         $form = $this->createForm(Stream1Type::class, $stream);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $user = $userRepository->find(7); // ID EXISTANT
+        $stream->setUser($user);
             $entityManager->flush();
 
             return $this->redirectToRoute('app_stream_crud_index', [], Response::HTTP_SEE_OTHER);

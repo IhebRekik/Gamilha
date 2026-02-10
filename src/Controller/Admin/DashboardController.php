@@ -20,7 +20,7 @@ class DashboardController extends AbstractController
     {
         $response = new Response('User ID saved in cookie');
 
-        $userId = 4; // example user id
+        $userId = 7; // example user id
 
         $cookie = Cookie::create('user_id')
             ->withValue($userId)
@@ -36,7 +36,7 @@ class DashboardController extends AbstractController
 #[Route('/dashboard', name: 'admin_dashboard')]
 public function index(Request $request, ChartBuilderInterface $chartBuilder): Response
 {
-    $userId = 4; // example value (replace with real user id)
+    $userId = 7; // example value (replace with real user id)
 
     // Charts
     $userChart = $chartBuilder->createChart(Chart::TYPE_LINE);
