@@ -4,6 +4,14 @@ namespace App\Entity;
 
 use App\Repository\StreamRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use App\Entity\Donation;
+use App\Entity\User;
+
+
+
+
 
 #[ORM\Entity(repositoryClass: StreamRepository::class)]
 class Stream
@@ -15,50 +23,112 @@ class Stream
 
     #[ORM\Column(length: 255)]
     private ?string $title = null;
+    #[ORM\OneToMany(mappedBy:"stream", targetEntity:Donation::class, cascade:["persist","remove"])]
+private Collection $donations;
+
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $description = null;
+
+    #[ORM\Column(length: 50)]
+    private ?string $game = null;
+
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $thumbnail = null;
 
     #[ORM\Column]
-    private ?int $viewers = 0;
+    private int $viewers = 0;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $url = null;
+    #[ORM\Column(length: 20)]
+    private string $status = 'live';
+    #[ORM\ManyToOne(inversedBy: 'streams')]
+    #[ORM\JoinColumn(nullable: false)] // chaque stream doit avoir un user
+    private ?User $user = null;
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+private ?string $url = null;
 
-    // Getters and setters...
 
-    public function getId(): ?int
+public function getUrl(): ?string
+{
+    return $this->url;
+}#[ORM\Column(type: 'datetime')]
+private ?\DateTime $createdAt = null;
+
+
+
+public function getCreatedAt(): ?\DateTime
+{
+    return $this->createdAt;
+}
+
+public function setCreatedAt(\DateTime $createdAt): self
+{
+    $this->createdAt = $createdAt;
+    return $this;
+}
+
+
+public function setUrl(?string $url): self
+{
+    $this->url = $url;
+    return $this;
+}    public function getId(): ?int { return $this->id; }
+
+    public function getTitle(): ?string { return $this->title; }
+    public function setTitle(string $title): self { $this->title = $title; return $this; }
+
+    public function getDescription(): ?string { return $this->description; }
+    public function setDescription(?string $description): self { $this->description = $description; return $this; }
+
+    public function getGame(): ?string { return $this->game; }
+    public function setGame(string $game): self { $this->game = $game; return $this; }
+
+    public function getThumbnail(): ?string { return $this->thumbnail; }
+    public function setThumbnail(?string $thumbnail): self { $this->thumbnail = $thumbnail; return $this; }
+
+    public function getViewers(): int { return $this->viewers; }
+    public function setViewers(int $viewers): self { $this->viewers = $viewers; return $this; }
+
+    public function getStatus(): string { return $this->status; }
+    public function setStatus(string $status): self { $this->status = $status; return $this; }
+    public function __construct() {
+    $this->donations = new ArrayCollection();
+    
+    $this->viewers = 0;
+    $this->status = 'live';
+    $this->createdAt = new \DateTime();
+}public function getDonations(): Collection
+{
+    return $this->donations;
+}
+
+public function addDonation(Donation $donation): self
+{
+    if (!$this->donations->contains($donation)) {
+        $this->donations->add($donation);
+        $donation->setStream($this);
+    }
+    return $this;
+}
+
+public function removeDonation(Donation $donation): self
+{
+    if ($this->donations->removeElement($donation)) {
+        if ($donation->getStream() === $this) {
+            $donation->setStream(null);
+        }
+    }
+    return $this;
+}
+public function getUser(): ?User
     {
-        return $this->id;
+        return $this->user;
     }
 
-    public function getTitle(): ?string
+    public function setUser(?User $user): self
     {
-        return $this->title;
-    }
-
-    public function setTitle(string $title): static
-    {
-        $this->title = $title;
-        return $this;
-    }
-
-    public function getViewers(): ?int
-    {
-        return $this->viewers;
-    }
-
-    public function setViewers(int $viewers): static
-    {
-        $this->viewers = $viewers;
-        return $this;
-    }
-
-    public function getUrl(): ?string
-    {
-        return $this->url;
-    }
-
-    public function setUrl(?string $url): static
-    {
-        $this->url = $url;
+        $this->user = $user;
         return $this;
     }
 }
+
+

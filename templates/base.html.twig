@@ -15,10 +15,6 @@
 		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 		
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/social
 
 		<link rel="icon" type="image/x-icon" href="{{ asset('images/gamilha.png') }}">
 		<link rel="stylesheet" href="{{ asset('styles/app.css') }}">
@@ -82,11 +78,20 @@
 								<i class="bi bi-share me-1"></i>
 								Social</a>
 						</li>
+						
 						<li class="nav-item">
 							<a class="nav-link" href="{{ path('admin_stream_index') }}">
 								<i class="bi bi-broadcast me-1"></i>
 								Streams</a>
 						</li>
+						<li class="nav-item">
+    <a class="nav-link" href="{{ path('admin_donation_index') }}">
+        <i class="bi bi-cash-coin me-1"></i>
+        Donations
+    </a>
+</li>
+
+						  
 						<li class="nav-item">
 							<a class="nav-link" href="{{ path('app_abonnement_index') }}">
 								<i class="bi bi-broadcast me-1"></i>
@@ -99,20 +104,10 @@
 						</li>
 						</li>
 							<li class="nav-item">
-<<<<<<< HEAD
 							<a class="nav-link text-success" href="{{ path('app_homepage') }}">
 								<i class="bi bi-globe me-1"></i>
-								Voir le site (front)
-							</a>
-						</li>
-												<li class="nav-item">
-    <a class="nav-link" href="{{ path('playlist_index') }}">
-        <i class="bi bi-music-note-list me-1"></i>
-        Playlists
-    </a>
-</li>
-=======
-							<a class="nav-link" href="{{ path('app_chat_message_index') }}">
+							<li class="nav-item">
+<a class="nav-link" href="{{ path('app_chat_message_index') }}">
 								<i class="bi bi-chat-dots me-1"></i>
 								Chat Admin</a>
 						</li>
@@ -120,10 +115,15 @@
 							<a class="nav-link" href="{{ path('chat_user_list') }}">
 								<i class="bi bi-chat-dots me-1"></i>
 								List des Amis</a>
+						</li>	Voir le site (front)
+							</a>
 						</li>
-						
->>>>>>> origin/social
-
+												<li class="nav-item">
+    <a class="nav-link" href="{{ path('playlist_index') }}">
+        <i class="bi bi-music-note-list me-1"></i>
+        Playlists
+    </a>
+</li>					
 <li class="nav-item">
     <a class="nav-link" href="{{ path('video_index') }}">
         <i class="bi bi-camera-video me-1"></i>

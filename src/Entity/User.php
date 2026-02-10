@@ -14,7 +14,8 @@ use App\Entity\Post;
 use App\Entity\Commentaire;
 use App\Entity\UserAbonnement;
 use Symfony\Component\Validator\Constraints as Assert;
-
+use App\Entity\Stream;
+use App\Entity\Donation;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -55,7 +56,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         maxMessage: "Le nom ne doit pas dépasser {{ limit }} caractères."
     )]
     private ?string $name = null;
-
+#[ORM\OneToMany(mappedBy: 'user', targetEntity: Stream::class)]
+private Collection $streams;
+#[ORM\OneToMany(mappedBy: 'user', targetEntity: Donation::class)]
+private Collection $donations;
     /**
      * @var Collection<int, Team>
      */
@@ -67,6 +71,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\OneToMany(targetEntity: Friend::class, mappedBy: 'user')]
     private Collection $friends;
+
+public function getStreams(): Collection
+{
+    return $this->streams;
+}
+
 
     // Getters and setters...
 
@@ -153,6 +163,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->userAbonnements = new ArrayCollection();
         $this->messagesSent = new ArrayCollection();
         $this->messagesRecipient = new ArrayCollection();
+        $this->donations = new ArrayCollection();
+        $this->streams = new ArrayCollection();
+
+     
     }
 
     /* ===================== TEAMS ===================== */
@@ -261,4 +275,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+    public function getDonations(): Collection
+{
+    return $this->donations;
+}
+
 }
