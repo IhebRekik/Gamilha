@@ -55,11 +55,31 @@
 </style>
 
 <div class="register-container">
-    <h2>Register</h2>
-    <form method="post">
-        <input type="text" name="name" placeholder="Name" required>
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Password" required>
+    <h2>Créer un compte</h2>
+
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">{{ message }}</div>
+    {% endfor %}
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">{{ message }}</div>
+    {% endfor %}
+
+    <form method="post" novalidate>
+
+        <input type="text"
+               name="name"
+               placeholder="Nom complet"
+              >
+
+        <input type="email"
+               name="email"
+            >
+
+        <input type="password"
+               name="password"
+            >
+
         <button type="submit">Register</button>
     </form>
 </div>
