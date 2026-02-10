@@ -6,14 +6,6 @@
 
 # To list all registered routes, run the following command:
 #   bin/console debug:router
-<<<<<<< HEAD
 controllers:
     resource: ../src/Controller/
     type: attribute
-=======
-
-controllers:
-    resource: ../src/Controller/
-    type: attribute
-
->>>>>>> origin/Gestion_Vedio_List

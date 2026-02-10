@@ -1,6 +1,5 @@
 {% extends 'base.html.twig' %}
 
-<<<<<<< HEAD
 {% block title %}Edit tournament{% endblock %}
 
 {% block body %}
@@ -8,16 +7,5 @@
 
     {{ include('admin/event/_form.html.twig', {'button_label': 'Update'}) }}
 
-=======
-{% block title %}Edit Event{% endblock %}
-
-{% block body %}
-    <h1>Edit Event</h1>
-
-    {{ include('admin/event/_form.html.twig', {'button_label': 'Update'}) }}
-
-    <a href="{{ path('admin_event_index') }}">back to list</a>
-
->>>>>>> origin/Gestion_Vedio_List
     {{ include('admin/event/_delete_form.html.twig') }}
 {% endblock %}
