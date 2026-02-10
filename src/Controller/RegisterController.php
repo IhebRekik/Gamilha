@@ -4,10 +4,12 @@ namespace App\Controller;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class RegisterController extends AbstractController
@@ -51,14 +53,22 @@ public function register(
         $user->setPassword(
             $passwordHasher->hashPassword($user, $plainPassword)
         );
-
+        
         $user->setRoles(['ROLE_USER']);
-
+    
         $em->persist($user);
         $em->flush();
+        $response = $this->redirectToRoute('app_login');
+        $emailFromRequest = $user->getEmail(); // ex: "user2%40gmail.com"
+        $email = urldecode($emailFromRequest); 
+        $cookie = Cookie::create('user_email')
+            ->withValue($email)
+            ->withExpires(strtotime('+1 day'));
+
+        $response->headers->setCookie($cookie);
 
         $this->addFlash('success', 'Compte créé avec succès.');
-        return $this->redirectToRoute('app_login');
+        return $response;
     }
 
     return $this->render('security/register.html.twig');

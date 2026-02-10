@@ -13,7 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-class User implements  PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -25,32 +25,31 @@ class User implements  PasswordAuthenticatedUserInterface
     #[Assert\Email(message: "Veuillez saisir une adresse email valide.")]
     private ?string $email = null;
 
+    #[ORM\Column(type: 'json')]
+    private array $roles = [];
 
     #[ORM\Column]
-    private ?string $roles = null;
-
-            #[ORM\Column]
-            #[Assert\NotBlank(message: "Le mot de passe est obligatoire.")]
-            #[Assert\Length(
-                min: 8,
-                minMessage: "Le mot de passe doit contenir au moins {{ limit }} caractères."
-            )]
-            #[Assert\Regex(
-                pattern: "/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/",
-                message: "Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre."
-            )]
-            private ?string $password = null;
+    #[Assert\NotBlank(message: "Le mot de passe est obligatoire.")]
+    #[Assert\Length(
+        min: 8,
+        minMessage: "Le mot de passe doit contenir au moins {{ limit }} caractères."
+    )]
+    #[Assert\Regex(
+        pattern: "/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/",
+        message: "Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre."
+    )]
+    private ?string $password = null;
 
 
-            #[ORM\Column(length: 255)]
-            #[Assert\NotBlank(message: "Le nom est obligatoire.")]
-            #[Assert\Length(
-                min: 3,
-                minMessage: "Le nom doit contenir au moins {{ limit }} caractères.",
-                max: 50,
-                maxMessage: "Le nom ne doit pas dépasser {{ limit }} caractères."
-            )]
-            private ?string $name = null;
+    #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le nom est obligatoire.")]
+    #[Assert\Length(
+        min: 3,
+        minMessage: "Le nom doit contenir au moins {{ limit }} caractères.",
+        max: 50,
+        maxMessage: "Le nom ne doit pas dépasser {{ limit }} caractères."
+    )]
+    private ?string $name = null;
 
 
 
@@ -77,19 +76,18 @@ class User implements  PasswordAuthenticatedUserInterface
     {
         return (string) $this->email;
     }
-
-    public function getRoles(): string
+    public function getRoles(): array
     {
-        return $this->roles;
-        
+        $roles = $this->roles;
+        $roles[] = 'ROLE_USER';
+        return array_unique($roles);
     }
 
-    public function setRoles(string $roles): static
+    public function setRoles(array $roles): static
     {
         $this->roles = $roles;
         return $this;
     }
-
     public function getPassword(): string
     {
         return $this->password;
@@ -119,7 +117,7 @@ class User implements  PasswordAuthenticatedUserInterface
     #[ORM\ManyToMany(targetEntity: Team::class, mappedBy: 'members')]
     private Collection $teams;
 
-   
+
 
     /**
      * @var Collection<int, UserAbonnement>

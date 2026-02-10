@@ -1,4 +1,5 @@
 <?php
+namespace App\Controller;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -9,21 +10,29 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class ListUtilisateursController extends AbstractController
 {
+       private UserRepository $userRepository;
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(UserRepository $userRepository, EntityManagerInterface $entityManager)
+    {
+        $this->userRepository = $userRepository;
+        $this->entityManager = $entityManager;
+    }
 #[Route('/chat/users', name: 'chat_user_list')]
 public function listUsers(
     Request $request,
     UserRepository $userRepository
 ): Response {
-    $cookieUserId = $request->cookies->get('user_id');
+    $cookieUserId = $request->cookies->get('user_email');
 
     // Récupérer tous les utilisateurs sauf celui dans le cookie
     $users = $userRepository->createQueryBuilder('u')
-        ->andWhere('u.id != :cookieId')
+        ->andWhere('u.email != :cookieId')
         ->setParameter('cookieId', $cookieUserId)
         ->getQuery()
         ->getResult();
 
-    return $this->render('chat/user_list.html.twig', [
+    return $this->render('chat_message/user_list.html.twig', [
         'users' => $users,
     ]);
 }
