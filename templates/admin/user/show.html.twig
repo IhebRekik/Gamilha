@@ -1,6 +1,5 @@
 {% extends 'base.html.twig' %}
 
-<<<<<<< HEAD
 {% block title %}Gamelha - Détails Utilisateur{% endblock %}
 
 {% block body %}
@@ -59,34 +58,3 @@
     </div>
 </div>
 {% endblock %}
-=======
-{% block title %}Détails Utilisateur{% endblock %}
-
-{% block body %}
-<div class="container py-4">
-    <h1 class="mb-4 text-white"><i class="bi bi-person-fill me-2"></i>Détails de l'utilisateur</h1>
-    <div class="card bg-dark border-0 shadow-lg">
-        <div class="card-body">
-            <dl class="row">
-                <dt class="col-sm-3 text-white ">ID</dt>
-                <dd class="col-sm-9 text-white">{{ user.id }}</dd>
-                <dt class="col-sm-3 text-white">Nom</dt>
-                <dd class="col-sm-9 text-white">{{ user.name }}</dd>
-                <dt class="col-sm-3 text-white">Email</dt>
-                <dd class="col-sm-9 text-white">{{ user.email }}</dd>
-                <dt class="col-sm-3 text-white">Équipes</dt>
-                {% for team in user.teams %}
-                    <dd class="col-sm-9 text-white">{{ team.name }}</dd>
-                {% endfor %}
-            </dl>
-        </div>
-        <div class="card-footer d-flex justify-content-between">
-            <a href="{{ path('admin_user_index') }}" class="btn btn-secondary"><i class="bi bi-arrow-left-circle-fill me-2"></i>Retour</a>
- <form method="post" action="{{ path('admin_user_delete', {'id': user.id}) }}" onsubmit="return confirm('Confirmer la suppression ?');" class="d-inline">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
-                                        <button class="btn btn-danger btn-sm"><i class="bi bi-trash-fill"></i> Supprimer</button>
-                                    </form>        </div>
-    </div>
-</div>
-{% endblock %}
->>>>>>> origin/Gestion_Vedio_List

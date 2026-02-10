@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 :root {
     --primary: #0d6efd;
     --purple: #8b5cf6;
@@ -197,8 +197,8 @@ body {
     .hero-section {
         min-height: 70vh;
     }
-=======
-body {
+
+    body {
     background-color: skyblue;
 }
 .dropdown-menu .dropdown-item:hover {
@@ -212,5 +212,4 @@ body {
     background-clip: text;
     color: transparent;
     font-size: xx-large;
->>>>>>> origin/Gestion_Vedio_List
-}
+}}
