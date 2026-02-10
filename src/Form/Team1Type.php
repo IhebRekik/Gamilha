@@ -17,16 +17,11 @@ class Team1Type extends AbstractType
             ->add('name')
             ->add('members', EntityType::class, [
                 'class' => User::class,
-<<<<<<< HEAD
                 'choice_label' => 'name',
                 'multiple' => true,
                 'attr' => [
                     'class' => 'select2'
                 ],
-=======
-                'choice_label' => 'id',
-                'multiple' => true,
->>>>>>> origin/Gestion_Vedio_List
             ])
         ;
     }
