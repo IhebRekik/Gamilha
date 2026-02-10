@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gamilha - Matchs{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-white">
+            <i class="bi bi-trophy-fill text-primary me-2"></i>Gestion des matchs (qualification)
+        </h1>
+        <a href="{{ path('admin_match_new') }}" class="btn btn-success shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> Nouveau match
+        </a>
+    </div>
+
+    <div class="card bg-dark border-0 shadow-lg">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0">
+                    <thead class="text-secondary text-uppercase small border-bottom border-primary border-opacity-25">
+                        <tr>
+                            <th class="ps-4">ID</th>
+                            <th>Bracket / Événement</th>
+                            <th>Tour</th>
+                            <th>Équipe A</th>
+                            <th>Équipe B</th>
+                            <th>Score</th>
+                            <th>Statut</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for match in matchs %}
+                        <tr class="border-bottom border-secondary border-opacity-10">
+                            <td class="ps-4 text-secondary">#{{ match.idMatch }}</td>
+                            <td class="text-white">{{ match.bracket.evenement ? match.bracket.evenement.nom : match.bracket.typeBracket }}</td>
+                            <td><span class="badge bg-info px-2">{{ match.tour }}</span></td>
+                            <td><span class="badge bg-primary px-2">{{ match.equipeA.nomEquipe }}</span></td>
+                            <td><span class="badge bg-warning text-dark px-2">{{ match.equipeB.nomEquipe }}</span></td>
+                            <td>{{ match.scoreEquipeA }} - {{ match.scoreEquipeB }}</td>
+                            <td><span class="badge bg-secondary px-2">{{ match.statut }}</span></td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group shadow-sm">
+                                    <a href="{{ path('admin_match_show', {'idMatch': match.idMatch}) }}" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
+                                    <a href="{{ path('admin_match_edit', {'idMatch': match.idMatch}) }}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                                    <form method="post" action="{{ path('admin_match_delete', {'idMatch': match.idMatch}) }}" onsubmit="return confirm('Confirmer la suppression ?');" class="d-inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ match.idMatch) }}">
+                                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center py-5 text-secondary">
+                                <i class="bi bi-trophy fs-1 d-block mb-2"></i>
+                                Aucun match trouvé.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

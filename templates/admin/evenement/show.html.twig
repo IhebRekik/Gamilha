@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+{% block title %}Gamilha - Détails Événement{% endblock %}
+{% block body %}
+<div class="container py-5">
+    <div class="d-flex align-items-center mb-4">
+        <a href="{{ path('admin_evenement_index') }}" class="btn btn-outline-secondary btn-sm me-3"><i class="bi bi-arrow-left"></i></a>
+        <h1 class="text-white h3 mb-0">Détails de l'événement</h1>
+    </div>
+    <div class="card bg-dark border border-primary border-opacity-25 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-header bg-dark border-bottom border-secondary border-opacity-10 py-3">
+            <h6 class="text-white mb-0">{{ evenement.nom }}</h6>
+            <small class="text-secondary">{{ evenement.jeu }} — {{ evenement.typeEvenement }}</small>
+        </div>
+        <div class="card-body py-4">
+            <dl class="row mb-0">
+                <dt class="col-sm-4 text-white">ID</dt>
+                <dd class="col-sm-8 text-white">{{ evenement.idEvenement }}</dd>
+                <dt class="col-sm-4 text-white">Nom</dt>
+                <dd class="col-sm-8 text-white">{{ evenement.nom }}</dd>
+                <dt class="col-sm-4 text-white">Description</dt>
+                <dd class="col-sm-8 text-white">{{ evenement.description ?? '—' }}</dd>
+                <dt class="col-sm-4 text-white">Jeu</dt>
+                <dd class="col-sm-8 text-white">{{ evenement.jeu }}</dd>
+                <dt class="col-sm-4 text-white">Type</dt>
+                <dd class="col-sm-8 text-white">{{ evenement.typeEvenement }}</dd>
+                <dt class="col-sm-4 text-white">Date début</dt>
+                <dd class="col-sm-8 text-white">{{ evenement.dateDebut ? evenement.dateDebut|date('d/m/Y') : '—' }}</dd>
+                <dt class="col-sm-4 text-white">Date fin</dt>
+                <dd class="col-sm-8 text-white">{{ evenement.dateFin ? evenement.dateFin|date('d/m/Y') : '—' }}</dd>
+                <dt class="col-sm-4 text-white">Statut</dt>
+                <dd class="col-sm-8 text-white">{{ evenement.statut }}</dd>
+                <dt class="col-sm-4 text-white">Règles</dt>
+                <dd class="col-sm-8 text-white">{{ evenement.regles ?? '—' }}</dd>
+            </dl>
+        </div>
+        <div class="card-footer bg-dark border-top border-secondary border-opacity-10 d-flex justify-content-between">
+            <a href="{{ path('admin_evenement_index') }}" class="btn btn-secondary"><i class="bi bi-arrow-left-circle-fill me-2"></i>Retour</a>
+            <div class="d-flex">
+                <a href="{{ path('admin_evenement_edit', {'idEvenement': evenement.idEvenement}) }}" class="btn btn-warning me-2"><i class="bi bi-pencil-fill me-1"></i>Modifier</a>
+                {{ include('admin/evenement/_delete_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

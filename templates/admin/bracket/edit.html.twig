@@ -1,0 +1,9 @@
+{% extends 'base.html.twig' %}
+{% block title %}Gamilha - Modifier le bracket{% endblock %}
+{% block body %}
+<div class="container py-4">
+    <h1 class="mb-4 text-white">Modifier le bracket</h1>
+    {{ include('admin/bracket/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
+    {{ include('admin/bracket/_delete_form.html.twig') }}
+</div>
+{% endblock %}
