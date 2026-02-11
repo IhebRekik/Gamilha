@@ -8,10 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use App\Entity\Donation;
 use App\Entity\User;
-
-
-
-
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: StreamRepository::class)]
 class Stream
@@ -22,104 +19,171 @@ class Stream
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le titre est obligatoire.")]
+    #[Assert\Length(min: 3, max: 255)]
     private ?string $title = null;
-    #[ORM\OneToMany(mappedBy:"stream", targetEntity:Donation::class, cascade:["persist","remove"])]
-private Collection $donations;
+
+    #[ORM\OneToMany(mappedBy: "stream", targetEntity: Donation::class, cascade: ["persist", "remove"])]
+    private Collection $donations;
 
     #[ORM\Column(type: 'text', nullable: true)]
+    #[Assert\Length(max: 2000)]
     private ?string $description = null;
 
     #[ORM\Column(length: 50)]
+    #[Assert\NotBlank(message: "Le jeu est obligatoire.")]
     private ?string $game = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $thumbnail = null;
 
     #[ORM\Column]
+    #[Assert\PositiveOrZero]
     private int $viewers = 0;
 
     #[ORM\Column(length: 20)]
+    #[Assert\Choice(choices: ['live', 'offline', 'ended'])]
     private string $status = 'live';
+
     #[ORM\ManyToOne(inversedBy: 'streams')]
-    #[ORM\JoinColumn(nullable: false)] // chaque stream doit avoir un user
+    #[ORM\JoinColumn(nullable: false)]
+    #[Assert\NotNull(message: "Un utilisateur est requis.")]
     private ?User $user = null;
+
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-private ?string $url = null;
+    #[Assert\Url(message: "URL invalide.")]
+    private ?string $url = null;
 
+    #[ORM\Column(type: 'datetime')]
+    #[Assert\NotNull]
+    private ?\DateTime $createdAt = null;
 
-public function getUrl(): ?string
-{
-    return $this->url;
-}#[ORM\Column(type: 'datetime')]
-private ?\DateTime $createdAt = null;
-
-
-
-public function getCreatedAt(): ?\DateTime
-{
-    return $this->createdAt;
-}
-
-public function setCreatedAt(\DateTime $createdAt): self
-{
-    $this->createdAt = $createdAt;
-    return $this;
-}
-
-
-public function setUrl(?string $url): self
-{
-    $this->url = $url;
-    return $this;
-}    public function getId(): ?int { return $this->id; }
-
-    public function getTitle(): ?string { return $this->title; }
-    public function setTitle(string $title): self { $this->title = $title; return $this; }
-
-    public function getDescription(): ?string { return $this->description; }
-    public function setDescription(?string $description): self { $this->description = $description; return $this; }
-
-    public function getGame(): ?string { return $this->game; }
-    public function setGame(string $game): self { $this->game = $game; return $this; }
-
-    public function getThumbnail(): ?string { return $this->thumbnail; }
-    public function setThumbnail(?string $thumbnail): self { $this->thumbnail = $thumbnail; return $this; }
-
-    public function getViewers(): int { return $this->viewers; }
-    public function setViewers(int $viewers): self { $this->viewers = $viewers; return $this; }
-
-    public function getStatus(): string { return $this->status; }
-    public function setStatus(string $status): self { $this->status = $status; return $this; }
-    public function __construct() {
-    $this->donations = new ArrayCollection();
-    
-    $this->viewers = 0;
-    $this->status = 'live';
-    $this->createdAt = new \DateTime();
-}public function getDonations(): Collection
-{
-    return $this->donations;
-}
-
-public function addDonation(Donation $donation): self
-{
-    if (!$this->donations->contains($donation)) {
-        $this->donations->add($donation);
-        $donation->setStream($this);
+    public function __construct()
+    {
+        $this->donations = new ArrayCollection();
+        $this->viewers = 0;
+        $this->status = 'live';
+        $this->createdAt = new \DateTime();
     }
-    return $this;
-}
 
-public function removeDonation(Donation $donation): self
-{
-    if ($this->donations->removeElement($donation)) {
-        if ($donation->getStream() === $this) {
-            $donation->setStream(null);
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getTitle(): ?string
+    {
+        return $this->title;
+    }
+
+    public function setTitle(string $title): self
+    {
+        $this->title = $title;
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(?string $description): self
+    {
+        $this->description = $description;
+        return $this;
+    }
+
+    public function getGame(): ?string
+    {
+        return $this->game;
+    }
+
+    public function setGame(string $game): self
+    {
+        $this->game = $game;
+        return $this;
+    }
+
+    public function getThumbnail(): ?string
+    {
+        return $this->thumbnail;
+    }
+
+    public function setThumbnail(?string $thumbnail): self
+    {
+        $this->thumbnail = $thumbnail;
+        return $this;
+    }
+
+    public function getViewers(): int
+    {
+        return $this->viewers;
+    }
+
+    public function setViewers(int $viewers): self
+    {
+        $this->viewers = $viewers;
+        return $this;
+    }
+
+    public function getStatus(): string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): self
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+    public function getUrl(): ?string
+    {
+        return $this->url;
+    }
+
+    public function setUrl(?string $url): self
+    {
+        $this->url = $url;
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTime
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTime $createdAt): self
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
+
+    public function getDonations(): Collection
+    {
+        return $this->donations;
+    }
+
+    public function addDonation(Donation $donation): self
+    {
+        if (!$this->donations->contains($donation)) {
+            $this->donations->add($donation);
+            $donation->setStream($this);
         }
+        return $this;
     }
-    return $this;
-}
-public function getUser(): ?User
+
+    public function removeDonation(Donation $donation): self
+    {
+        if ($this->donations->removeElement($donation)) {
+            if ($donation->getStream() === $this) {
+                $donation->setStream(new Stream()); // FIXED
+            }
+        }
+        return $this;
+    }
+
+    public function getUser(): ?User
     {
         return $this->user;
     }
@@ -130,5 +194,3 @@ public function getUser(): ?User
         return $this;
     }
 }
-
-

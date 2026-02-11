@@ -1,0 +1,121 @@
+{# templates/pricing/index.html.twig #}
+
+{% extends 'base_front.html.twig' %}
+
+{% block title %}Nos Plans d'Abonnement{% endblock %}
+
+{% block body %}
+    <div class="min-vh-100 d-flex align-items-center py-5" 
+         style="background: linear-gradient(135deg, #0f0c29, #302b63, #24243e); color: white;">
+        
+        <div class="container">
+            <div class="text-center mb-5">
+                <h1 class="display-4 fw-bold mb-3" 
+                    style="background: linear-gradient(to right, #c471ed, #f64f59); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                    Choisissez Votre Plan d'Abonnement
+                </h1>
+                <p class="lead text-white-75">
+                    Débloquez tout le potentiel de votre expérience esports avec nos plans premium
+                </p>
+            </div>
+
+            <div class="row g-4 justify-content-center">
+                {% for abonnement in abonnements %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="card h-100 shadow-lg hover-lift position-relative border-0"
+                             {% if abonnement.type == 'pro' %}
+                                 style="background: linear-gradient(135deg, #6b48ff, #a239ca);"
+                             {% elseif abonnement.type == 'Elite' %}
+                                 style="background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);"
+                             {% else %}
+                                 style="background: #212529;"
+                             {% endif %}
+                            >
+
+                            {# Badge "Plus Populaire" uniquement pour Pro #}
+                            {% if abonnement.type == 'pro' %}
+                                <span class="position-absolute top-0 start-50 translate-middle badge rounded-pill bg-warning text-dark px-4 py-2 fs-6 fw-bold" 
+                                      style="transform: translate(-50%, -50%);">
+                                    ★ PLUS POPULAIRE ★
+                                </span>
+                            {% endif %}
+
+                            <div class="card-body d-flex flex-column p-4 p-xl-5 text-center text-white">
+                                <div class="mb-4">
+                                    {# Icône selon le type #}
+                                    <div class="icon-circle mx-auto mb-3 {% if abonnement.type == 'Gratuit' %}bg-secondary{% elseif abonnement.type == 'Pro' %}bg-white text-primary{% else %}bg-warning text-dark{% endif %}">
+                                        <i class="bi {% if abonnement.type == 'Gratuit' %}bi-star{% elseif abonnement.type == 'Pro' %}bi-lightning-fill{% else %}bi-crown{% endif %} fs-3"></i>
+                                    </div>
+
+                                    <h3 class="card-title fw-bold">{{ abonnement.type }}</h3>
+                                    <p class="text-white-75">
+                                        {% if abonnement.type == 'Gratuit' %}Parfait pour commencer votre aventure esports
+                                        {% elseif abonnement.type == 'Pro' %}Pour les joueurs sérieux qui veulent progresser
+                                        {% else %}L'expérience ultime pour les professionnels{% endif %}
+                                    </p>
+                                </div>
+
+                                <div class="mb-4">
+                                    <h2 class="display-5 fw-bold">
+                                        {% if abonnement.prix == 0 %}0{% else %}{{ abonnement.prix }}{% endif %} TND 
+                                        <small class="fs-6">/ mois</small>
+                                    </h2>
+                                </div>
+
+                                <ul class="list-unstyled mb-4 text-start flex-grow-1">
+                                    {% for avantage in abonnement.avantages %}
+                                        <li class="mb-3">
+                                            <i class="bi bi-check-circle-fill me-2 {% if abonnement.type == 'Elite' %}text-warning{% elseif abonnement.type == 'Pro' %}text-white{% else %}text-success{% endif %}"></i>
+                                            {{ avantage }}
+                                        </li>
+                                    {% else %}
+                                        <li class="text-muted">Aucun avantage listé</li>
+                                    {% endfor %}
+                                </ul>
+
+                                <div class="mt-auto">
+                                    {% if abonnement.type == 'Gratuit' %}
+                                        <a href="{{ path('app_register') }}" class="btn btn-outline-light btn-lg">
+                                            Commencer Gratuitement
+                                        </a>
+                                    {% else %}
+                                        <a href="#" 
+                                           class="btn {% if abonnement.type == 'Elite' %}btn-warning text-dark{% else %}btn-light{% endif %} btn-lg fw-bold">
+                                            S'abonner Maintenant
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="col-12 text-center py-5">
+                        <p class="lead">Aucun plan d'abonnement disponible pour le moment.</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        .hover-lift {
+            transition: all 0.3s ease;
+        }
+        .hover-lift:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5) !important;
+        }
+        .icon-circle {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+{% endblock %}

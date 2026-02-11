@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Friend;
-use App\Repository\FriendRepository;
 
 class SocialController extends AbstractController
 {
@@ -26,8 +25,8 @@ class SocialController extends AbstractController
     public function index(
         Request $request,
         EntityManagerInterface $em,
-        PostRepository $postRepo
-
+        PostRepository $postRepo,
+        UserRepository $userRepository
     ): Response {
         $post = new Post();
         $form = $this->createForm(PostType::class, $post);
@@ -78,8 +77,9 @@ class SocialController extends AbstractController
     }
 // Récupère l'utilisateur par défaut (id = 1)
 $defaultUser = $em->getRepository(User::class)->find(1);
-$friendIds = array_map(fn($f) => $f->getFriend()->getId(), $em->getRepository(Friend::class)->findBy(['user' => $defaultUser]));
 
+$friendIds =[0];
+    
 $suggestedUsers = $em->getRepository(User::class)->createQueryBuilder('u')
     ->where('u != :currentUser')
     ->andWhere('u.id NOT IN (:friendIds)')
@@ -269,7 +269,7 @@ public function friends(
     ]);
 
     return $this->render('social/friends.html.twig', [
-        'friends' => $friends
+        'users' => $friends
     ]);
 }
 

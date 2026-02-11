@@ -31,6 +31,8 @@ final class AbonnementController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+                $avantagesText = $form->get('avantages')->getData();
+            $abonnement->setAvantages(explode(",", trim($avantagesText)));
             $entityManager->persist($abonnement);
             $entityManager->flush();
 
@@ -45,16 +47,28 @@ final class AbonnementController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_abonnement_show', methods: ['GET'])]
-    public function show(Abonnement $abonnement): Response
+    public function show(int $id, AbonnementRepository $repo): Response
     {
+        $abonnement = $repo->find($id);
+
+        if (!$abonnement) {
+            throw $this->createNotFoundException('Abonnement introuvable.');
+        }
+
         return $this->render('admin/abonnement/show.html.twig', [
             'abonnement' => $abonnement,
         ]);
     }
 
     #[Route('/{id}/edit', name: 'app_abonnement_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Abonnement $abonnement, EntityManagerInterface $entityManager): Response
+    public function edit(int $id, Request $request, AbonnementRepository $repo, EntityManagerInterface $entityManager): Response
     {
+        $abonnement = $repo->find($id);
+
+        if (!$abonnement) {
+            throw $this->createNotFoundException('Abonnement introuvable.');
+        }
+
         $form = $this->createForm(AbonnementType::class, $abonnement);
         $form->handleRequest($request);
 
@@ -72,13 +86,27 @@ final class AbonnementController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_abonnement_delete', methods: ['POST'])]
-    public function delete(Request $request, Abonnement $abonnement, EntityManagerInterface $entityManager): Response
+    public function delete(int $id, Request $request, AbonnementRepository $repo, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$abonnement->getId(), $request->getPayload()->getString('_token'))) {
+        $abonnement = $repo->find($id);
+
+        if (!$abonnement) {
+            throw $this->createNotFoundException('Abonnement introuvable.');
+        }
+
+        if ($this->isCsrfTokenValid('delete'.$abonnement->getId(), $request->request->get('_token'))) {
             $entityManager->remove($abonnement);
             $entityManager->flush();
         }
 
         return $this->redirectToRoute('app_abonnement_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route("/type/get", name: 'app_abonnementuser_index', methods: ['GET'])]
+    public function user_index(AbonnementRepository $abonnementRepository): Response
+    {
+        return $this->render('admin/user_abonnement/user_index.html.twig', [
+            'abonnements' => $abonnementRepository->findAll(),
+        ]);
     }
 }
