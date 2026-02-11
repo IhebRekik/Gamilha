@@ -42,21 +42,7 @@
                 </div>
             </div>
 
-            {# URL #}
-            <div class="col-12">
-                <div class="mb-3">
-                    {{ form_label(form.url, 'Lien du Stream', {
-                        'label_attr': {'class': 'form-label text-white fw-semibold'}
-                    }) }}
-                    {{ form_widget(form.url, {
-                        'attr': {
-                            'class': 'form-control bg-dark text-white border-secondary border-opacity-50',
-                            'placeholder': 'https://...'
-                        }
-                    }) }}
-                    {{ form_errors(form.url, {'attr': {'class': 'text-danger small mt-1'}}) }}
-                </div>
-            </div>
+        
 
         </div>
     </div>

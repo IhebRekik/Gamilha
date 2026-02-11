@@ -22,10 +22,12 @@ security:
             form_login:
                 login_path: app_login
                 check_path: app_login
-                default_target_path: app_homepage
+                success_handler: App\Security\LoginSuccessHandler
             logout:
                 path: app_logout
-                target: app_homepage
+                target: app_login
+                delete_cookies:
+                    user_email: null
 
     access_control:
         - { path: ^/admin, roles: ROLE_ADMIN }

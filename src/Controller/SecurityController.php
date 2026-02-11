@@ -12,7 +12,7 @@ use function PHPUnit\Framework\containsEqual;
 
 class SecurityController extends AbstractController
 {
-    #[Route('/login', name: 'app_login')]
+    #[Route('/', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
         /** @var \App\Entity\User|null $user */
@@ -51,7 +51,7 @@ class SecurityController extends AbstractController
     #[Route('/logout', name: 'app_logout')]
     public function logout(): Response
     {
-        $response = new Response();
+        $response =  $this->redirectToRoute('app_login');
 
     // Supprimer le cookie "user_email"
     $cookie = Cookie::create('user_email')
@@ -70,6 +70,6 @@ class SecurityController extends AbstractController
             return $this->redirectToRoute('admin_dashboard');
         }
 
-        return $this->redirectToRoute('app_homepage');
+        return $this->redirectToRoute('app_login');
     }
 }

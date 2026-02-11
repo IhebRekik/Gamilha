@@ -40,7 +40,7 @@ final class ChatMessageController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             // Get sender from cookie
-            $userId = $request->cookies->get('user_id');
+            $userId = 3;
 
             if (!$userId) {
                 throw new \Exception('user_id cookie not found');
@@ -109,9 +109,8 @@ final class ChatMessageController extends AbstractController
         UserRepository $userRepository,
         ChatMessageRepository $chatMessageRepository
     ): Response {
-        $cookieUserId = $request->cookies->get('user_id');
 
-        $sender = $userRepository->find($cookieUserId);
+        $sender = $userRepository->find(1);
         $recipient = $userRepository->find($recipientId);
 
         if (!$sender || !$recipient) {
@@ -165,35 +164,31 @@ final class ChatMessageController extends AbstractController
 
         return $this->json(['status' => 'success']);
     }
-    #[Route('/conversation/delete/{id}', name: 'chat_conversation_delete', methods: ['POST'])]
+  #[Route('/conversation/delete/{id}', name: 'chat_conversation_delete', methods: ['POST'])]
 public function deleteConversation(
     ChatMessage $message,
     Request $request,
     EntityManagerInterface $entityManager
 ): Response {
-    // Vérifier le token CSRF
-    $submittedToken = $request->request->get('_token');
-    if (!$this->isCsrfTokenValid('delete'.$message->getId(), $submittedToken)) {
+
+    if (!$this->isCsrfTokenValid('delete'.$message->getId(), $request->request->get('_token'))) {
         throw $this->createAccessDeniedException('Token CSRF invalide.');
     }
 
-    // Récupérer l'id du destinataire pour rester dans la conversation
-    $recipientId = $message->getRecipient()->getId();
-    $senderId = $message->getSender()->getId();
-    $cookieUserId = $request->cookies->get('user_id');
+    $currentUser = $this->getUser();
+     /** @var User $currentUser */
 
-    // Supprimer seulement si le message appartient à l'utilisateur du cookie
-    if ($cookieUserId != $senderId) {
-        throw $this->createAccessDeniedException('Vous ne pouvez pas supprimer ce message.');
-    }
+   
+
+    $recipientId = $message->getRecipient()->getId();
 
     $entityManager->remove($message);
     $entityManager->flush();
 
-    // Redirection vers la conversation
     return $this->redirectToRoute('chat_conversation', [
-        'recipientId' => ($cookieUserId == $senderId) ? $recipientId : $senderId
+        'recipientId' => $recipientId
     ]);
 }
+
 
 }

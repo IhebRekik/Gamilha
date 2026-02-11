@@ -34,12 +34,7 @@ final class StreamController extends AbstractController
              $cookieUserId = $request->cookies->get('user_id');
 
             // Récupérer tous les utilisateurs sauf celui dans le cookie
-            $user = $userRepository->createQueryBuilder('u')
-                ->andWhere('u.id != :cookieId')
-                ->setParameter('cookieId', $cookieUserId)
-                ->setMaxResults(1)
-                ->getQuery()
-                ->getOneOrNullResult();
+            $user = $userRepository->find(1);   
             $stream->setUser($user);
             $entityManager->persist($stream);
             $entityManager->flush();

@@ -1,3 +1,4 @@
+{# templates/abonnement/_form.html.twig #}
 {{ form_start(form) }}
 
 <div class="card bg-dark border-primary border-opacity-25 shadow-lg rounded-4">
@@ -15,11 +16,10 @@
                         <span class="input-group-text bg-primary border-0 text-white">
                             <i class="bi bi-bookmark-star-fill"></i>
                         </span>
-
                         {{ form_widget(form.type, {
                             'attr': {
                                 'class': 'form-control bg-dark text-white border-secondary border-opacity-50',
-                                'placeholder': 'Ex : Premium, Gold, Basic...'
+                                'placeholder': 'Ex : Premium, Gold, Basic, Pro, Elite...'
                             }
                         }) }}
                     </div>
@@ -27,25 +27,56 @@
                     {{ form_errors(form.type, {'attr': {'class': 'text-danger small mt-1'}}) }}
                 </div>
             </div>
-              <div class="mb-3">
+
+            {# Prix de l’abonnement #}
+            <div class="col-md-6">
+                <div class="mb-3">
                     {{ form_label(form.prix, 'Prix de l’abonnement', {
                         'label_attr': {'class': 'form-label text-white fw-semibold'}
                     }) }}
 
                     <div class="input-group">
                         <span class="input-group-text bg-primary border-0 text-white">
-                            <i class="bi bi-bookmark-star-fill"></i>
+                            <i class="bi bi-currency-dollar"></i>
                         </span>
-
                         {{ form_widget(form.prix, {
                             'attr': {
                                 'class': 'form-control bg-dark text-white border-secondary border-opacity-50',
-                                'placeholder': 'Ex : 10TND, 20TND...'
+                                'placeholder': 'Ex : 9.99, 19.99, 0 (gratuit)',
+                                'step': '0.01',
+                                'min': '0'
                             }
                         }) }}
+                        <span class="input-group-text bg-dark text-white border-secondary border-opacity-50">
+                            TND
+                        </span>
                     </div>
 
                     {{ form_errors(form.prix, {'attr': {'class': 'text-danger small mt-1'}}) }}
+                </div>
+            </div>
+
+            {# Avantages #}
+            <div class="col-12">
+                <div class="mb-3">
+                    {{ form_label(form.avantages, 'Avantages inclus', {
+                        'label_attr': {'class': 'form-label text-white fw-semibold'}
+                    }) }}
+
+                    {{ form_widget(form.avantages, {
+                        'attr': {
+                            'class': 'form-control bg-dark text-white border-secondary border-opacity-50 font-monospace',
+                            'rows': 9,
+                            'placeholder': "Accès à tous les tournois gratuits\n2 playlists de coaching\nProfil de base\nCoach IA de base\nRecherche d'amis limitée\nChat basique\nSupport communautaire\n\nPour le plan Pro :\nAccès illimité aux playlists\nCoach IA avancé\nStatistiques détaillées\n..."
+                        }
+                    }) }}
+
+                    <div class="form-text text-muted mt-2 small">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Écris **un avantage par ligne**. Chaque ligne apparaîtra avec une coche ✓ sur la page publique.
+                    </div>
+
+                    {{ form_errors(form.avantages, {'attr': {'class': 'text-danger small mt-1'}}) }}
                 </div>
             </div>
 

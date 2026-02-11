@@ -45,7 +45,7 @@ public function new(Request $request, EntityManagerInterface $em, int $streamId,
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
-      $user = $userRepository->find(7);   // 👤 donneur
+      $user = $userRepository->find(1);   // 👤 donneur
         $donation->setUser($user);
         $donation->setStream($stream);  
         
@@ -123,7 +123,7 @@ public function donateByEmoji(int $streamId, string $emoji, EntityManagerInterfa
 
     $donation = new Donation();
     $donation->setStream($stream);
-    $user = $userRepository->find(7);
+    $user = $userRepository->find(1);
     $donation->setUser($user);
     $donation->setDonorName('Anonymous'); // Ou ajouter utilisateur connecté
     $donation->setAmount($emojiAmounts[$emoji]);

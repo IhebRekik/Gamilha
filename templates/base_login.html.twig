@@ -121,97 +121,9 @@
     {% block stylesheets %}{% endblock %}
 </head>
 <body class="hero-gradient">
-    <nav class="navbar navbar-expand-lg front-nav py-3 sticky-top">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-2" href="{{ path('app_homepage') }}">
-                <img src="{{ asset('images/gamilha.png') }}" alt="Gamilha" height="40">
-                Gamilha
-            </a>
-            <button class="navbar-toggler border-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#frontNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="frontNav">
-                <ul class="navbar-nav ms-auto align-items-center gap-1">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path('app_homepage') }}"><i class="bi bi-house-door me-1"></i> Accueil</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path('front_evenement_index') }}"><i class="bi bi-calendar-event me-1"></i> Événements</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ path('front_equipe_index') }}"><i class="bi bi-people-fill me-1"></i> Équipes</a>
-                    </li>
-                    <li class="nav-item ms-2">
-                        
-                    </li>
-                    	<li class="nav-item">
-							<a class="nav-link" href="{{ path('chat_user_list') }}">
-								<i class="bi bi-chat-dots me-1"></i>
-								List des Amis</a>
-						</li>	
-                        <li class="nav-item">
-							<a class="nav-link" href="{{ path('social_index') }}">
-								<i class="bi bi-chat-dots me-1"></i>
-								reseaux</a>
-						</li>
-                        <li class="nav-item">
-							<a class="nav-link" href="{{ path('stream_index') }}">
-								<i class="bi bi-chat-dots me-1"></i>
-								streams</a>
-						</li>
-                        <li class="nav-item">
-							<a class="nav-link" href="{{ path('app_abonnementuser_index') }}">
-								<i class="bi bi-chat-dots me-1"></i>
-                        Abonnements</a>
-						</li>
-                     <li class="nav-item dropdown ms-3">
-							<a class="nav-link dropdown-toggle d-flex align-items-center"
-							href="#"
-							id="userDropdown"
-							role="button"
-							data-bs-toggle="dropdown"
-							aria-expanded="false">
 
-								<i class="bi bi-person-circle fs-4 me-2"></i>
 
-								{% if app.user %}
-									<span>{{ app.user.name }}</span>
-								{% else %}
-									<span>Compte</span>
-								{% endif %}
-							</a>
-
-							<ul class="dropdown-menu dropdown-menu-end bg-dark border-primary shadow"
-								aria-labelledby="userDropdown">
-
-									<!-- PROFIL -->
-									<li>
-										<a class="dropdown-item text-white" href="{{ path('app_profile') }}">
-											<i class="bi bi-person me-2"></i>
-											Mon profil
-										</a>
-									</li>
-
-									<li><hr class="dropdown-divider bg-secondary"></li>
-
-									<!-- LOGOUT -->
-									<li>
-										<a class="dropdown-item text-white" href="{{ path('app_logout') }}">
-											<i class="bi bi-box-arrow-right me-2"></i>
-											Déconnexion
-										</a>
-									</li>
-								
-							</ul>
-						</li>
-						
-
-                </ul>
-            </div>
-        </div>
-    </nav>
-
-    <main class="container py-4 pb-5">
+    <main class="container py-4 pb-5 ">
         {% block body %}{% endblock %}
     </main>
 

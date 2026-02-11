@@ -22,7 +22,15 @@ public function index(Request $request, PostRepository $postRepository): Respons
     $search = $request->query->get('q');
     $userSearch = $request->query->get('user');
 
-    $posts = $postRepository->search($search, $userSearch);
+    $posts =  $postRepository->findAll();
+
+    if($search) {
+        $posts = $postRepository->findByContent($search);
+    }
+    if($userSearch) {
+        $posts = $postRepository->findByUserEmail($userSearch);
+    }
+    
 
     return $this->render('admin/post/index.html.twig', [
         'posts' => $posts,
