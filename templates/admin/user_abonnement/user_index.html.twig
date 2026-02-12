@@ -79,10 +79,12 @@
                                             Commencer Gratuitement
                                         </a>
                                     {% else %}
-                                        <a href="#" 
-                                           class="btn {% if abonnement.type == 'Elite' %}btn-warning text-dark{% else %}btn-light{% endif %} btn-lg fw-bold">
-                                            S'abonner Maintenant
-                                        </a>
+                                        <form method="post" action="{{ path('app_user_abonnement_new', {'id': abonnement.id}) }}">
+                                            <button
+                                               class="btn {% if abonnement.type == 'Elite' %}btn-warning text-dark{% else %}btn-light{% endif %} btn-lg fw-bold">
+                                                S'abonner Maintenant
+                                            </button>
+                                        </form>
                                     {% endif %}
                                 </div>
                             </div>
