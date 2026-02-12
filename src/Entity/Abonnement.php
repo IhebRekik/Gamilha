@@ -3,8 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\AbonnementRepository;
+use BcMath\Number;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -39,6 +41,9 @@ class Abonnement
 
     #[ORM\Column(nullable: true)]
     private ?array $avantages = null;
+
+    #[ORM\Column(type: Types::INTEGER)]
+    private ?int $duree = null;
 
     public function __construct()
     {
@@ -109,6 +114,18 @@ class Abonnement
     public function setAvantages(?array $avantages): static
     {
         $this->avantages = $avantages;
+
+        return $this;
+    }
+
+    public function getDuree(): ?int
+    {
+        return $this->duree;
+    }
+
+    public function setDuree(int $duree): static
+    {
+        $this->duree = $duree;
 
         return $this;
     }

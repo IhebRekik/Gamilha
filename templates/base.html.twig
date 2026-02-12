@@ -15,7 +15,7 @@
 <div class="d-flex">
 
     <!-- SIDEBAR -->
-    <div class="bg-black border-end border-secondary p-3" style="width: 260px; min-height: 100vh;">
+    <div class="bg-black border-end border-secondary p-3" style="width: 400px; min-height: 100vh;">
 
         <h5 class="fw-bold mb-4">
             <img src="{{ asset('images/gamilha.png') }}" width="30" class="me-2">
@@ -77,6 +77,18 @@
                     <i class="bi bi-cash-coin me-2"></i> Donations
                 </a>
             </li>
+             <li class="nav-item">
+                <a class="nav-link text-light" href="{{ path('app_abonnement_index') }}">
+                    <i class="bi bi-cash-coin me-2"></i> Les Abonnements
+                </a>
+            </li>
+             <li class="nav-item">
+                <a class="nav-link text-light" href="{{ path('app_user_abonnement_index') }}">
+                    <i class="bi bi-cash-coin me-2"></i> User Abonnements
+                </a>
+            </li>
+
+
 
             <hr class="text-secondary">
 
@@ -85,6 +97,7 @@
                     <i class="bi bi-box-arrow-right me-2"></i> Déconnexion
                 </a>
             </li>
+            
 
         </ul>
     </div>
