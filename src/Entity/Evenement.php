@@ -8,6 +8,8 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Entity\User;
+use App\Entity\Equipe;
 
 #[ORM\Entity(repositoryClass: EvenementRepository::class)]
 #[ORM\Table(name: 'evenement')]
@@ -61,9 +63,21 @@ class Evenement
     #[ORM\OneToMany(targetEntity: Bracket::class, mappedBy: 'evenement', cascade: ['remove'])]
     private Collection $brackets;
 
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    private ?User $createdBy = null;
+
+    /** @var Collection<int, Equipe> */
+    #[ORM\ManyToMany(targetEntity: Equipe::class)]
+    #[ORM\JoinTable(name: 'evenement_equipe')]
+    #[ORM\JoinColumn(name: 'idEvenement', referencedColumnName: 'idEvenement', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'idEquipe', referencedColumnName: 'idEquipe', onDelete: 'CASCADE')]
+    private Collection $equipesParticipantes;
+
     public function __construct()
     {
         $this->brackets = new ArrayCollection();
+        $this->equipesParticipantes = new ArrayCollection();
     }
 
     public function getIdEvenement(): ?int
@@ -120,7 +134,7 @@ class Evenement
         return $this->dateDebut;
     }
 
-    public function setDateDebut(\DateTimeInterface $dateDebut): static
+    public function setDateDebut(?\DateTimeInterface $dateDebut): static
     {
         $this->dateDebut = $dateDebut;
         return $this;
@@ -131,7 +145,7 @@ class Evenement
         return $this->dateFin;
     }
 
-    public function setDateFin(\DateTimeInterface $dateFin): static
+    public function setDateFin(?\DateTimeInterface $dateFin): static
     {
         $this->dateFin = $dateFin;
         return $this;
@@ -194,6 +208,39 @@ class Evenement
                 $bracket->setEvenement(null);
             }
         }
+        return $this;
+    }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): static
+    {
+        $this->createdBy = $createdBy;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Equipe>
+     */
+    public function getEquipesParticipantes(): Collection
+    {
+        return $this->equipesParticipantes;
+    }
+
+    public function addEquipesParticipante(Equipe $equipe): static
+    {
+        if (!$this->equipesParticipantes->contains($equipe)) {
+            $this->equipesParticipantes->add($equipe);
+        }
+        return $this;
+    }
+
+    public function removeEquipesParticipante(Equipe $equipe): static
+    {
+        $this->equipesParticipantes->removeElement($equipe);
         return $this;
     }
 

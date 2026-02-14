@@ -1,4 +1,4 @@
-{{ form_start(form) }}
+{{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
 <div class="card bg-dark border-primary border-opacity-25 shadow-lg rounded-4">
     <div class="card-body p-4">
         <div class="row g-4">
@@ -20,6 +20,11 @@
             <div class="col-md-6">
                 {{ form_row(form.niveau, {'label_attr': {'class': 'form-label text-white fw-semibold'}, 'attr': {'class': 'form-select bg-dark text-white border-secondary'}}) }}
             </div>
+            {% if form.members is defined %}
+            <div class="col-12">
+                {{ form_row(form.members, {'label_attr': {'class': 'form-label text-white fw-semibold'}, 'attr': {'class': 'form-select bg-dark text-white border-secondary'}}) }}
+            </div>
+            {% endif %}
         </div>
     </div>
     <div class="card-footer bg-black bg-opacity-25 border-top border-secondary border-opacity-10 p-3">

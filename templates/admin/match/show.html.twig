@@ -18,9 +18,9 @@
                 <dt class="col-sm-4 text-white">Tour</dt>
                 <dd class="col-sm-8 text-white">{{ match.tour }}</dd>
                 <dt class="col-sm-4 text-white">Équipe A</dt>
-                <dd class="col-sm-8 text-white">{{ match.equipeA.nomEquipe }}</dd>
+                <dd class="col-sm-8 text-white">{{ match.equipeA ? match.equipeA.nomEquipe : 'TBD' }}</dd>
                 <dt class="col-sm-4 text-white">Équipe B</dt>
-                <dd class="col-sm-8 text-white">{{ match.equipeB.nomEquipe }}</dd>
+                <dd class="col-sm-8 text-white">{{ match.equipeB ? match.equipeB.nomEquipe : 'TBD' }}</dd>
                 <dt class="col-sm-4 text-white">Score</dt>
                 <dd class="col-sm-8 text-white">{{ match.scoreEquipeA }} - {{ match.scoreEquipeB }}</dd>
                 <dt class="col-sm-4 text-white">Statut</dt>

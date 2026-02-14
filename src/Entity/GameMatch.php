@@ -16,8 +16,7 @@ class GameMatch
     #[ORM\Column(name: 'idMatch')]
     private ?int $idMatch = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, name: 'dateMatch')]
-    #[Assert\NotBlank(message: 'La date du match est obligatoire.')]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, name: 'dateMatch', nullable: true)]
     private ?\DateTimeInterface $dateMatch = null;
 
     #[ORM\Column]
@@ -38,13 +37,11 @@ class GameMatch
     private ?string $statut = null;
 
     #[ORM\ManyToOne(targetEntity: Equipe::class, inversedBy: 'matchsEquipeA')]
-    #[ORM\JoinColumn(name: 'equipeA_id', referencedColumnName: 'idEquipe', nullable: false)]
-    #[Assert\NotBlank(message: 'L\'équipe A est obligatoire.')]
+    #[ORM\JoinColumn(name: 'equipeA_id', referencedColumnName: 'idEquipe', nullable: true, onDelete: 'SET NULL')]
     private ?Equipe $equipeA = null;
 
     #[ORM\ManyToOne(targetEntity: Equipe::class, inversedBy: 'matchsEquipeB')]
-    #[ORM\JoinColumn(name: 'equipeB_id', referencedColumnName: 'idEquipe', nullable: false)]
-    #[Assert\NotBlank(message: 'L\'équipe B est obligatoire.')]
+    #[ORM\JoinColumn(name: 'equipeB_id', referencedColumnName: 'idEquipe', nullable: true, onDelete: 'SET NULL')]
     private ?Equipe $equipeB = null;
 
     #[ORM\ManyToOne(targetEntity: Bracket::class, inversedBy: 'matchs')]
@@ -62,7 +59,7 @@ class GameMatch
         return $this->dateMatch;
     }
 
-    public function setDateMatch(\DateTimeInterface $dateMatch): static
+    public function setDateMatch(?\DateTimeInterface $dateMatch): static
     {
         $this->dateMatch = $dateMatch;
         return $this;
@@ -148,6 +145,9 @@ class GameMatch
     #[Assert\IsTrue(message: 'Les deux équipes doivent être différentes.')]
     public function isEquipesDifferent(): bool
     {
-        return $this->equipeA === null || $this->equipeB === null || $this->equipeA->getIdEquipe() !== $this->equipeB->getIdEquipe();
+        if ($this->equipeA === null || $this->equipeB === null) {
+            return true;
+        }
+        return $this->equipeA->getIdEquipe() !== $this->equipeB->getIdEquipe();
     }
 }

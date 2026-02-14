@@ -27,10 +27,16 @@ final class EquipeController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $equipe = new Equipe();
-        $form = $this->createForm(EquipeType::class, $equipe);
+        $admin = $this->getUser();
+        $equipe->setOwner($admin);
+        
+        $form = $this->createForm(EquipeType::class, $equipe, ['include_members' => true]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            if (!$equipe->getMembers()->contains($admin)) {
+                $equipe->addMember($admin);
+            }
             $entityManager->persist($equipe);
             $entityManager->flush();
 
@@ -55,7 +61,7 @@ final class EquipeController extends AbstractController
     #[Route('/{idEquipe}/edit', name: 'admin_equipe_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, #[MapEntity(mapping: ['idEquipe' => 'idEquipe'])] Equipe $equipe, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(EquipeType::class, $equipe);
+        $form = $this->createForm(EquipeType::class, $equipe, ['include_members' => true]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

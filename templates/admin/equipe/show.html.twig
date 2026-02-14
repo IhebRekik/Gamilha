@@ -23,8 +23,30 @@
                 <dd class="col-sm-8 text-white">{{ equipe.dateCreation ? equipe.dateCreation|date('d/m/Y') : '—' }}</dd>
                 <dt class="col-sm-4 text-white">Niveau</dt>
                 <dd class="col-sm-8 text-white">{{ equipe.niveau }}</dd>
+                <dt class="col-sm-4 text-white">Propriétaire</dt>
+                <dd class="col-sm-8 text-white">{{ equipe.owner ? equipe.owner.name ~ ' (' ~ equipe.owner.email ~ ')' : '—' }}</dd>
             </dl>
         </div>
+        {% if equipe.members|length > 0 %}
+        <div class="card-body py-4 border-top border-secondary border-opacity-10">
+            <h3 class="h5 text-white mb-3"><i class="bi bi-people-fill me-2"></i>Membres ({{ equipe.members|length }})</h3>
+            <div class="row g-2">
+                {% for member in equipe.members %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="d-flex align-items-center gap-2 p-2 bg-dark rounded border border-secondary border-opacity-25">
+                        <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                            <i class="bi bi-person-fill text-white"></i>
+                        </div>
+                        <span class="text-white">{{ member.name }}</span>
+                        {% if equipe.owner and member == equipe.owner %}
+                        <span class="badge bg-primary ms-auto">Propriétaire</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
         <div class="card-footer bg-dark border-top border-secondary border-opacity-10 d-flex justify-content-between">
             <a href="{{ path('admin_equipe_index') }}" class="btn btn-secondary"><i class="bi bi-arrow-left-circle-fill me-2"></i>Retour</a>
             <div class="d-flex">

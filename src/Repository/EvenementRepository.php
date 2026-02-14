@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Evenement;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -44,5 +45,18 @@ class EvenementRepository extends ServiceEntityRepository
         $qb->orderBy('e.' . $sortBy, $sortOrder);
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * @return Evenement[]
+     */
+    public function findByCreatedBy(User $user): array
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.createdBy = :user')
+            ->setParameter('user', $user)
+            ->orderBy('e.dateDebut', 'DESC')
+            ->getQuery()
+            ->getResult();
     }
 }

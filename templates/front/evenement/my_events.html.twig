@@ -1,0 +1,75 @@
+{% extends 'base_front.html.twig' %}
+
+{% block title %}Mes événements — Gamilha{% endblock %}
+
+{% block body %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb text-muted">
+        <li class="breadcrumb-item"><a href="{{ path('app_homepage') }}" class="text-muted text-decoration-none">Accueil</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('front_evenement_index') }}" class="text-muted text-decoration-none">Événements</a></li>
+        <li class="breadcrumb-item active text-white">Mes événements</li>
+    </ol>
+</nav>
+
+<section class="mb-4 d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <h1 class="section-title d-flex align-items-center gap-2">
+        <i class="bi bi-calendar-check-fill text-primary"></i>
+        Mes événements
+    </h1>
+    <a href="{{ path('front_evenement_new') }}" class="btn btn-gamilha">
+        <i class="bi bi-plus-lg me-1"></i> Créer un événement
+    </a>
+</section>
+
+{% if evenements|length > 0 %}
+<div class="row g-4">
+    {% for evenement in evenements %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card card-front h-100">
+            {% if evenement.image %}
+            <img src="{{ evenement.image }}" alt="{{ evenement.nom }}" class="card-img-top w-100" style="height: 180px; object-fit: cover;">
+            {% else %}
+            <div class="card-img-top bg-dark d-flex align-items-center justify-content-center text-muted" style="height: 180px;">
+                <i class="bi bi-calendar-event display-4"></i>
+            </div>
+            {% endif %}
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="badge badge-gamilha">{{ evenement.jeu }}</span>
+                    <span class="badge bg-dark text-info border border-info">{{ evenement.statut }}</span>
+                </div>
+                <h5 class="card-title fw-bold text-white mb-2">{{ evenement.nom }}</h5>
+                <p class="text-muted small mb-3">{{ evenement.description ? evenement.description|slice(0, 100) ~ '…' : '—' }}</p>
+                <div class="d-flex gap-3 text-muted small mb-3">
+                    <span><i class="bi bi-calendar3 me-1"></i>{{ evenement.dateDebut ? evenement.dateDebut|date('d/m/Y') : '—' }}</span>
+                    <span><i class="bi bi-calendar3-event me-1"></i>{{ evenement.dateFin ? evenement.dateFin|date('d/m/Y') : '—' }}</span>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ path('front_evenement_show', { idEvenement: evenement.idEvenement }) }}" class="btn btn-sm btn-outline-primary">Voir</a>
+                    <a href="{{ path('front_evenement_edit', { idEvenement: evenement.idEvenement }) }}" class="btn btn-sm btn-outline-secondary">Modifier</a>
+                    {% set bracket = evenement.brackets|first %}
+                    {% if bracket and bracket.matchs|length > 0 %}
+                    <a href="{{ path('front_evenement_edit_matches', { idEvenement: evenement.idEvenement }) }}" class="btn btn-sm btn-outline-info">Matchs</a>
+                    {% elseif bracket %}
+                    <a href="{{ path('front_evenement_tirage', { idEvenement: evenement.idEvenement }) }}" class="btn btn-sm btn-gamilha">Tirage au sort</a>
+                    {% endif %}
+                    <form method="post" action="{{ path('front_evenement_delete', { idEvenement: evenement.idEvenement }) }}" class="d-inline" onsubmit="return confirm('Supprimer cet événement ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ evenement.idEvenement) }}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Supprimer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card card-front">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-calendar-x display-4 text-muted mb-3"></i>
+        <p class="text-muted mb-3">Vous n'avez pas encore créé d'événement.</p>
+        <a href="{{ path('front_evenement_new') }}" class="btn btn-gamilha">Créer un événement</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

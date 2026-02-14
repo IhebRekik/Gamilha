@@ -1,0 +1,86 @@
+{% extends 'base_front.html.twig' %}
+
+{% block title %}Modifier {{ evenement.nom }} — Gamilha{% endblock %}
+
+{% block body %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb text-muted">
+        <li class="breadcrumb-item"><a href="{{ path('app_homepage') }}" class="text-muted text-decoration-none">Accueil</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('front_evenement_index') }}" class="text-muted text-decoration-none">Événements</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('front_evenement_show', { idEvenement: evenement.idEvenement }) }}" class="text-muted text-decoration-none">{{ evenement.nom }}</a></li>
+        <li class="breadcrumb-item active text-white">Modifier</li>
+    </ol>
+</nav>
+
+<div class="card card-front">
+    <div class="card-body p-4 p-md-5">
+        <h1 class="h3 mb-4">
+            <i class="bi bi-pencil-square text-primary me-2"></i>
+            Modifier l'événement
+        </h1>
+
+        {{ form_start(form) }}
+        <div class="row g-3">
+            <div class="col-12">
+                {{ form_row(form.nom, {
+                    'attr': {'class': 'form-control bg-dark text-white border-secondary'},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-12">
+                {{ form_row(form.description, {
+                    'attr': {'class': 'form-control bg-dark text-white border-secondary', 'rows': 3},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.jeu, {
+                    'attr': {'class': 'form-control bg-dark text-white border-secondary'},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.typeEvenement, {
+                    'attr': {'class': 'form-select bg-dark text-white border-secondary'},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.dateDebut, {
+                    'attr': {'class': 'form-control bg-dark text-white border-secondary'},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.dateFin, {
+                    'attr': {'class': 'form-control bg-dark text-white border-secondary'},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.statut, {
+                    'attr': {'class': 'form-select bg-dark text-white border-secondary'},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-12">
+                {{ form_row(form.regles, {
+                    'attr': {'class': 'form-control bg-dark text-white border-secondary', 'rows': 2},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-12">
+                {{ form_row(form.image, {
+                    'attr': {'class': 'form-control bg-dark text-white border-secondary'},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+        </div>
+        <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn btn-gamilha">Enregistrer</button>
+            <a href="{{ path('front_evenement_show', { idEvenement: evenement.idEvenement }) }}" class="btn btn-outline-secondary">Annuler</a>
+        </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

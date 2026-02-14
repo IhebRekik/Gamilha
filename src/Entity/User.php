@@ -16,6 +16,7 @@ use App\Entity\UserAbonnement;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Entity\Stream;
 use App\Entity\Donation;
+use App\Entity\Equipe;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -71,6 +72,18 @@ private Collection $donations;
      */
     #[ORM\OneToMany(targetEntity: Friend::class, mappedBy: 'user')]
     private Collection $friends;
+
+    /**
+     * @var Collection<int, Equipe>
+     */
+    #[ORM\ManyToMany(targetEntity: Equipe::class, mappedBy: 'members')]
+    private Collection $equipes;
+
+    /**
+     * @var Collection<int, Equipe>
+     */
+    #[ORM\OneToMany(targetEntity: Equipe::class, mappedBy: 'owner')]
+    private Collection $equipesOwned;
 
 public function getStreams(): Collection
 {
@@ -165,7 +178,8 @@ public function getStreams(): Collection
         $this->messagesRecipient = new ArrayCollection();
         $this->donations = new ArrayCollection();
         $this->streams = new ArrayCollection();
-
+        $this->equipes = new ArrayCollection();
+        $this->equipesOwned = new ArrayCollection();
      
     }
 
@@ -279,5 +293,59 @@ public function getStreams(): Collection
 {
     return $this->donations;
 }
+
+    /* ===================== EQUIPES ===================== */
+
+    /**
+     * @return Collection<int, Equipe>
+     */
+    public function getEquipes(): Collection
+    {
+        return $this->equipes;
+    }
+
+    public function addEquipe(Equipe $equipe): static
+    {
+        if (!$this->equipes->contains($equipe)) {
+            $this->equipes->add($equipe);
+            $equipe->addMember($this);
+        }
+        return $this;
+    }
+
+    public function removeEquipe(Equipe $equipe): static
+    {
+        if ($this->equipes->removeElement($equipe)) {
+            $equipe->removeMember($this);
+        }
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Equipe>
+     */
+    public function getEquipesOwned(): Collection
+    {
+        return $this->equipesOwned;
+    }
+
+    public function addEquipeOwned(Equipe $equipe): static
+    {
+        if (!$this->equipesOwned->contains($equipe)) {
+            $this->equipesOwned->add($equipe);
+            $equipe->setOwner($this);
+        }
+        return $this;
+    }
+
+    public function removeEquipeOwned(Equipe $equipe): static
+    {
+        if ($this->equipesOwned->removeElement($equipe)) {
+            if ($equipe->getOwner() === $this) {
+                $equipe->setOwner(null);
+            }
+        }
+        return $this;
+    }
 
 }

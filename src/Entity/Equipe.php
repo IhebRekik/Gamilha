@@ -51,10 +51,22 @@ class Equipe
     #[ORM\OneToMany(targetEntity: GameMatch::class, mappedBy: 'equipeB')]
     private Collection $matchsEquipeB;
 
+    /** @var Collection<int, User> */
+    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'equipes')]
+    #[ORM\JoinTable(name: 'equipe_user')]
+    #[ORM\JoinColumn(name: 'equipe_id', referencedColumnName: 'idEquipe')]
+    #[ORM\InverseJoinColumn(name: 'user_id', referencedColumnName: 'id')]
+    private Collection $members;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+    private ?User $owner = null;
+
     public function __construct()
     {
         $this->matchsEquipeA = new ArrayCollection();
         $this->matchsEquipeB = new ArrayCollection();
+        $this->members = new ArrayCollection();
     }
 
     public function getIdEquipe(): ?int
@@ -67,7 +79,7 @@ class Equipe
         return $this->nomEquipe;
     }
 
-    public function setNomEquipe(string $nomEquipe): static
+    public function setNomEquipe(?string $nomEquipe): static
     {
         $this->nomEquipe = $nomEquipe;
         return $this;
@@ -122,7 +134,7 @@ class Equipe
         return $this->niveau;
     }
 
-    public function setNiveau(string $niveau): static
+    public function setNiveau(?string $niveau): static
     {
         $this->niveau = $niveau;
         return $this;
@@ -142,6 +154,39 @@ class Equipe
     public function getMatchsEquipeB(): Collection
     {
         return $this->matchsEquipeB;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getMembers(): Collection
+    {
+        return $this->members;
+    }
+
+    public function addMember(User $member): static
+    {
+        if (!$this->members->contains($member)) {
+            $this->members->add($member);
+        }
+        return $this;
+    }
+
+    public function removeMember(User $member): static
+    {
+        $this->members->removeElement($member);
+        return $this;
+    }
+
+    public function getOwner(): ?User
+    {
+        return $this->owner;
+    }
+
+    public function setOwner(?User $owner): static
+    {
+        $this->owner = $owner;
+        return $this;
     }
 
     public function __toString(): string
