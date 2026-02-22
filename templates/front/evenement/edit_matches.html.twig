@@ -1,0 +1,58 @@
+{% extends 'base_front.html.twig' %}
+
+{% block title %}Détails des matchs — {{ evenement.nom }} — Gamilha{% endblock %}
+
+{% block body %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb text-muted">
+        <li class="breadcrumb-item"><a href="{{ path('app_homepage') }}" class="text-muted text-decoration-none">Accueil</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('front_evenement_index') }}" class="text-muted text-decoration-none">Événements</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('front_evenement_show', { idEvenement: evenement.idEvenement }) }}" class="text-muted text-decoration-none">{{ evenement.nom }}</a></li>
+        <li class="breadcrumb-item active text-white">Modifier les matchs</li>
+    </ol>
+</nav>
+
+<div class="card card-front">
+    <div class="card-body p-4 p-md-5">
+        <h1 class="h3 mb-4">
+            <i class="bi bi-calendar-event text-primary me-2"></i>
+            Détails des matchs — {{ evenement.nom }}
+        </h1>
+        <p class="text-muted mb-4">Saisissez la date et le statut de chaque confrontation. L'arborescence du bracket sera alors prête.</p>
+
+        {{ form_start(form) }}
+        <div class="table-responsive">
+            <table class="table table-dark table-borderless align-middle">
+                <thead>
+                    <tr class="border-bottom border-secondary">
+                        <th class="text-muted">Tour</th>
+                        <th class="text-muted">Match</th>
+                        <th class="text-muted">Date du match</th>
+                        <th class="text-muted">Statut</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for matchForm in form.matchs %}
+                    {% set match = matchForm.vars.value %}
+                    <tr class="border-bottom border-secondary">
+                        <td class="text-white">Tour {{ match.tour }}</td>
+                        <td class="text-white">
+                            {{ match.equipeA ? match.equipeA.nomEquipe : 'TBD' }} vs {{ match.equipeB ? match.equipeB.nomEquipe : 'TBD' }}
+                        </td>
+                        <td>{{ form_widget(matchForm.dateMatch, { 'attr': {'class': 'form-control form-control-sm bg-dark text-white border-secondary'} }) }}</td>
+                        <td>{{ form_widget(matchForm.statut, { 'attr': {'class': 'form-select form-select-sm bg-dark text-white border-secondary'} }) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn btn-gamilha">
+                <i class="bi bi-check-lg me-1"></i> Enregistrer les détails
+            </button>
+            <a href="{{ path('front_evenement_show', { idEvenement: evenement.idEvenement }) }}" class="btn btn-outline-secondary">Voir le bracket</a>
+        </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}

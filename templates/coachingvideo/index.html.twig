@@ -1,0 +1,95 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Vidéos{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>🎥 Liste des vidéos</h1>
+
+        <a href="{{ path('video_new') }}" class="btn btn-primary">
+            ➕ Ajouter une vidéo
+        </a>
+    </div>
+
+    <div class="row">
+        {% for video in videos %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 shadow-sm bg-dark text-white">
+
+                    <!-- 🎬 APERÇU VIDÉO -->
+                    <div class="ratio ratio-16x9">
+                        {% if video.url starts with 'http' %}
+                            {# URL externe (YouTube, etc.) #}
+                            <iframe
+                                src="{{ video.url }}"
+                                title="{{ video.titre }}"
+                                allowfullscreen>
+                            </iframe>
+                        {% else %}
+                            {# Vidéo locale uploadée #}
+                            <video controls preload="metadata">
+                                <source src="{{ asset(video.url) }}" type="video/mp4">
+                                Votre navigateur ne supporte pas la vidéo.
+                            </video>
+                        {% endif %}
+                    </div>
+
+                    <!-- 📄 INFOS -->
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            {{ video.titre }}
+                        </h5>
+
+                        <p class="card-text small opacity-75">
+                            {{ video.description|slice(0, 120) }}
+                            {% if video.description|length > 120 %}...{% endif %}
+                        </p>
+
+                        <ul class="list-unstyled small mb-3">
+                            <li>
+                                🎯 <strong>Niveau :</strong> {{ video.niveau }}
+                            </li>
+                            <li>
+                                📂 <strong>Playlist :</strong> {{ video.playlist.title }}
+                            </li>
+                            <li>
+                                💎 <strong>Premium :</strong>
+                                {% if video.premium %}
+                                    <span class="badge bg-warning text-dark">Oui</span>
+                                {% else %}
+                                    <span class="badge bg-success">Non</span>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- ⚙️ ACTIONS -->
+                    <div class="card-footer bg-transparent border-top d-flex justify-content-between">
+                        <a href="{{ path('video_edit', {id: video.id}) }}"
+                           class="btn btn-warning btn-sm">
+                            ✏️ Modifier
+                        </a>
+
+                        <form method="post"
+                              action="{{ path('video_delete', {id: video.id}) }}"
+                              onsubmit="return confirm('Supprimer cette vidéo ?');">
+                            <input type="hidden" name="_token"
+                                   value="{{ csrf_token('delete' ~ video.id) }}">
+                            <button class="btn btn-danger btn-sm">
+                                🗑️ Supprimer
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12 text-center opacity-75">
+                <p>Aucune vidéo disponible.</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

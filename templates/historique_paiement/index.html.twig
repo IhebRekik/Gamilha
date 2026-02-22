@@ -1,0 +1,119 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Historique des Paiements{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+
+    <!-- En-tête -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-white d-flex align-items-center mb-0">
+            <i class="bi bi-credit-card-fill text-success me-2"></i>
+            Historique des Paiements
+        </h1>
+    </div>
+
+    <!-- Barre de recherche -->
+    <div class="card bg-dark border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="input-group input-group-lg">
+                <span class="input-group-text bg-secondary border-0 text-white">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input 
+                    id="searchInput" 
+                    type="text" 
+                    class="form-control bg-secondary text-white border-0 shadow-none" 
+                    placeholder="Rechercher par utilisateur ou abonnement..."
+                >
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau -->
+    <div class="card bg-dark border-0 shadow-lg">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0" id="paymentTable">
+                    <thead class="text-secondary text-uppercase small border-bottom border-success border-opacity-25">
+                        <tr>
+                            <th>Utilisateur</th>
+                            <th>Abonnement</th>
+                            <th>Montant</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for paiement in pagination %}
+                        <tr>
+                            <td class="user">
+                                {{ paiement.user.email }}
+                            </td>
+                            <td class="abonnement">
+                                {{ paiement.abonnement.type }}
+                            </td>
+                            <td class="montant text-success fw-bold">
+                                {{ paiement.montant }} TND
+                            </td>
+                            <td class="date">
+                                {{ paiement.createdAt|date('d/m/Y H:i') }}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-secondary">
+                                <i class="bi bi-receipt fs-1 d-block mb-2"></i>
+                                Aucun paiement trouvé
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center mt-4">
+        {{ knp_pagination_render(pagination) }}
+    </div>
+
+</div>
+
+<!-- Recherche côté client -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchInput');
+    const table = document.getElementById('paymentTable');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr:not(:has(td[colspan]))'));
+
+    function filterRows() {
+        const searchText = searchInput.value.toLowerCase().trim();
+
+        let filteredRows = rows.filter(row => {
+            const user = row.querySelector('.user')?.textContent.toLowerCase() || '';
+            const abonnement = row.querySelector('.abonnement')?.textContent.toLowerCase() || '';
+            return user.includes(searchText) || abonnement.includes(searchText);
+        });
+
+        tbody.innerHTML = '';
+        filteredRows.forEach(row => tbody.appendChild(row));
+
+        if (filteredRows.length === 0 && rows.length > 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="text-center py-5 text-secondary">
+                        <i class="bi bi-search fs-1 d-block mb-2"></i>
+                        Aucun paiement ne correspond à votre recherche
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    searchInput.addEventListener('input', filterRows);
+});
+</script>
+
+{% endblock %}

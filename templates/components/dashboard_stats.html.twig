@@ -1,0 +1,229 @@
+<script>
+const userGrowth = {{ this.getUserGrowth()|json_encode|raw }};
+const revenueGrowth = {{ this.getRevenueGrowth()|json_encode|raw }};
+const subscriptionStats = {{ this.getSubscriptionStats()|json_encode|raw }};
+const gamesStats = {{ this.getGamesStats()|json_encode|raw }};
+</script>
+<div data-poll="15000|$refresh" class="row g-4 mb-5">
+
+    <div class="col-md-3">
+		<div class="card bg-dark border-0 shadow-lg text-white h-100">
+			<div class="card-body text-center d-flex flex-column justify-content-center">
+				<h2 class="fw-bold mb-1">{{ this.getUsersCount() }}</h2>
+				<div class="text-success small">Nombre total des utilisateurs</div>
+			</div>
+		</div>
+	</div>
+	<!-- Utilisateurs -->
+	<div class="col-md-3">
+		<div class="card bg-dark border-0 shadow-lg text-white h-100">
+			<div class="card-body text-center d-flex flex-column justify-content-center">
+				<div class="fs-6 mb-2 text-muted">{{ this.getUsersEvolution() }}%</div>
+				<div class="text-success small">Evolution de Utilisateurs de ce mois</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Tournois Actifs -->
+	<div class="col-md-3">
+		<div class="card bg-dark border-0 shadow-lg text-white h-100">
+			<div class="card-body text-center d-flex flex-column justify-content-center">
+                <h2 class="fw-bold mb-1">{{ this.getTournamentsEvolution() }}%</h2>
+				<div class="text-success small">Evolution de Tournois de ce mois</div>
+                
+			</div>
+		</div>
+	</div>
+
+	<!-- Streams en direct -->
+	<div class="col-md-3">
+		<div class="card bg-dark border-0 shadow-lg text-white h-100">
+			<div class="card-body text-center d-flex flex-column justify-content-center">
+				<h2 class="fw-bold mb-1">{{ this.getStreamsEvolution() }}%</h2>
+                <div class="text-success small">Evolution de Streams de ce mois</div>
+
+			</div>
+		</div>
+	</div>
+
+	<!-- Revenus Mensuels -->
+	<div class="col-md-3">
+		<div class="card bg-dark border-0 shadow-lg text-white h-100">
+			<div class="card-body text-center d-flex flex-column justify-content-center">
+				<div class="fs-6 mb-2 text-muted">Revenus Mensuels</div>
+				<h2 class="fw-bold mb-1">{{ this.getRevenueEvolution() }}%</h2>
+				<div class="text-success small">Evolution de Revenu de ce mois</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+<div
+	class="row g-4 mt-5">
+
+	<!-- 1. Croissance Utilisateurs -->
+	<div class="col-xl-6">
+		<div class="card bg-dark bg-gradient border-0 shadow-lg overflow-hidden h-100">
+			<div class="card-header d-flex align-items-center bg-gradient-primary border-bottom-0 py-3">
+				<i class="bi bi-graph-up-arrow fs-4 me-3 text-white"></i>
+				<div>
+					<h5 class="mb-0 text-white fw-semibold">Croissance Utilisateurs</h5>
+					<small class="text-white">Sur les 6 derniers mois</small>
+				</div>
+			</div>
+			<div class="card-body p-4">
+				<canvas id="userGrowthChart" height="220"></canvas>
+			</div>
+		</div>
+	</div>
+
+	<!-- 2. Revenus Mensuels -->
+	<div class="col-xl-6">
+		<div class="card bg-dark bg-gradient border-0 shadow-lg overflow-hidden h-100">
+			<div class="card-header d-flex align-items-center bg-gradient-success border-bottom-0 py-3">
+				<i class="bi bi-currency-euro fs-4 me-3 text-white"></i>
+				<div>
+					<h5 class="mb-0 text-white fw-semibold">Revenus Mensuels</h5>
+					<small class="text-white">Évolution des revenus</small>
+				</div>
+			</div>
+			<div class="card-body p-4">
+				<canvas id="revenueChart" height="220"></canvas>
+			</div>
+		</div>
+	</div>
+
+	<!-- 3. Tournois par jeu -->
+	<div class="col-xl-6">
+		<div class="card bg-dark bg-gradient border-0 shadow-lg overflow-hidden h-100">
+			<div class="card-header d-flex align-items-center bg-gradient-info border-bottom-0 py-3">
+				<i class="bi bi-controller fs-4 me-3 text-white"></i>
+				<div>
+					<h5 class="mb-0 text-white fw-semibold">Tournois par Jeu</h5>
+					<small class="text-white">Distribution des tournois actifs</small>
+				</div>
+			</div>
+			<div class="card-body p-4">
+				<canvas id="gamesChart" height="220"></canvas>
+			</div>
+		</div>
+	</div>
+
+	<!-- 4. Répartition Abonnements -->
+	<div class="col-xl-6">
+		<div class="card bg-dark bg-gradient border-0 shadow-lg overflow-hidden h-100">
+			<div class="card-header d-flex align-items-center bg-gradient-warning border-bottom-0 py-3">
+				<i class="bi bi-stars fs-4 me-3 text-white"></i>
+				<div>
+					<h5 class="mb-0 text-white fw-semibold">Répartition Abonnements</h5>
+					<small class="text-white">Free / Pro / Elite</small>
+				</div>
+			</div>
+			<div class="card-body p-4 d-flex justify-content-center align-items-center">
+				<canvas id="subscriptionChart" height="240"></canvas>
+			</div>
+		</div>
+	</div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script><script>
+// Configuration commune pour tous les charts
+const commonOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+        legend: {
+            labels: {
+                color: '#e0e0ff',
+                font: { size: 13 }
+            }
+        },
+        tooltip: {
+            backgroundColor: '#2a004f',
+            titleColor: '#fff',
+            bodyColor: '#e0e0ff'
+        }
+    },
+    scales: {
+        x: {
+            ticks: { color: '#e0e0ff' },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+        },
+        y: {
+            ticks: { color: '#e0e0ff' },
+            grid: { color: 'rgba(255,255,255,0.05)' }
+        }
+    }
+};
+
+// 1️⃣ Croissance Utilisateurs
+new Chart(document.getElementById('userGrowthChart'), {
+    type: 'line',
+    data: {
+        labels: userGrowth.labels,
+        datasets: [{
+            label: 'Utilisateurs',
+            data: userGrowth.data,
+            borderColor: '#c084fc',
+            backgroundColor: 'rgba(192,132,252,0.2)',
+            tension: 0.4,
+            fill: true
+        }]
+    },
+    options: commonOptions
+});
+
+// 2️⃣ Revenus Mensuels
+new Chart(document.getElementById('revenueChart'), {
+    type: 'bar',
+    data: {
+        labels: revenueGrowth.labels,
+        datasets: [{
+            label: 'Revenus (€)',
+            data: revenueGrowth.data,
+            backgroundColor: '#34d399'
+        }]
+    },
+    options: commonOptions
+});
+
+// 3️⃣ Tournois par jeu (horizontal)
+new Chart(document.getElementById('gamesChart'), {
+    type: 'bar',
+    data: {
+        labels: gamesStats.labels,
+        datasets: [{
+            label: 'Tournois actifs',
+            data: gamesStats.data,
+            backgroundColor: '#3b82f6'
+        }]
+    },
+    options: {
+        ...commonOptions,
+        indexAxis: 'y'
+    }
+});
+
+// 4️⃣ Répartition Abonnements
+new Chart(document.getElementById('subscriptionChart'), {
+    type: 'doughnut',
+    data: {
+        labels: subscriptionStats.labels,
+        datasets: [{
+            data: subscriptionStats.data,
+            backgroundColor: ['#6b7280','#a78bfa','#f472b6']
+        }]
+    },
+    options: {
+        ...commonOptions,
+        cutout: '65%'
+    }
+});
+</script>
+<div class="card bg-dark border-0 mt-2 shadow-lg text-white">
+
+<div class="card-header d-flex align-items-center">
+	<i class="bi bi-activity me-2"></i>
+	<h5 class="mb-0">Activité Récente</h5>
+</div>
+</div>

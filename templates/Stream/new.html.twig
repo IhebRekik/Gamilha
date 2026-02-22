@@ -1,0 +1,15 @@
+{% extends 'base_front.html.twig' %}
+
+{% block title %}Nouveau Stream{% endblock %}
+
+{% block body %}
+<h1>Configurer votre stream</h1>
+
+{{ form_start(form) }}
+    {{ form_row(form.title) }}
+    {{ form_row(form.game) }}
+
+    <button class="btn btn-primary">Lancer le stream</button>
+{{ form_end(form) }}
+
+{% endblock %}

@@ -1,0 +1,115 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ playlist.title }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+
+
+    <!-- 🎶 INFOS PLAYLIST -->
+    <div class="mb-4">
+        <h1>🎶 {{ playlist.title }}</h1>
+        <p class="opacity-75">{{ playlist.description }}</p>
+
+        <p class="small">
+            🎯 <strong>Niveau :</strong> {{ playlist.niveau }} |
+            📂 <strong>Catégorie :</strong> {{ playlist.categorie }}
+        </p>
+    </div>
+
+    <hr class="mb-4">
+<form method="get" class="row g-2 mb-4">
+    <div class="col-md-4">
+        <input type="text" name="q" class="form-control"
+               placeholder="🔍 Rechercher..."
+               value="{{ app.request.get('q') }}">
+    </div>
+
+    <div class="col-md-3">
+        <select name="niveau" class="form-select">
+            <option value="">Tous niveaux</option>
+            <option value="debutant">Débutant</option>
+            <option value="intermediaire">Intermédiaire</option>
+            <option value="avance">Avancé</option>
+        </select>
+    </div>
+
+    <div class="col-md-3">
+        <select name="categorie" class="form-select">
+            <option value="">Toutes catégories</option>
+            <option value="fitness">Fitness</option>
+            <option value="yoga">Yoga</option>
+            <option value="musculation">Musculation</option>
+            <option value="cardio">Cardio</option>
+        </select>
+    </div>
+
+    <div class="col-md-2">
+        <button class="btn btn-primary w-100">Filtrer</button>
+    </div>
+</form>
+
+    <!-- 🎥 VIDÉOS DE LA PLAYLIST -->
+    <h3 class="mb-4">🎥 Vidéos de la playlist</h3>
+
+    <div class="row">
+        {% for video in videos %}
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 shadow-sm bg-dark text-white">
+
+                    <!-- 🎬 APERÇU VIDÉO -->
+                    <div class="ratio ratio-16x9">
+                        {% if video.url starts with 'http' %}
+                            <iframe
+                                src="{{ video.url }}"
+                                title="{{ video.titre }}"
+                                allowfullscreen>
+                            </iframe>
+                        {% else %}
+                            <video controls preload="metadata">
+                                <source src="{{ asset(video.url) }}" type="video/mp4">
+                                Votre navigateur ne supporte pas la vidéo.
+                            </video>
+                        {% endif %}
+                    </div>
+
+                    <!-- 📄 INFOS -->
+                    <div class="card-body">
+                        <h5 class="card-title">{{ video.titre }}</h5>
+
+                        <p class="card-text small opacity-75">
+                            {{ video.description|slice(0, 120) }}
+                            {% if video.description|length > 120 %}...{% endif %}
+                        </p>
+
+                        <ul class="list-unstyled small">
+                            <li>
+                                🎯 <strong>Niveau :</strong> {{ video.niveau }}
+                            </li>
+                            <li>
+                                💎 <strong>Premium :</strong>
+                                {% if video.premium %}
+                                    <span class="badge bg-warning text-dark">Oui</span>
+                                {% else %}
+                                    <span class="badge bg-success">Non</span>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12 text-center opacity-75">
+                <p>Aucune vidéo dans cette playlist</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- ⬅️ RETOUR -->
+    <a href="{{ path('playlist_index') }}" class="btn btn-secondary mt-4">
+        ⬅️ Retour aux playlists
+    </a>
+
+</div>
+{% endblock %}

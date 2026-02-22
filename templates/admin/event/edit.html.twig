@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit tournament{% endblock %}
+
+{% block body %}
+    <h1>Edit tournament</h1>
+
+    {{ include('admin/event/_form.html.twig', {'button_label': 'Update'}) }}
+
+    {{ include('admin/event/_delete_form.html.twig') }}
+{% endblock %}

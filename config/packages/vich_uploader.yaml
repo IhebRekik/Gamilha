@@ -1,0 +1,13 @@
+vich_uploader:
+    db_driver: orm
+
+    mappings:
+        chat_images:
+            uri_prefix: /uploads/images
+            upload_destination: '%kernel.project_dir%/public/uploads/images'
+            namer: Vich\UploaderBundle\Naming\UniqidNamer
+
+        chat_audio:
+            uri_prefix: /uploads/audio
+            upload_destination: '%kernel.project_dir%/public/uploads/audio'
+            namer: Vich\UploaderBundle\Naming\UniqidNamer

@@ -1,0 +1,184 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gamilha - Événements{% endblock %}
+
+{% macro sort_link(sortBy, currentSortBy, currentSortOrder, search, label) %}
+    {% set nextOrder = (currentSortBy == sortBy and currentSortOrder == 'ASC') ? 'DESC' : 'ASC' %}
+    <a href="{{ path('admin_evenement_index', { search: search, sortBy: sortBy, sortOrder: nextOrder }) }}" class="text-decoration-none text-secondary d-inline-flex align-items-center">
+        {{ label }}
+        {% if currentSortBy == sortBy %}
+            <i class="bi bi-chevron-{{ currentSortOrder == 'ASC' ? 'up' : 'down' }} ms-1 small"></i>
+        {% else %}
+            <i class="bi bi-chevron-expand ms-1 small opacity-50"></i>
+        {% endif %}
+    </a>
+{% endmacro %}
+
+{% block body %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-white">
+            <i class="bi bi-calendar-event-fill text-primary me-2"></i>Gestion des événements
+        </h1>
+        <a href="{{ path('admin_evenement_new') }}" class="btn btn-success shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> Nouvel événement
+        </a>
+    </div>
+
+    <form method="get" action="{{ path('admin_evenement_index') }}" class="mb-3" id="searchForm">
+        <input type="hidden" name="sortBy" value="{{ sortBy }}">
+        <input type="hidden" name="sortOrder" value="{{ sortOrder }}">
+        <div class="input-group">
+            <span class="input-group-text bg-dark border-secondary text-secondary">
+                <i class="bi bi-search"></i>
+            </span>
+            <input type="text" name="search" id="searchInput" value="{{ search }}" class="form-control bg-dark border-secondary text-white" placeholder="Rechercher (nom, jeu, type, statut...)" aria-label="Rechercher">
+            <button type="submit" class="btn btn-primary">Rechercher</button>
+            {% if search %}
+                <a href="{{ path('admin_evenement_index', { sortBy: sortBy, sortOrder: sortOrder }) }}" class="btn btn-outline-secondary" id="clearBtn">Effacer</a>
+            {% endif %}
+        </div>
+    </form>
+
+    <div class="card bg-dark border-0 shadow-lg">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0" id="evenementsTable">
+                    <thead class="text-secondary text-uppercase small border-bottom border-primary border-opacity-25">
+                        <tr>
+                            <th class="ps-4">{{ _self.sort_link('idEvenement', sortBy, sortOrder, search, 'ID') }}</th>
+                            <th>{{ _self.sort_link('nom', sortBy, sortOrder, search, 'Nom') }}</th>
+                            <th>{{ _self.sort_link('jeu', sortBy, sortOrder, search, 'Jeu') }}</th>
+                            <th>{{ _self.sort_link('typeEvenement', sortBy, sortOrder, search, 'Type') }}</th>
+                            <th>{{ _self.sort_link('dateDebut', sortBy, sortOrder, search, 'Début') }}</th>
+                            <th>{{ _self.sort_link('dateFin', sortBy, sortOrder, search, 'Fin') }}</th>
+                            <th>{{ _self.sort_link('statut', sortBy, sortOrder, search, 'Statut') }}</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for evenement in evenements %}
+                        <tr class="border-bottom border-secondary border-opacity-10">
+                            <td class="ps-4 text-secondary">#{{ evenement.idEvenement }}</td>
+                            <td class="fw-semibold text-white name">{{ evenement.nom }}</td>
+                            <td class="jeu"><span class="badge bg-secondary px-2">{{ evenement.jeu }}</span></td>
+                            <td class="type">{{ evenement.typeEvenement }}</td>
+                            <td class="date-debut">{{ evenement.dateDebut ? evenement.dateDebut|date('d/m/Y') : '—' }}</td>
+                            <td class="date-fin">{{ evenement.dateFin ? evenement.dateFin|date('d/m/Y') : '—' }}</td>
+                            <td class="statut"><span class="badge bg-info px-2">{{ evenement.statut }}</span></td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group shadow-sm">
+                                    <a href="{{ path('admin_evenement_show', {'idEvenement': evenement.idEvenement}) }}" class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
+                                    <a href="{{ path('admin_evenement_edit', {'idEvenement': evenement.idEvenement}) }}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                                    <a href="{{ path('admin_bracket_new', {'idEvenement': evenement.idEvenement}) }}" class="btn btn-sm btn-outline-success" title="Ajouter un bracket"><i class="bi bi-diagram-3"></i></a>
+                                    <form method="post" action="{{ path('admin_evenement_delete', {'idEvenement': evenement.idEvenement}) }}" onsubmit="return confirm('Confirmer la suppression ?');" class="d-inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ evenement.idEvenement) }}">
+                                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr id="no-results-row">
+                            <td colspan="8" class="text-center py-5 text-secondary">
+                                <i class="bi bi-calendar-x fs-1 d-block mb-2"></i>
+                                Aucun événement trouvé.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript pour la recherche dynamique -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchInput');
+    const searchForm = document.getElementById('searchForm');
+    const table = document.getElementById('evenementsTable');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr:not(#no-results-row)')); // Exclure la ligne "aucun résultat"
+    const noResultsRow = document.getElementById('no-results-row');
+
+    function filterTable() {
+        const searchText = searchInput.value.toLowerCase().trim();
+        let visibleCount = 0;
+
+        // Filtrer les lignes en les affichant/cachant
+        rows.forEach(row => {
+            const name = row.querySelector('.name')?.textContent.toLowerCase() || '';
+            const jeu = row.querySelector('.jeu')?.textContent.toLowerCase() || '';
+            const type = row.querySelector('.type')?.textContent.toLowerCase() || '';
+            const statut = row.querySelector('.statut')?.textContent.toLowerCase() || '';
+            const dateDebut = row.querySelector('.date-debut')?.textContent.toLowerCase() || '';
+            const dateFin = row.querySelector('.date-fin')?.textContent.toLowerCase() || '';
+
+            const matches = searchText === '' || 
+                          name.includes(searchText) || 
+                          jeu.includes(searchText) || 
+                          type.includes(searchText) || 
+                          statut.includes(searchText) ||
+                          dateDebut.includes(searchText) ||
+                          dateFin.includes(searchText);
+
+            if (matches) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Afficher/masquer le message "aucun résultat"
+        if (noResultsRow) {
+            if (visibleCount === 0 && searchText !== '') {
+                noResultsRow.style.display = '';
+                noResultsRow.innerHTML = `
+                    <td colspan="8" class="text-center py-5 text-secondary">
+                        <i class="bi bi-search fs-1 d-block mb-2"></i>
+                        Aucun événement ne correspond à votre recherche
+                    </td>
+                `;
+            } else {
+                noResultsRow.style.display = 'none';
+            }
+        } else if (visibleCount === 0 && searchText !== '') {
+            // Créer la ligne "aucun résultat" si elle n'existe pas
+            const noResultsTr = document.createElement('tr');
+            noResultsTr.id = 'no-results-row';
+            noResultsTr.innerHTML = `
+                <td colspan="8" class="text-center py-5 text-secondary">
+                    <i class="bi bi-search fs-1 d-block mb-2"></i>
+                    Aucun événement ne correspond à votre recherche
+                </td>
+            `;
+            tbody.appendChild(noResultsTr);
+        }
+    }
+
+    // Recherche dynamique à chaque frappe
+    searchInput.addEventListener('input', filterTable);
+
+    // Empêcher la soumission du formulaire lors de la recherche dynamique
+    searchForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        filterTable();
+    });
+
+    // Bouton effacer
+    const clearBtn = document.getElementById('clearBtn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            searchInput.value = '';
+            filterTable();
+            // Rediriger vers la page sans paramètre de recherche
+            window.location.href = clearBtn.href;
+        });
+    }
+});
+</script>
+{% endblock %}

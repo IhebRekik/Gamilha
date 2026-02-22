@@ -1,0 +1,61 @@
+{% extends 'base_front.html.twig' %}
+
+{% block title %}Événements — Gamilha{% endblock %}
+
+{% block body %}
+<section class="mb-4 d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <div>
+        <h1 class="section-title d-flex align-items-center gap-2">
+            <i class="bi bi-calendar-event-fill text-primary"></i>
+            Événements
+        </h1>
+        <p class="text-muted mb-0">Tournois et compétitions e-sport à suivre.</p>
+    </div>
+    <div class="d-flex gap-2">
+        {% if is_granted('ROLE_USER') %}
+        <a href="{{ path('front_evenement_my_events') }}" class="btn btn-outline-primary">Mes événements</a>
+        <a href="{{ path('front_evenement_new') }}" class="btn btn-gamilha">Créer un événement</a>
+        {% endif %}
+    </div>
+</section>
+
+{% if evenements|length > 0 %}
+<div class="row g-4">
+    {% for evenement in evenements %}
+    <div class="col-md-6 col-lg-4">
+        <a href="{{ path('front_evenement_show', { idEvenement: evenement.idEvenement }) }}" class="text-decoration-none text-reset">
+            <div class="card card-front h-100">
+                {% if evenement.image %}
+                <img src="{{ evenement.image }}" alt="{{ evenement.nom }}" class="card-img-top w-100" style="height: 180px; object-fit: cover;">
+                {% else %}
+                <div class="card-img-top bg-dark d-flex align-items-center justify-content-center text-muted" style="height: 180px;">
+                    <i class="bi bi-calendar-event display-4"></i>
+                </div>
+                {% endif %}
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge badge-gamilha">{{ evenement.jeu }}</span>
+                        <span class="badge bg-dark text-info border border-info">{{ evenement.statut }}</span>
+                    </div>
+                    <h5 class="card-title fw-bold text-white mb-2">{{ evenement.nom }}</h5>
+                    <p class="text-muted small mb-3">{{ evenement.description ? evenement.description|slice(0, 120) ~ '…' : '—' }}</p>
+                    <div class="d-flex gap-3 text-muted small">
+                        <span><i class="bi bi-calendar3 me-1"></i>{{ evenement.dateDebut ? evenement.dateDebut|date('d/m/Y') : '—' }}</span>
+                        <span><i class="bi bi-calendar3-event me-1"></i>{{ evenement.dateFin ? evenement.dateFin|date('d/m/Y') : '—' }}</span>
+                        <span><i class="bi bi-broadcast me-1"></i>{{ evenement.typeEvenement }}</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card card-front">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-calendar-x display-4 text-muted mb-3"></i>
+        <p class="text-muted mb-0">Aucun événement pour le moment.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,8 @@
+twig:
+    file_name_pattern: '*.twig'
+    globals:
+        ably_api_key: '%ably.api_key%'
+
+when@test:
+    twig:
+        strict_variables: true

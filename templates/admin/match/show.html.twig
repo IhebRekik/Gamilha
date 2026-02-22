@@ -1,0 +1,39 @@
+{% extends 'base.html.twig' %}
+{% block title %}Gamilha - Détails du match{% endblock %}
+{% block body %}
+<div class="container py-5">
+    <div class="d-flex align-items-center mb-4">
+        <a href="{{ path('admin_match_index') }}" class="btn btn-outline-secondary btn-sm me-3"><i class="bi bi-arrow-left"></i></a>
+        <h1 class="text-white h3 mb-0">Détails du match</h1>
+    </div>
+    <div class="card bg-dark border border-primary border-opacity-25 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-body py-4">
+            <dl class="row mb-0">
+                <dt class="col-sm-4 text-white">ID Match</dt>
+                <dd class="col-sm-8 text-white">{{ match.idMatch }}</dd>
+                <dt class="col-sm-4 text-white">Bracket / Événement</dt>
+                <dd class="col-sm-8 text-white">{{ match.bracket.typeBracket }} — {{ match.bracket.evenement.nom }}</dd>
+                <dt class="col-sm-4 text-white">Date</dt>
+                <dd class="col-sm-8 text-white">{{ match.dateMatch ? match.dateMatch|date('d/m/Y H:i') : '—' }}</dd>
+                <dt class="col-sm-4 text-white">Tour</dt>
+                <dd class="col-sm-8 text-white">{{ match.tour }}</dd>
+                <dt class="col-sm-4 text-white">Équipe A</dt>
+                <dd class="col-sm-8 text-white">{{ match.equipeA ? match.equipeA.nomEquipe : 'TBD' }}</dd>
+                <dt class="col-sm-4 text-white">Équipe B</dt>
+                <dd class="col-sm-8 text-white">{{ match.equipeB ? match.equipeB.nomEquipe : 'TBD' }}</dd>
+                <dt class="col-sm-4 text-white">Score</dt>
+                <dd class="col-sm-8 text-white">{{ match.scoreEquipeA }} - {{ match.scoreEquipeB }}</dd>
+                <dt class="col-sm-4 text-white">Statut</dt>
+                <dd class="col-sm-8 text-white">{{ match.statut }}</dd>
+            </dl>
+        </div>
+        <div class="card-footer bg-dark border-top border-secondary border-opacity-10 d-flex justify-content-between">
+            <a href="{{ path('admin_match_index') }}" class="btn btn-secondary"><i class="bi bi-arrow-left-circle-fill me-2"></i>Retour</a>
+            <div class="d-flex">
+                <a href="{{ path('admin_match_edit', {'idMatch': match.idMatch}) }}" class="btn btn-warning me-2"><i class="bi bi-pencil-fill me-1"></i>Modifier</a>
+                {{ include('admin/match/_delete_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

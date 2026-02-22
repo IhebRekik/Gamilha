@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Résultat Coaching</title>
+</head>
+<body>
+
+<h1>Résultat Analyse</h1>
+
+<div>
+    {{ analysis.result }}
+</div>
+
+<script>
+    const hasResult = {{ analysis.result is not empty ? 'true' : 'false' }};
+
+    if (!hasResult) {
+        setTimeout(() => {
+            location.reload();
+        }, 5000);
+    }
+</script>
+
+</body>
+</html>

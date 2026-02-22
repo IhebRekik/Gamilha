@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Gamilha Admin{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+    <link rel="icon" href="{{ asset('images/gamilha.png') }}">
+</head>
+
+<body class="bg-dark text-light">
+
+<div class="d-flex">
+
+    <!-- SIDEBAR -->
+    <div class="bg-black border-end border-secondary p-3" style="width: 400px; min-height: 100vh;">
+
+        <h5 class="fw-bold mb-4">
+            <img src="{{ asset('images/gamilha.png') }}" width="30" class="me-2">
+            Gamilha Admin
+        </h5>
+
+        <ul class="nav nav-pills flex-column gap-2">
+
+            <li class="nav-item">
+                <a class="nav-link text-light" href="{{ path('admin_dashboard') }}">
+                    <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link text-light" href="{{ path('admin_user_index') }}">
+                    <i class="bi bi-people me-2"></i> Utilisateurs
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link text-light" href="{{ path('admin_evenement_index') }}">
+                    <i class="bi bi-calendar-event me-2"></i> Événements
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link text-light" href="{{ path('admin_match_index') }}">
+                    <i class="bi bi-trophy me-2"></i> Matchs
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link text-light" href="{{ path('admin_bracket_index') }}">
+                    <i class="bi bi-diagram-3 me-2"></i> Brackets
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link text-light" href="{{ path('admin_equipe_index') }}">
+                    <i class="bi bi-people me-2"></i> Équipes
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link text-light" href="{{ path('admin_post_index') }}">
+                    <i class="bi bi-share me-2"></i> Social
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link text-light" href="{{ path('admin_stream_index') }}">
+                    <i class="bi bi-broadcast me-2"></i> Streams
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a class="nav-link text-light" href="{{ path('admin_donation_index') }}">
+                    <i class="bi bi-cash-coin me-2"></i> Donations
+                </a>
+            </li>
+             <li class="nav-item">
+                <a class="nav-link text-light" href="{{ path('app_abonnement_index') }}">
+                    <i class="bi bi-cash-coin me-2"></i> Les Abonnements
+                </a>
+            </li>
+             <li class="nav-item">
+                <a class="nav-link text-light" href="{{ path('app_user_abonnement_index') }}">
+                    <i class="bi bi-cash-coin me-2"></i> User Abonnements
+                </a>
+            </li>
+            <li class="nav-item">
+    <a class="nav-link text-light" href="{{ path('admin_historique_paiement_index') }}">
+        <i class="bi bi-credit-card me-2"></i> Historique Paiement
+    </a>
+</li>
+
+
+            <hr class="text-secondary">
+
+            <li class="nav-item">
+                <a class="nav-link text-danger" href="{{ path('app_logout') }}">
+                    <i class="bi bi-box-arrow-right me-2"></i> Déconnexion
+                </a>
+            </li>
+            
+
+        </ul>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="flex-grow-1">
+
+        <!-- TOP BAR -->
+        <nav class="navbar navbar-dark bg-black border-bottom border-secondary px-4">
+            <span class="navbar-text">
+                Bonjour {{ app.user ? app.user.name : '' }}
+            </span>
+        </nav>
+
+        <!-- PAGE CONTENT -->
+        <div class="container-fluid py-4">
+            <div class="bg-secondary bg-opacity-10 p-4 rounded-4 shadow-sm">
+                {% block body %}{% endblock %}
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

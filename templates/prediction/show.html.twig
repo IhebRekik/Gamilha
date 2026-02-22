@@ -1,0 +1,92 @@
+{% extends 'base_front.html.twig' %}
+
+{% block body %}
+
+<div class="container mt-5">
+
+    <div class="card shadow-lg border-0 rounded-4 p-4">
+
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold">
+                📊 Stream Prediction
+            </h2>
+
+            <span class="badge 
+                {% if data.prediction.confidence_level >= 0.8 %}
+                    bg-success
+                {% elseif data.prediction.confidence_level >= 0.5 %}
+                    bg-warning
+                {% else %}
+                    bg-danger
+                {% endif %}
+                fs-6 px-3 py-2 rounded-pill">
+                Confiance : {{ data.prediction.confidence_text }}
+            </span>
+        </div>
+
+        <div class="row text-center">
+
+            <!-- Streams attendus -->
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-light">
+                    <h6 class="text-muted">Streams attendus</h6>
+                    <h1 class="fw-bold text-primary">
+                        {{ data.prediction.streams_expected }}
+                    </h1>
+                    <small class="text-muted">
+                        sur {{ data.prediction.period_days }} jours
+                    </small>
+                </div>
+            </div>
+
+            <!-- Intervalle -->
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-light">
+                    <h6 class="text-muted">Intervalle estimé</h6>
+                    <h3 class="fw-bold text-dark">
+                        {{ data.prediction.streams_min }}
+                        -
+                        {{ data.prediction.streams_max }}
+                    </h3>
+                </div>
+            </div>
+
+            <!-- Donations -->
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm rounded-4 p-4 bg-light">
+                    <h6 class="text-muted">Total Donations</h6>
+                    <h3 class="fw-bold text-success">
+                        {{ data.contributions.total_donation_amount }} $
+                    </h3>
+                    <small>
+                        {{ data.contributions.total_donations }} donations
+                    </small>
+                </div>
+            </div>
+
+        </div>
+
+        <hr class="my-4">
+
+        <h4 class="mb-3">💡 Recommandations</h4>
+
+        <ul class="list-group list-group-flush">
+            {% for rec in data.recommendations %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ rec.message }}
+                    <span class="badge bg-secondary">
+                        {{ rec.priority }}
+                    </span>
+                </li>
+            {% else %}
+                <li class="list-group-item">
+                    Aucune recommandation pour le moment 🎉
+                </li>
+            {% endfor %}
+        </ul>
+
+    </div>
+
+</div>
+
+{% endblock %}

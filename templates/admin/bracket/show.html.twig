@@ -1,0 +1,106 @@
+{% extends 'base.html.twig' %}
+{% block title %}Gamilha - Détails du bracket{% endblock %}
+{% block body %}
+<div class="container py-5">
+    <div class="d-flex align-items-center mb-4">
+        <a href="{{ path('admin_bracket_index') }}" class="btn btn-outline-secondary btn-sm me-3"><i class="bi bi-arrow-left"></i></a>
+        <h1 class="text-white h3 mb-0">Détails du bracket</h1>
+    </div>
+    <div class="card bg-dark border border-primary border-opacity-25 shadow-lg rounded-4 overflow-hidden mb-4">
+        <div class="card-body py-4">
+            <dl class="row mb-0">
+                <dt class="col-sm-4 text-white">ID Bracket</dt>
+                <dd class="col-sm-8 text-white">{{ bracket.idBracket }}</dd>
+                <dt class="col-sm-4 text-white">Type</dt>
+                <dd class="col-sm-8 text-white">{{ bracket.typeBracket }}</dd>
+                <dt class="col-sm-4 text-white">Nombre de tours</dt>
+                <dd class="col-sm-8 text-white">{{ bracket.nombreTours }}</dd>
+                <dt class="col-sm-4 text-white">Statut</dt>
+                <dd class="col-sm-8 text-white">{{ bracket.statut }}</dd>
+                <dt class="col-sm-4 text-white">Événement</dt>
+                <dd class="col-sm-8 text-white">{{ bracket.evenement ? bracket.evenement.nom : '—' }}</dd>
+            </dl>
+        </div>
+    </div>
+    {% if bracket.matchs|length > 0 %}
+    <div class="card bg-dark border border-primary border-opacity-25 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-header bg-transparent border-bottom border-secondary py-3">
+            <h2 class="h5 text-white mb-0"><i class="bi bi-diagram-3-fill text-primary me-2"></i>Arbre du tournoi</h2>
+        </div>
+        <div class="card-body p-0">
+            <div class="bracket-tree overflow-auto py-4 px-3">
+                {% for tour in rounds %}
+                <div class="bracket-round" data-round="{{ tour }}">
+                    <div class="round-label text-muted small text-center mb-2 fw-semibold text-uppercase">
+                        {% if loop.last and rounds|length > 1 %}Finale{% elseif loop.revindex == 2 and rounds|length > 2 %}Demi-finales{% else %}Tour {{ tour }}{% endif %}
+                    </div>
+                    <div class="bracket-matches d-flex flex-column justify-content-around" style="min-height: {{ (matchsByTour[tour]|length * 120) }}px;">
+                        {% for match in matchsByTour[tour] %}
+                        <div class="bracket-match-wrapper">
+                            <div class="bracket-match {% if match.statut == 'terminé' %}match-finished{% endif %}">
+                                <div class="match-team match-team-top {% if match.statut == 'terminé' and match.scoreEquipeA > match.scoreEquipeB %}winner{% endif %}">
+                                    <span class="team-name">{{ match.equipeA.nomEquipe }}</span>
+                                    <span class="team-score">{{ match.scoreEquipeA }}</span>
+                                </div>
+                                <div class="match-team match-team-bottom {% if match.statut == 'terminé' and match.scoreEquipeB > match.scoreEquipeA %}winner{% endif %}">
+                                    <span class="team-name">{{ match.equipeB.nomEquipe }}</span>
+                                    <span class="team-score">{{ match.scoreEquipeB }}</span>
+                                </div>
+                                <div class="match-status-badge">
+                                    <span class="badge {% if match.statut == 'terminé' %}bg-success{% elseif match.statut == 'en cours' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">{{ match.statut }}</span>
+                                </div>
+                                {% if match.dateMatch %}
+                                <div class="match-date text-muted small">{{ match.dateMatch|date('d/m H:i') }}</div>
+                                {% endif %}
+                            </div>
+                            {% if not loop.last %}
+                            <div class="bracket-connector"></div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% if not loop.last %}
+                <div class="bracket-round-connector">
+                    <svg viewBox="0 0 40 100" preserveAspectRatio="none"><path d="M20 0 L20 50 L40 50 M20 50 L20 100" stroke="rgba(139, 92, 246, 0.4)" stroke-width="1.5" fill="none"/></svg>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <style>
+    .bracket-tree { display: flex; align-items: center; gap: 0; padding: 24px 16px; }
+    .bracket-round { flex: 0 0 auto; min-width: 240px; padding: 0 20px; }
+    .bracket-round-connector { flex: 0 0 32px; min-width: 32px; display: flex; align-items: center; justify-content: center; }
+    .bracket-round-connector svg { width: 100%; height: 80px; }
+    .bracket-matches { display: flex; flex-direction: column; justify-content: space-evenly; gap: 20px; width: 100%; }
+    .bracket-match { background: linear-gradient(145deg, rgba(26, 26, 38, 0.98), rgba(18, 18, 26, 0.98)); border: 1px solid rgba(139, 92, 246, 0.3); border-radius: 14px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.4); min-width: 220px; position: relative; }
+    .bracket-match.match-finished { border-color: rgba(34, 197, 94, 0.5); }
+    .match-team { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid rgba(139, 92, 246, 0.12); min-height: 44px; }
+    .match-team:last-of-type { border-bottom: none; }
+    .match-team.winner { background: linear-gradient(90deg, rgba(34, 197, 94, 0.2), transparent); border-left: 3px solid #22c55e; }
+    .match-team .team-name { color: #e2e8f0; font-weight: 600; font-size: 0.95rem; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 10px; }
+    .match-team .team-score { background: rgba(139, 92, 246, 0.35); color: #c084fc; font-weight: 700; min-width: 36px; text-align: center; padding: 6px 10px; border-radius: 10px; }
+    .match-team.winner .team-score { background: rgba(34, 197, 94, 0.5); color: #4ade80; }
+    .match-status-badge { position: absolute; top: 10px; right: 10px; }
+    .match-date { position: absolute; bottom: 8px; left: 16px; font-size: 0.72rem; opacity: 0.8; }
+    .bracket-connector { height: 16px; }
+    </style>
+    {% else %}
+    <div class="card bg-dark border border-primary border-opacity-25 shadow-lg rounded-4 overflow-hidden">
+        <div class="card-body text-center text-muted py-5">
+            <i class="bi bi-trophy display-6 mb-2"></i>
+            <p class="mb-0">Aucun match dans ce bracket.</p>
+        </div>
+    </div>
+    {% endif %}
+    <div class="d-flex justify-content-between mt-4">
+        <a href="{{ path('admin_bracket_index') }}" class="btn btn-secondary"><i class="bi bi-arrow-left-circle-fill me-2"></i>Retour</a>
+        <div class="d-flex">
+            <a href="{{ path('admin_bracket_edit', {'idBracket': bracket.idBracket}) }}" class="btn btn-warning me-2"><i class="bi bi-pencil-fill me-1"></i>Modifier</a>
+            {{ include('admin/bracket/_delete_form.html.twig') }}
+        </div>
+    </div>
+</div>
+{% endblock %}

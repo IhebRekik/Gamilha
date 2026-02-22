@@ -1,0 +1,144 @@
+{% extends 'base_front.html.twig' %}
+
+{% block title %}Conversation avec
+	{{ recipient.name }}
+{% endblock %}
+
+{% block body %}
+	<div class="container py-4">
+
+		<h2 class="text-white mb-4">
+			<i class="bi bi-chat-dots text-primary me-2"></i>
+			Conversation avec
+			{{ recipient.name }}
+		</h2>
+
+		<div class="card bg-dark border-0 shadow-lg mb-3" style="height: 500px; overflow-y: auto; padding: 15px;">
+			<div class="card-body d-flex flex-column">
+
+				{% for message in messages %}
+					{% set isSender = message.sender.email == app.request.cookies.get('user_email') %}
+					<div class="d-flex mb-2 {{ isSender ? 'justify-content-end' : 'justify-content-start' }}">
+						<div class="p-2 rounded
+							    {{ isSender ? 'bg-primary text-white' : 'bg-secondary text-white' }} message-bubble" style="max-width: 60%;" data-message-id="{{ message.id }}">
+
+							<div class="d-flex justify-content-between align-items-start mb-1">
+								<strong>{{ message.sender.name }}</strong>
+								<small class="text-muted ms-2">{{ message.createdAt|date('H:i') }}</small>
+							</div>
+
+							<div class="message-content">
+								<p class="mb-1">{{ message.content }}</p>
+							</div>
+
+							{% if isSender %}
+								<div
+									class="d-flex justify-content-end gap-1">
+									<!-- Edit button -->
+									<button class="btn btn-sm btn-outline-warning py-0 px-1 edit-btn">✏️</button>
+
+									<!-- Delete button triggers modal -->
+									<button type="button" class="btn btn-sm btn-outline-danger py-0 px-1" data-bs-toggle="modal" data-bs-target="#deleteModal{{ message.id }}">
+										🗑️
+									</button>
+
+									<!-- Modal de confirmation -->
+									<div class="modal fade" id="deleteModal{{ message.id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ message.id }}" aria-hidden="true">
+										<div class="modal-dialog modal-dialog-centered">
+											<div class="modal-content bg-dark text-white border-0 shadow-lg">
+												<div class="modal-header border-bottom border-secondary">
+													<h5 class="modal-title" id="deleteModalLabel{{ message.id }}">Supprimer le message</h5>
+													<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+												</div>
+												<div class="modal-body">
+													Êtes-vous sûr de vouloir supprimer ce message ?
+													<p class="mt-2">
+														<em>"{{ message.content }}"</em>
+													</p>
+												</div>
+												<div class="modal-footer border-top border-secondary">
+													<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+													<form method="post" action="{{ path('chat_conversation_delete', {'id': message.id}) }}" class="d-inline">
+														<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ message.id) }}">
+														<button type="submit" class="btn btn-danger">Supprimer</button>
+													</form>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							{% endif %}
+						</div>
+					</div>
+				{% else %}
+					<p class="text-secondary text-center mt-4">Pas encore de messages</p>
+				{% endfor %}
+
+			</div>
+		</div>
+
+		<div class="card bg-dark border-0 shadow-lg p-3">
+			{{ form_start(form) }}
+			<div class="d-flex gap-2">
+				{{ form_widget(form.content, {'attr': {'class': 'form-control bg-secondary text-white', 'placeholder': 'Écrire un message...'}}) }}
+				<button type="submit" class="btn btn-success">Envoyer</button>
+			</div>
+			{{ form_end(form) }}
+		</div>
+
+	</div>
+
+	<script>
+		// Scroll automatique en bas
+const chatCard = document.querySelector('.card-body.d-flex.flex-column');
+if (chatCard) {
+chatCard.scrollTop = chatCard.scrollHeight;
+}
+
+// Inline edit
+document.querySelectorAll('.edit-btn').forEach(btn => {
+btn.addEventListener('click', function () {
+const bubble = this.closest('.message-bubble');
+const contentDiv = bubble.querySelector('.message-content');
+const messageId = bubble.dataset.messageId;
+const originalText = contentDiv.innerText;
+
+// Replace content with input + save button
+contentDiv.innerHTML = `
+                <input type="text" class="form-control form-control-sm mb-1" value="${originalText}">
+                <button class="btn btn-sm btn-success save-btn">💾</button>
+                <button class="btn btn-sm btn-secondary cancel-btn">✖</button>
+            `;
+
+// Cancel edit
+contentDiv.querySelector('.cancel-btn').addEventListener('click', () => {
+contentDiv.innerHTML = `<p class="mb-1">${originalText}</p>`;
+});
+
+// Save edit
+contentDiv.querySelector('.save-btn').addEventListener('click', () => {
+const newContent = contentDiv.querySelector('input').value;
+
+// Send AJAX request to update message
+fetch (`/chat/message/conversation/edit/${messageId}`, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json',
+'X-CSRF-TOKEN': '{{ csrf_token("edit") }}'
+},
+body: JSON.stringify(
+{content: newContent}
+)
+}).then(response => {
+if (response.ok) {
+contentDiv.innerHTML = `<p class="mb-1">${newContent}</p>`;
+} else {
+alert('Erreur lors de la mise à jour.');
+contentDiv.innerHTML = `<p class="mb-1">${originalText}</p>`;
+}
+});
+});
+});
+});
+	</script>
+{% endblock %}

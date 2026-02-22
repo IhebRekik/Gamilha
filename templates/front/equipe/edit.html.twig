@@ -1,0 +1,92 @@
+{% extends 'base_front.html.twig' %}
+
+{% block title %}Modifier {{ equipe.nomEquipe }} — Gamilha{% endblock %}
+
+{% block body %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb text-muted">
+        <li class="breadcrumb-item"><a href="{{ path('app_homepage') }}" class="text-muted text-decoration-none">Accueil</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('front_equipe_index') }}" class="text-muted text-decoration-none">Équipes</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('front_equipe_my_teams') }}" class="text-muted text-decoration-none">Mes équipes</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('front_equipe_show', { idEquipe: equipe.idEquipe }) }}" class="text-muted text-decoration-none">{{ equipe.nomEquipe }}</a></li>
+        <li class="breadcrumb-item active text-white">Modifier</li>
+    </ol>
+</nav>
+
+<div class="card card-front">
+    <div class="card-body p-4 p-md-5">
+        <h1 class="h3 mb-4">
+            <i class="bi bi-pencil-fill text-warning me-2"></i>
+            Modifier {{ equipe.nomEquipe }}
+        </h1>
+
+        {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': true}}) }}
+        <div class="row g-3">
+            <div class="col-md-6">
+                {{ form_row(form.nomEquipe, {
+                    'attr': {'class': 'form-control bg-dark text-white border-secondary'},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.tag, {
+                    'attr': {'class': 'form-control bg-dark text-white border-secondary'},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.logo, {
+                    'attr': {'class': 'form-control bg-dark text-white border-secondary'},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.pays, {
+                    'attr': {'class': 'form-control bg-dark text-white border-secondary'},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.dateCreation, {
+                    'attr': {'class': 'form-control bg-dark text-white border-secondary'},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.niveau, {
+                    'attr': {'class': 'form-select bg-dark text-white border-secondary'},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-12">
+                {{ form_row(form.members, {
+                    'attr': {'class': 'form-select bg-dark text-white border-secondary'},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+                <small class="form-text text-muted">Gérez les membres de votre équipe. Vous resterez automatiquement membre en tant que propriétaire.</small>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="bi bi-save-fill me-1"></i> Enregistrer
+                </button>
+            </div>
+        </div>
+        {{ form_end(form) }}
+
+        <div class="d-flex gap-2 mt-2">
+            <a href="{{ path('front_equipe_show', { idEquipe: equipe.idEquipe }) }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Retour
+            </a>
+            <form method="post" action="{{ path('front_equipe_delete', { idEquipe: equipe.idEquipe }) }}" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette équipe ?');">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ equipe.idEquipe) }}">
+                <button type="submit" class="btn btn-outline-danger">
+                    <i class="bi bi-trash me-1"></i> Supprimer
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

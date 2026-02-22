@@ -1,0 +1,61 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gamelha - Détails Événement{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="d-flex align-items-center mb-4">
+        <a href="{{ path('admin_event_index') }}" class="btn btn-outline-secondary btn-sm me-3">
+            <i class="bi bi-arrow-left"></i>
+        </a>
+        <h1 class="text-white h3 mb-0">Détails de l'Événement</h1>
+    </div>
+
+    <div >
+        <div >
+            <div class="card bg-dark border border-primary border-opacity-25 shadow-lg rounded-4 overflow-hidden">
+                <div class="card-header bg-dark border-bottom border-secondary border-opacity-10 py-3 d-flex align-items-center">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                        <i class="bi bi-calendar-event-fill text-white fs-5"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-white mb-0">Administrateur Gamelha</h6>
+                        <small class="text-secondary">Événement: <span class="text-info">{{ event.name }}</span></small>
+                    </div>
+                </div>
+
+                <div class="card-body py-4">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-white">ID</dt>
+                        <dd class="col-sm-8 text-white">{{ event.id }}</dd>
+
+                        <dt class="col-sm-4 text-white">Nom</dt>
+                        <dd class="col-sm-8 text-white">{{ event.name }}</dd>
+
+                        <dt class="col-sm-4 text-white">Date</dt>
+                        <dd class="col-sm-8 text-white">{{ event.date ? event.date|date('d/m/Y H:i') : '—' }}</dd>
+
+                        <dt class="col-sm-4 text-white">Jeu</dt>
+                        <dd class="col-sm-8 text-white">{{ event.game }}</dd>
+                    </dl>
+                </div>
+
+                <div class="card-footer bg-dark border-top border-secondary border-opacity-10 d-flex justify-content-between">
+                    <a href="{{ path('admin_event_index') }}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left-circle-fill me-2"></i>Retour
+                    </a>
+
+                    <div class="d-flex">
+                        <a href="{{ path('admin_event_edit', {'id': event.id}) }}" class="btn btn-warning me-2">
+                            <i class="bi bi-pencil-fill me-1"></i>Modifier
+                        </a>
+                        {{ include('admin/event/_delete_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+      
+    </div>
+</div>
+{% endblock %}

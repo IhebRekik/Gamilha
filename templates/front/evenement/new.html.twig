@@ -1,0 +1,195 @@
+{% extends 'base_front.html.twig' %}
+
+{% block title %}Créer un événement — Gamilha{% endblock %}
+
+{% block body %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb text-muted">
+        <li class="breadcrumb-item"><a href="{{ path('app_homepage') }}" class="text-muted text-decoration-none">Accueil</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('front_evenement_index') }}" class="text-muted text-decoration-none">Événements</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('front_evenement_my_events') }}" class="text-muted text-decoration-none">Mes événements</a></li>
+        <li class="breadcrumb-item active text-white">Créer un événement</li>
+    </ol>
+</nav>
+
+<div class="card card-front">
+    <div class="card-body p-4 p-md-5">
+        <h1 class="h3 mb-4 text-white">
+            <i class="bi bi-calendar-plus-fill text-primary me-2"></i>
+            Créer un événement
+        </h1>
+        <p class="text-muted mb-4">Renseignez les détails, choisissez le type de bracket et les équipes participantes. Ensuite vous pourrez lancer le tirage au sort des confrontations.</p>
+
+        {{ form_start(form, {'attr': {'class': 'needs-validation'}}) }}
+        <div class="row g-3">
+            <div class="col-12">
+                {{ form_row(form.nom, {
+                    'attr': {'class': 'form-control bg-dark text-white border-secondary'},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    {{ form_label(form.description, null, {
+                        'label_attr': {'class': 'form-label text-white fw-semibold mb-1'}
+                    }) }}
+                    <button type="button"
+                            class="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
+                            id="speech-description-btn">
+                        <i class="bi bi-mic-fill"></i>
+                        <span>Dicter la description</span>
+                    </button>
+                </div>
+                {{ form_widget(form.description, {
+                    'attr': {'class': 'form-control bg-dark text-white border-secondary', 'rows': 3}
+                }) }}
+                {{ form_errors(form.description) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.jeu, {
+                    'attr': {'class': 'form-control bg-dark text-white border-secondary'},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.typeEvenement, {
+                    'attr': {'class': 'form-select bg-dark text-white border-secondary'},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.dateDebut, {
+                    'attr': {'class': 'form-control bg-dark text-white border-secondary'},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.dateFin, {
+                    'attr': {'class': 'form-control bg-dark text-white border-secondary'},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.statut, {
+                    'attr': {'class': 'form-select bg-dark text-white border-secondary'},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-md-6">
+                {{ form_row(form.typeBracket, {
+                    'attr': {'class': 'form-select bg-dark text-white border-secondary'},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-12">
+                {{ form_row(form.regles, {
+                    'attr': {'class': 'form-control bg-dark text-white border-secondary', 'rows': 2},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-12">
+                {{ form_row(form.image, {
+                    'attr': {'class': 'form-control bg-dark text-white border-secondary'},
+                    'label_attr': {'class': 'form-label text-white fw-semibold'}
+                }) }}
+            </div>
+            <div class="col-12">
+                {{ form_label(form.equipesParticipantes, null, {'label_attr': {'class': 'form-label text-white fw-semibold'}}) }}
+                <div class="border border-secondary rounded-3 p-3 bg-dark" style="max-height: 280px; overflow-y: auto;">
+                    {% for child in form.equipesParticipantes %}
+                    <div class="form-check mb-2">
+                        {{ form_widget(child, {'attr': {'class': 'form-check-input'}}) }}
+                        {{ form_label(child, null, {'label_attr': {'class': 'form-check-label text-white ms-2'}}) }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {{ form_errors(form.equipesParticipantes) }}
+            </div>
+        </div>
+        <div class="mt-4 d-flex gap-2">
+            <button type="submit" class="btn btn-gamilha">
+                <i class="bi bi-check-lg me-1"></i> Créer l'événement
+            </button>
+            <a href="{{ path('front_evenement_my_events') }}" class="btn btn-outline-secondary">Annuler</a>
+        </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        (function () {
+            const btn = document.getElementById('speech-description-btn');
+            if (!btn) {
+                return;
+            }
+
+            const textarea = document.getElementById('{{ form.description.vars.id }}');
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                btn.style.display = 'none';
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'fr-FR';
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            let isListening = false;
+
+            btn.addEventListener('click', function () {
+                if (isListening) {
+                    recognition.stop();
+                } else {
+                    try {
+                        recognition.start();
+                    } catch (e) {
+                        // Certaines implémentations lèvent une erreur si start est appelé plusieurs fois
+                    }
+                }
+            });
+
+            recognition.onstart = function () {
+                isListening = true;
+                btn.classList.remove('btn-outline-secondary');
+                btn.classList.add('btn-success');
+                btn.innerHTML = '<i class="bi bi-mic-mute-fill"></i><span>Enregistrement...</span>';
+            };
+
+            function resetButton() {
+                isListening = false;
+                btn.classList.remove('btn-success');
+                btn.classList.add('btn-outline-secondary');
+                btn.innerHTML = '<i class="bi bi-mic-fill"></i><span>Dicter la description</span>';
+            }
+
+            recognition.onerror = function () {
+                resetButton();
+            };
+
+            recognition.onend = function () {
+                resetButton();
+            };
+
+            recognition.onresult = function (event) {
+                if (!textarea) {
+                    return;
+                }
+
+                const lastResult = event.results[event.results.length - 1];
+                if (!lastResult.isFinal) {
+                    return;
+                }
+
+                const transcript = lastResult[0].transcript || '';
+                const current = textarea.value || '';
+                const separator = current && !current.endsWith(' ') ? ' ' : '';
+                textarea.value = current + separator + transcript.trim();
+            };
+        })();
+    </script>
+{% endblock %}

@@ -1,0 +1,217 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gamelha - Abonnements utilisateurs{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+
+    <!-- En-tête -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+        <h1 class="text-white d-flex align-items-center mb-0">
+            <i class="bi bi-credit-card-2-front-fill text-primary me-2"></i>
+            Abonnements des utilisateurs
+        </h1>
+
+       
+    </div>
+
+    <!-- Barre de recherche + filtres -->
+    <div class="card bg-dark border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-center">
+                <!-- Recherche -->
+                <div class="col-12 col-md-5 col-lg-4">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text bg-secondary border-0 text-white">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input 
+                            id="searchInput" 
+                            type="text" 
+                            class="form-control bg-secondary text-white border-0 shadow-none" 
+                            placeholder="Rechercher (utilisateur, type...)" 
+                            aria-label="Rechercher">
+                    </div>
+                </div>
+
+                <!-- Filtres -->
+                <div class="col-12 col-md-7 col-lg-8">
+                    <div class="d-flex flex-wrap gap-3">
+                        <!-- Filtre par statut -->
+                        <div class="flex-grow-1 flex-shrink-1" style="min-width: 180px;">
+                            <select id="filterStatus" class="form-select bg-secondary text-white border-0 shadow-none">
+                                <option value="">Tous les statuts</option>
+                                <option value="active">Actif</option>
+                                <option value="expired">Expiré</option>
+                            </select>
+                        </div>
+
+                        <!-- Tri -->
+                        <div class="flex-grow-1 flex-shrink-1" style="min-width: 200px;">
+                            <select id="sortDate" class="form-select bg-secondary text-white border-0 shadow-none">
+                                <option value="">Tri par défaut</option>
+                                <option value="debut_desc">Date début ↓ (récent)</option>
+                                <option value="debut_asc">Date début ↑ (ancien)</option>
+                                <option value="fin_desc">Date fin ↓ (bientôt fin)</option>
+                                <option value="fin_asc">Date fin ↑ (fin lointaine)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau -->
+    <div class="card bg-dark border-0 shadow-lg">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0" id="userAbonnementsTable">
+                    <thead class="text-secondary text-uppercase small border-bottom border-primary border-opacity-25">
+                        <tr>
+                            <th>Utilisateur</th>
+                            <th>Type</th>
+                            <th>Date début</th>
+                            <th>Date fin</th>
+                            <th >Statut</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                    {% for ua in user_abonnements %}
+                        <tr class="border-bottom border-secondary border-opacity-10">
+                            <td class="user">
+                                {{ ua.user ? (ua.user.name ?: ua.user.name ?: ua.user.email) : '—' }}
+                            </td>
+                            <td class="type">
+                                {{ ua.abonnement ? ua.abonnement.type : '—' }}
+                            </td>
+                            <td class="debut" data-timestamp="{{ ua.dateDebut ? ua.dateDebut.timestamp : '' }}">
+                                <span class="badge bg-success bg-opacity-25 text-success border border-success border-opacity-25 px-3 py-2">
+                                    <i class="bi bi-calendar-check me-1"></i>
+                                    {{ ua.dateDebut ? ua.dateDebut|date('d/m/Y') : '—' }}
+                                </span>
+                            </td>
+                            <td class="fin" data-timestamp="{{ ua.dateFin ? ua.dateFin.timestamp : '' }}">
+                                <span class="badge bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25 px-3 py-2">
+                                    <i class="bi bi-calendar-x me-1"></i>
+                                    {{ ua.dateFin ? ua.dateFin|date('d/m/Y') : '—' }}
+                                </span>
+                            </td>
+                            <td class="status">
+                                {% if ua.dateFin and ua.dateFin < date() %}
+                                    <span class="badge bg-danger">Expiré</span>
+                                {% elseif ua.dateDebut and ua.dateDebut <= date() %}
+                                    <span class="badge bg-success">Actif</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Inactif</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group shadow-sm">
+                                    <a href="{{ path('app_user_abonnement_show', {'id': ua.id}) }}"
+                                       class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ path('app_user_abonnement_edit', {'id': ua.id}) }}"
+                                       class="btn btn-sm btn-outline-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center py-5 text-secondary">
+                                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                Aucun abonnement utilisateur trouvé
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- JavaScript pour le filtrage et tri côté client -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchInput');
+    const filterStatus = document.getElementById('filterStatus');
+    const sortDate = document.getElementById('sortDate');
+    const table = document.getElementById('userAbonnementsTable');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr:not(:has(td[colspan]))'));
+
+    function isActive(row) {
+        const finCell = row.querySelector('.fin');
+        if (!finCell || !finCell.dataset.timestamp) return false;
+        const finTimestamp = parseInt(finCell.dataset.timestamp);
+        return finTimestamp > Date.now() / 1000;
+    }
+
+    function filterAndSort() {
+        const searchText = searchInput.value.toLowerCase().trim();
+        const statusFilter = filterStatus.value;
+        const sortValue = sortDate.value;
+
+        let filteredRows = rows.filter(row => {
+            const userText = row.querySelector('.user')?.textContent.toLowerCase() || '';
+            const typeText = row.querySelector('.type')?.textContent.toLowerCase() || '';
+            const statusText = row.querySelector('.status')?.textContent.toLowerCase() || '';
+
+            const matchesSearch = userText.includes(searchText) || typeText.includes(searchText);
+            
+            let matchesStatus = true;
+            if (statusFilter === 'active') matchesStatus = isActive(row);
+            if (statusFilter === 'expired') matchesStatus = !isActive(row) && row.querySelector('.fin')?.dataset.timestamp;
+
+            return matchesSearch && matchesStatus;
+        });
+
+        // Tri
+        if (sortValue) {
+            const [field, direction] = sortValue.split('_');
+            const isDesc = direction === 'desc';
+
+            filteredRows.sort((a, b) => {
+                let valA, valB;
+                if (field === 'debut') {
+                    valA = parseInt(a.querySelector('.debut')?.dataset.timestamp || 0);
+                    valB = parseInt(b.querySelector('.debut')?.dataset.timestamp || 0);
+                } else if (field === 'fin') {
+                    valA = parseInt(a.querySelector('.fin')?.dataset.timestamp || 0);
+                    valB = parseInt(b.querySelector('.fin')?.dataset.timestamp || 0);
+                }
+                if (valA === valB) return 0;
+                return isDesc ? valB - valA : valA - valB;
+            });
+        }
+
+        // Affichage
+        tbody.innerHTML = '';
+        filteredRows.forEach(row => tbody.appendChild(row));
+
+        // Message aucun résultat
+        if (filteredRows.length === 0 && rows.length > 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center py-5 text-secondary">
+                        <i class="bi bi-search fs-1 d-block mb-2"></i>
+                        Aucun abonnement ne correspond à votre recherche
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    searchInput.addEventListener('input', filterAndSort);
+    filterStatus.addEventListener('change', filterAndSort);
+    sortDate.addEventListener('change', filterAndSort);
+});
+</script>
+{% endblock %}

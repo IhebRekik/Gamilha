@@ -1,0 +1,108 @@
+{# templates/admin/dashboard/index.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Dashboard Administrateur{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+
+<!-- Header -->
+<div class="text-center mb-5 pb-4">
+    <h1 class="display-4 fw-bold mb-2 text-white text-shadow" style="text-shadow: 0 0 15px rgba(160,32,240,0.6);">
+        Dashboard Administrateur
+    </h1>
+    <p class="lead text-white-75 opacity-75">
+        <i class="bi bi-speedometer2 me-2"></i>Vue d'ensemble de la plateforme en temps réel
+    </p>
+</div>
+
+{{ component('dashboard_stats') }}
+
+{# ================= IA STREAMERS GLOBAL SECTION ================= #}
+{% if predictionData is defined and predictionData is not empty %}
+
+<div class="card bg-dark border-0 shadow-lg rounded-4 mt-5 p-4"
+     style="background: linear-gradient(145deg, #1e1e2f, #2c2c44);">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="text-white fw-bold mb-0">
+            <i class="bi bi-robot me-2 text-info"></i>
+            Prédictions IA des Streamers
+        </h3>
+        <span class="badge bg-primary rounded-pill px-3 py-2">
+            {{ predictionData|length }} utilisateurs analysés
+        </span>
+    </div>
+
+    <div class="row">
+
+        {% for item in predictionData %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="p-4 rounded-4 bg-black bg-opacity-50 shadow-sm h-100 d-flex flex-column justify-content-between">
+
+                    <!-- HEADER USER -->
+                    <div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="text-white fw-bold mb-0">
+                                {{ item.user.name }}
+                            </h5>
+                            <span class="badge bg-info text-dark">
+                                {{ item.data.prediction.confidence_text }}
+                            </span>
+                        </div>
+
+                        <!-- STATS -->
+                        <div class="mb-3">
+                            <h2 class="fw-bold text-success mb-0">
+                                {{ item.data.prediction.streams_expected }}
+                            </h2>
+                            <small class="text-white-50">
+                                Streams prévus (30j)
+                            </small>
+                        </div>
+
+                        <div class="text-white-50 small mb-3">
+                            <i class="bi bi-clock me-1"></i>
+                            Dernier stream :
+                            {{ item.data.contributions.last_stream_date ?? '—' }}
+                        </div>
+
+                        <div class="text-warning small mb-3">
+                            Intervalle :
+                            {{ item.data.prediction.streams_min }}
+                            -
+                            {{ item.data.prediction.streams_max }}
+                        </div>
+                    </div>
+
+                    <!-- RECOMMANDATIONS -->
+                    {% if item.data.recommendations is defined and item.data.recommendations is not empty %}
+                        <div class="mt-3">
+                            <h6 class="text-info mb-2">
+                                <i class="bi bi-lightbulb-fill me-1"></i>
+                                Recommandations
+                            </h6>
+                            <ul class="small text-white-50 ps-3 mb-0">
+                                {% for rec in item.data.recommendations %}
+                                    <li>{{ rec.message }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                </div>
+            </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+{% else %}
+
+<div class="alert alert-dark text-center mt-5">
+    Aucun streamer trouvé
+</div>
+
+{% endif %}
+{% endblock %}

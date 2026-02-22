@@ -1,0 +1,186 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gamelha - Abonnements{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+
+    <!-- En-tête + barre de contrôle -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+        <h1 class="text-white d-flex align-items-center mb-0">
+            <i class="bi bi-card-checklist text-primary me-2"></i>
+            Gestion des abonnements
+        </h1>
+
+        <a href="{{ path('app_abonnement_new') }}" class="btn btn-success shadow-sm px-3">
+            <i class="bi bi-plus-lg me-1"></i> Nouvel abonnement
+        </a>
+    </div>
+
+    <!-- Barre de recherche et filtres -->
+    <div class="card bg-dark border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3 align-items-center">
+                <!-- Recherche -->
+                <div class="col-12 col-md-5 col-lg-4">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text bg-secondary border-0 text-white">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input 
+                            id="searchInput" 
+                            type="text" 
+                            class="form-control bg-secondary text-white border-0 shadow-none" 
+                            placeholder="Rechercher un abonnement (type, prix...)" 
+                            aria-label="Rechercher">
+                    </div>
+                </div>
+
+                <!-- Filtres combinés -->
+                <div class="col-12 col-md-7 col-lg-8">
+                    <div class="d-flex flex-wrap gap-3">
+                        <!-- Filtre par type -->
+                        <div class="flex-grow-1 flex-shrink-1" style="min-width: 180px;">
+                            <select id="filterType" class="form-select bg-secondary text-white border-0 shadow-none">
+                                <option value="">Tous les types</option>
+                                {% for type in types %}
+                                    <option value="{{ type }}">{{ type }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Tri par prix -->
+                        <div class="flex-grow-1 flex-shrink-1" style="min-width: 180px;">
+                            <select id="sortPrice" class="form-select bg-secondary text-white border-0 shadow-none">
+                                <option value="">Tri par défaut</option>
+                                <option value="asc">Prix : croissant ↑</option>
+                                <option value="desc">Prix : décroissant ↓</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tableau -->
+    <div class="card bg-dark border-0 shadow-lg">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-dark table-hover align-middle mb-0" id="abonnementTable">
+                    <thead class="text-secondary text-uppercase small border-bottom border-primary border-opacity-25">
+                        <tr>
+                            <th>Type</th>
+                            <th>Prix</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for abonnement in abonnements %}
+                            <tr class="border-bottom border-secondary border-opacity-10">
+                                <td class="type">{{ abonnement.type }}</td>
+                                <td class="prix">{{ abonnement.prix }}</td>
+                                 <td class="prix">
+                                {% for option in abonnement.options %}
+                                {{ option }}{% if not loop.last %}, {% endif %}
+                                {% endfor %}
+                                </td>
+                                <td class="text-end pe-4">
+                                    <div class="btn-group shadow-sm">
+                                        <a href="{{ path('app_abonnement_show', {'id': abonnement.id}) }}" 
+                                           class="btn btn-sm btn-outline-info"><i class="bi bi-eye"></i></a>
+                                        <a href="{{ path('app_abonnement_edit', {'id': abonnement.id}) }}" 
+                                           class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
+                                        <form method="post" 
+                                              action="{{ path('app_abonnement_delete', {'id': abonnement.id}) }}" 
+                                              onsubmit="return confirm('Confirmer la suppression ?');" 
+                                              class="d-inline">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ abonnement.id) }}">
+                                            <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-secondary">
+                                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                    Aucun abonnement trouvé
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- JavaScript (inchangé) -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const searchInput = document.getElementById('searchInput');
+    const filterSelect = document.getElementById('filterType');
+    const sortSelect = document.getElementById('sortPrice');
+    const table = document.getElementById('abonnementTable');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+    function filterAndSort() {
+        const searchText = searchInput.value.toLowerCase().trim();
+        const filterType = filterSelect.value.toLowerCase();
+        const sortOrder = sortSelect.value;
+
+        let filteredRows = rows.filter(row => {
+            if (!row.querySelector('.type')) return false; // skip "aucun résultat"
+            
+            const typeCell = row.querySelector('.type')?.textContent.toLowerCase() || '';
+            const priceCell = row.querySelector('.prix')?.textContent || '';
+            
+            const textMatch = 
+                typeCell.includes(searchText) || 
+                priceCell.includes(searchText) ||
+                row.textContent.toLowerCase().includes(searchText);
+                
+            const typeMatch = filterType === '' || typeCell === filterType;
+            
+            return textMatch && typeMatch;
+        });
+
+        if (sortOrder === 'asc') {
+            filteredRows.sort((a, b) => {
+                const prixA = parseFloat(a.querySelector('.prix')?.textContent || 0);
+                const prixB = parseFloat(b.querySelector('.prix')?.textContent || 0);
+                return prixA - prixB;
+            });
+        } else if (sortOrder === 'desc') {
+            filteredRows.sort((a, b) => {
+                const prixA = parseFloat(a.querySelector('.prix')?.textContent || 0);
+                const prixB = parseFloat(b.querySelector('.prix')?.textContent || 0);
+                return prixB - prixA;
+            });
+        }
+
+        tbody.innerHTML = '';
+        filteredRows.forEach(row => tbody.appendChild(row));
+
+        // Afficher message "aucun résultat" si vide
+        if (filteredRows.length === 0 && rows.length > 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="text-center py-5 text-secondary">
+                        <i class="bi bi-search fs-1 d-block mb-2"></i>
+                        Aucun abonnement ne correspond à votre recherche
+                    </td>
+                </tr>
+            `;
+        }
+    }
+
+    searchInput.addEventListener('input', filterAndSort);
+    filterSelect.addEventListener('change', filterAndSort);
+    sortSelect.addEventListener('change', filterAndSort);
+});
+</script>
+{% endblock %}

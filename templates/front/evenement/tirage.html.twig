@@ -1,0 +1,39 @@
+{% extends 'base_front.html.twig' %}
+
+{% block title %}Tirage au sort — {{ evenement.nom }} — Gamilha{% endblock %}
+
+{% block body %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb text-muted">
+        <li class="breadcrumb-item"><a href="{{ path('app_homepage') }}" class="text-muted text-decoration-none">Accueil</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('front_evenement_index') }}" class="text-muted text-decoration-none">Événements</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('front_evenement_my_events') }}" class="text-muted text-decoration-none">Mes événements</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('front_evenement_show', { idEvenement: evenement.idEvenement }) }}" class="text-muted text-decoration-none">{{ evenement.nom }}</a></li>
+        <li class="breadcrumb-item active text-white">Tirage au sort</li>
+    </ol>
+</nav>
+
+<div class="card card-front">
+    <div class="card-body p-4 p-md-5 text-center">
+        <h1 class="h3 mb-3">
+            <i class="bi bi-shuffle text-warning me-2"></i>
+            Tirage au sort des confrontations
+        </h1>
+        <p class="text-muted mb-4">Les équipes participantes seront réparties aléatoirement pour former l'arbre du bracket <strong>{{ bracket.typeBracket }}</strong> ({{ evenement.equipesParticipantes|length }} équipes).</p>
+        <ul class="list-unstyled text-muted small mb-4">
+            {% for equipe in evenement.equipesParticipantes %}
+            <li>{{ equipe.nomEquipe }}</li>
+            {% endfor %}
+        </ul>
+        <form method="post" action="{{ path('front_evenement_tirage', { idEvenement: evenement.idEvenement }) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token('tirage' ~ evenement.idEvenement) }}">
+            <button type="submit" class="btn btn-gamilha btn-lg">
+                <i class="bi bi-shuffle me-2"></i> Lancer le tirage au sort
+            </button>
+        </form>
+        <p class="text-muted small mt-3 mb-0">Ensuite vous pourrez saisir la date (et le statut) de chaque match.</p>
+        <hr class="my-4">
+        <a href="{{ path('front_evenement_show', { idEvenement: evenement.idEvenement }) }}" class="btn btn-outline-secondary">Retour à l'événement</a>
+    </div>
+</div>
+{% endblock %}

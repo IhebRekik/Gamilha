@@ -1,0 +1,53 @@
+{{ form_start(form) }}
+
+<div class="card bg-dark border-primary border-opacity-25 shadow-lg rounded-4">
+
+  
+
+    <div class="row g-4">
+
+        <div class="col-md-6">
+            {{ form_label(form.type, null, {'label_attr': {'class':'text-white fw-semibold'}}) }}
+            {{ form_widget(form.type, {'attr': {'class':'form-control bg-dark text-white border-secondary'}}) }}
+        </div>
+
+        <div class="col-md-3">
+            {{ form_label(form.prix, null, {'label_attr': {'class':'text-white fw-semibold'}}) }}
+            {{ form_widget(form.prix, {'attr': {'class':'form-control bg-dark text-white border-secondary'}}) }}
+        </div>
+
+        <div class="col-md-3">
+            {{ form_label(form.duree, null, {'label_attr': {'class':'text-white fw-semibold'}}) }}
+            {{ form_widget(form.duree, {'attr': {'class':'form-control bg-dark text-white border-secondary'}}) }}
+        </div>
+
+        <div class="col-12">
+            {{ form_label(form.avantages, null, {'label_attr': {'class':'text-white fw-semibold'}}) }}
+            {{ form_widget(form.avantages, {'attr': {'class':'form-control bg-dark text-white border-secondary'}}) }}
+        </div>
+
+        <div class="col-12">
+            <label class="text-white fw-semibold mb-2">Pages accessibles</label>
+            <div class="row">
+                {% for option in form.options %}
+                    <div class="col-md-4 mb-2">
+                        <div class="form-check bg-dark p-2 rounded-3 border border-secondary">
+                            {{ form_widget(option, {'attr': {'class':'form-check-input'}}) }}
+                            {{ form_label(option, null, {'label_attr': {'class':'form-check-label text-white ms-2'}}) }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+    </div>
+
+    <div class="text-end mt-4">
+        <button class="btn btn-primary px-4 shadow">
+            <i class="bi bi-save me-2"></i> Enregistrer
+        </button>
+    </div>
+
+</div>
+
+{{ form_end(form) }}

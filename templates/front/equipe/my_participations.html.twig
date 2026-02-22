@@ -1,0 +1,135 @@
+{% extends 'base_front.html.twig' %}
+
+{% block title %}Mes participations — Gamilha{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Calendrier : texte blanc pour le thème sombre */
+        #calendar .fc-toolbar-title { color: #fff !important; }
+        #calendar .fc-col-header-cell-cushion { color: #fff !important; }
+        #calendar .fc-daygrid-day-number { color: #fff !important; }
+        #calendar .fc-button { color: #fff !important; }
+        #calendar a { text-decoration: none !important; }
+        #calendar .fc-daygrid-day-number { text-decoration: none !important; }
+        #calendar .fc-col-header-cell-cushion { text-decoration: none !important; }
+        #calendar .fc-scrollgrid { border-color: rgba(139, 92, 246, 0.3) !important; }
+        #calendar .fc-theme-standard td, #calendar .fc-theme-standard th { border-color: rgba(139, 92, 246, 0.2) !important; }
+    </style>
+{% endblock %}
+
+{% block body %}
+<nav aria-label="breadcrumb" class="mb-4">
+    <ol class="breadcrumb text-muted">
+        <li class="breadcrumb-item"><a href="{{ path('app_homepage') }}" class="text-muted text-decoration-none">Accueil</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('front_equipe_index') }}" class="text-muted text-decoration-none">Équipes</a></li>
+        <li class="breadcrumb-item"><a href="{{ path('front_equipe_my_teams') }}" class="text-muted text-decoration-none">Mes équipes</a></li>
+        <li class="breadcrumb-item active text-white">Mes participations</li>
+    </ol>
+</nav>
+
+<h1 class="section-title d-flex align-items-center gap-2 mb-4">
+    <i class="bi bi-calendar-check-fill text-primary"></i>
+    Mes participations
+</h1>
+
+<p class="text-muted mb-4">Événements auxquels vos équipes participent.</p>
+
+{% if participations|length > 0 %}
+<div class="card card-front mb-4">
+    <div class="card-body p-4">
+        <div id="calendar"></div>
+    </div>
+</div>
+
+<div class="mb-3">
+    <h2 class="h5 text-white mb-3"><i class="bi bi-list-ul me-2"></i>Liste des événements</h2>
+</div>
+<div class="row g-4">
+    {% for part in participations %}
+    {% set evenement = part.evenement %}
+    {% set equipesUser = part.equipesUser %}
+    <div class="col-md-6 col-lg-4">
+        <a href="{{ path('front_evenement_show', { idEvenement: evenement.idEvenement }) }}" class="text-decoration-none text-reset">
+            <div class="card card-front h-100">
+                {% if evenement.image %}
+                <img src="{{ evenement.image }}" alt="{{ evenement.nom }}" class="card-img-top w-100" style="height: 140px; object-fit: cover;">
+                {% else %}
+                <div class="card-img-top bg-dark d-flex align-items-center justify-content-center text-muted" style="height: 140px;">
+                    <i class="bi bi-calendar-event display-4"></i>
+                </div>
+                {% endif %}
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge badge-gamilha">{{ evenement.jeu }}</span>
+                        <span class="badge bg-dark text-info border border-info">{{ evenement.statut }}</span>
+                    </div>
+                    <h5 class="card-title fw-bold text-white mb-2">{{ evenement.nom }}</h5>
+                    <p class="text-muted small mb-2">
+                        <i class="bi bi-people-fill me-1"></i>
+                        Vos équipes : {{ equipesUser|length > 0 ? equipesUser|join(', ') : '—' }}
+                    </p>
+                    <div class="d-flex gap-3 text-muted small">
+                        <span><i class="bi bi-calendar3 me-1"></i>{{ evenement.dateDebut ? evenement.dateDebut|date('d/m/Y') : '—' }}</span>
+                        <span><i class="bi bi-calendar3-event me-1"></i>{{ evenement.dateFin ? evenement.dateFin|date('d/m/Y') : '—' }}</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card card-front">
+    <div class="card-body text-center py-5">
+        <i class="bi bi-calendar-x display-4 text-muted mb-3"></i>
+        <p class="text-muted mb-4">Vous ne participez à aucun événement pour le moment.</p>
+        <p class="text-muted small">Rejoignez une équipe qui participe à des tournois, ou créez votre propre équipe pour vous inscrire aux événements.</p>
+        <a href="{{ path('front_equipe_index') }}" class="btn btn-primary mt-3">
+            <i class="bi bi-people-fill me-1"></i> Voir les équipes
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.20/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.20/locales-all.global.min.js"></script>
+    {% if eventsForCalendar|length > 0 %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const calendarEl = document.getElementById('calendar');
+        if (calendarEl) {
+            const events = {{ eventsForCalendar|json_encode|raw }};
+            const fullCalendarEvents = events.map(e => ({
+                id: e.id,
+                title: e.title,
+                start: e.start,
+                end: e.end || undefined,
+                url: e.url
+            }));
+
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'fr',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,listWeek'
+                },
+                events: fullCalendarEvents,
+                eventClick: function(info) {
+                    info.jsEvent.preventDefault();
+                    if (info.event.url) {
+                        window.location.href = info.event.url;
+                    }
+                }
+            });
+            calendar.render();
+        }
+    });
+    </script>
+    {% endif %}
+{% endblock %}
