@@ -156,6 +156,16 @@ public function getStreams(): Collection
      */
     #[ORM\OneToMany(targetEntity: ChatMessage::class, mappedBy: 'recipient')]
     private Collection $messagesRecipient;
+#[ORM\OneToMany(mappedBy: 'user', targetEntity: Post::class, orphanRemoval: true)]
+    private Collection $posts;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Commentaire::class, orphanRemoval: true)]
+    private Collection $commentaires;
+    #[ORM\OneToMany(mappedBy: "receiver", targetEntity: Notification::class)]
+private Collection $receivedNotifications;
+
+#[ORM\OneToMany(mappedBy: "sender", targetEntity: Notification::class)]
+private Collection $sentNotifications;
 
     public function __construct()
     {
@@ -165,8 +175,12 @@ public function getStreams(): Collection
         $this->messagesRecipient = new ArrayCollection();
         $this->donations = new ArrayCollection();
         $this->streams = new ArrayCollection();
+$this->commentaires = new ArrayCollection();
 
-     
+     $this->posts = new ArrayCollection();
+     $this->receivedNotifications = new ArrayCollection();
+    $this->sentNotifications = new ArrayCollection();
+
     }
 
     /* ===================== TEAMS ===================== */
@@ -279,5 +293,8 @@ public function getStreams(): Collection
 {
     return $this->donations;
 }
-
+public function getReceivedNotifications(): Collection
+{
+    return $this->receivedNotifications;
+}
 }

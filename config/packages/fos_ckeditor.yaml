@@ -1,0 +1,16 @@
+fos_ck_editor:
+    base_path: "https://cdn.ckeditor.com/4.22.1/full"
+    js_path:   "https://cdn.ckeditor.com/4.22.1/full/ckeditor.js"
+
+    default_config: default
+    configs:
+        default:
+            toolbar:
+                - ['Format', 'Bold', 'Italic', 'Underline', 'Strike', 'TextColor', 'BGColor']
+                - ['NumberedList', 'BulletedList', 'Blockquote']
+                - ['Undo', 'Redo', 'Source']
+            uiColor: "#1f2937"     # sombre
+            height: 120
+            removePlugins: 'elementspath,image,table,link,about' # enlève image, tableau, lien
+            resize_enabled: false
+            contentsCss: '/css/ckeditor-custom.css' # pour appliquer ton thème sombre

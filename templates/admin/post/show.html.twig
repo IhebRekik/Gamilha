@@ -16,7 +16,8 @@
         <div class="card-body py-4">
             <dl class="row mb-0">
                 <dt class="col-sm-4 text-white">Contenu</dt>
-                <dd class="col-sm-8 text-white">{{ post.content }}</dd>
+                <dd class="col-sm-8 text-white">    {{ post.content|raw }}
+</dd>
 
                 {% if post.image %}
                     <dt class="col-sm-4 text-white">Image</dt>
@@ -33,7 +34,8 @@
                 {% endif %}
 
                 <dt class="col-sm-4 text-white">Likes</dt>
-                <dd class="col-sm-8 text-white">❤️ {{ post.likes }}</dd>
+                <dd class="col-sm-8 text-white">    ❤️ {{ post.getLikesCount() }}
+
 
                 <dt class="col-sm-4 text-white">Nombre de commentaires</dt>
                 <dd class="col-sm-8 text-white">{{ post.commentaires|length }}</dd>

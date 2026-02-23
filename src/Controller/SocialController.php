@@ -8,108 +8,108 @@ use App\Entity\User;
 use App\Form\PostType;
 use App\Repository\PostRepository;
 use App\Repository\UserRepository;
-
+use App\Entity\Notification;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Entity\Friend;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class SocialController extends AbstractController
 {
-    // =========================
-    // FEED + AJOUT POST
-    // =========================
     #[Route('/social', name: 'social_index')]
     public function index(
         Request $request,
         EntityManagerInterface $em,
-        PostRepository $postRepo,
-        UserRepository $userRepository
+        PostRepository $postRepo
     ): Response {
+
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $defaultUser = $this->getUser();
+
         $post = new Post();
         $form = $this->createForm(PostType::class, $post);
         $form->handleRequest($request);
 
-      if ($form->isSubmitted()) {
+        if ($form->isSubmitted()) {
 
-    if ($form->isValid()) {
+            if ($form->isValid()) {
 
-        $user = $em->getRepository(User::class)->find(1);
-        if (!$user) {
-            throw $this->createNotFoundException('Utilisateur par défaut introuvable');
+                $post->setUser($defaultUser);
+
+                $imageFile = $form->get('imageFile')->getData();
+                if ($imageFile) {
+                    $fileName = uniqid() . '.' . $imageFile->guessExtension();
+                    $imageFile->move(
+                        $this->getParameter('kernel.project_dir') . '/public/uploads',
+                        $fileName
+                    );
+                    $post->setImage($fileName);
+                }
+
+                $em->persist($post);
+                $em->flush();
+
+                $this->addFlash('success', 'Publication ajoutée avec succès');
+                return $this->redirectToRoute('social_index');
+
+            } else {
+                $this->addFlash('error', 'Veuillez corriger les erreurs du formulaire');
+            }
         }
-        $post->setUser($user);
 
-        // Image
-        $imageFile = $form->get('imageFile')->getData();
-        if ($imageFile) {
-            $fileName = uniqid() . '.' . $imageFile->guessExtension();
-            $imageFile->move(
-                $this->getParameter('kernel.project_dir') . '/public/uploads',
-                $fileName
-            );
-            $post->setImage($fileName);
+        $posts = $postRepo->findSmartFeed($defaultUser);
+
+        $editPostForms = [];
+        foreach ($posts as $p) {
+            $editForm = $this->createForm(PostType::class, $p, [
+                'action' => $this->generateUrl('post_edit', ['id' => $p->getId()]),
+                'method' => 'POST',
+            ]);
+            $editPostForms[$p->getId()] = $editForm->createView();
         }
 
-        $em->persist($post);
-        $em->flush();
+        $friendIds = array_map(
+            fn($f) => $f->getFriend()->getId(),
+            $em->getRepository(Friend::class)->findBy(['user' => $defaultUser])
+        );
 
-        $this->addFlash('success', 'Publication ajoutée avec succès');
-        return $this->redirectToRoute('social_index');
+        $suggestedUsers = $em->getRepository(User::class)->createQueryBuilder('u')
+            ->where('u != :currentUser')
+            ->andWhere('u.id NOT IN (:friendIds)')
+            ->setParameter('currentUser', $defaultUser)
+            ->setParameter('friendIds', $friendIds ?: [0])
+            ->setMaxResults(4)
+            ->getQuery()
+            ->getResult();
 
-    } else {
-        // 👇 PAS DE PAGE ROUGE
-        $this->addFlash('error', 'Veuillez corriger les erreurs du formulaire');
-    }
-}
+        $notifications = $em->getRepository(Notification::class)
+            ->findBy(['receiver' => $defaultUser], ['createdAt' => 'DESC']);
 
-      // === NOUVEAU : formulaires d'édition pour chaque post (pour les modals) ===
-    $posts = $postRepo->findBy([], ['createdAt' => 'DESC']);
-    $editPostForms = [];
-    foreach ($posts as $p) {
-        $editForm = $this->createForm(PostType::class, $p, [
-            'action' => $this->generateUrl('post_edit', ['id' => $p->getId()]),
-            'method' => 'POST',
+        return $this->render('social/index.html.twig', [
+            'posts' => $posts,
+            'form' => $form->createView(),
+            'editPostForms' => $editPostForms,
+            'defaultUser' => $defaultUser,
+            'suggestedUsers' => $suggestedUsers,
+            'notifications' => $notifications,
         ]);
-        $editPostForms[$p->getId()] = $editForm->createView();
     }
-// Récupère l'utilisateur par défaut (id = 1)
-$defaultUser = $em->getRepository(User::class)->find(1);
 
-$friendIds =[0];
-    
-$suggestedUsers = $em->getRepository(User::class)->createQueryBuilder('u')
-    ->where('u != :currentUser')
-    ->andWhere('u.id NOT IN (:friendIds)')
-    ->setParameter('currentUser', $defaultUser)
-    ->setParameter('friendIds', $friendIds ?: [0])
-    ->setMaxResults(4)
-    ->getQuery()
-    ->getResult();
-
-    return $this->render('social/index.html.twig', [
-        'posts' => $posts,
-        'form' => $form->createView(),
-        'editPostForms' => $editPostForms,   // ← passé au Twig
-        'defaultUser' => $defaultUser,   // ← AJOUTE CETTE LIGNE
-            'suggestedUsers' => $suggestedUsers,  // ← ici
-
-    ]);}
-    // =========================
-    // EDIT POST
-    // =========================
-   #[Route('/post/{id}/edit', name: 'post_edit', methods: ['POST'])]
+#[Route('/post/{id}/edit', name: 'post_edit', methods: ['POST'])]
 public function editPost(
     Post $post,
     Request $request,
     EntityManagerInterface $em
 ): Response {
-    // Utilisateur par défaut si jamais
-    $defaultUser = $em->getRepository(User::class)->find(1);
-    if (!$post->getUser()) {
-        $post->setUser($defaultUser);
+
+    $currentUser = $this->getUser();
+
+    // 🔐 Sécurité : seul le propriétaire peut modifier
+    if ($post->getUser() !== $currentUser) {
+        throw $this->createAccessDeniedException('Vous ne pouvez pas modifier ce post.');
     }
 
     $form = $this->createForm(PostType::class, $post);
@@ -118,138 +118,102 @@ public function editPost(
     if ($form->isSubmitted() && $form->isValid()) {
         $em->flush();
         $this->addFlash('success', 'Publication modifiée avec succès !');
-    } else if ($form->isSubmitted()) {
+    } elseif ($form->isSubmitted()) {
         $this->addFlash('error', 'Erreur lors de la validation du formulaire');
     }
 
     return $this->redirectToRoute('social_index');
-}
-    // =========================
-    // DELETE POST
-    // =========================
-    #[Route('/post/delete/{id}', name: 'post_delete')]
-    public function deletePost(Post $post, EntityManagerInterface $em): Response
-    {
-        if (!$post->getUser()) {
-            $post->setUser($em->getRepository(User::class)->find(1));
-        }
+}#[Route('/post/delete/{id}', name: 'post_delete')]
+public function deletePost(Post $post, EntityManagerInterface $em): Response
+{
+    $currentUser = $this->getUser();
 
-        $em->remove($post);
-        $em->flush();
-
-        return $this->redirectToRoute('social_index');
+    // 🔐 Sécurité : seul le propriétaire peut supprimer
+    if ($post->getUser() !== $currentUser) {
+        throw $this->createAccessDeniedException('Vous ne pouvez pas supprimer ce post.');
     }
 
-    // =========================
-    // AJOUT COMMENTAIRE
-    // =========================
+    $em->remove($post);
+    $em->flush();
+
+    $this->addFlash('success', 'Publication supprimée.');
+    return $this->redirectToRoute('social_index');
+}
+
     #[Route('/comment/add', name: 'comment_add', methods: ['POST'])]
     public function addComment(
         Request $request,
         EntityManagerInterface $em,
-        PostRepository $postRepo
+        PostRepository $postRepo,
+        ValidatorInterface $validator
     ): Response {
+
+        $defaultUser = $this->getUser();
+
         $text = trim($request->request->get('text'));
         $postId = $request->request->get('post_id');
-
-        if (!$text || !$postId) {
-            return $this->redirectToRoute('social_index');
-        }
-
         $post = $postRepo->find($postId);
+
         if (!$post) {
             return $this->redirectToRoute('social_index');
-        }
-
-        $user = $em->getRepository(User::class)->find(1);
-        if (!$user) {
-            throw $this->createNotFoundException('Utilisateur par défaut introuvable');
         }
 
         $comment = new Commentaire();
         $comment->setText($text);
         $comment->setPost($post);
-        $comment->setUser($user);
+        $comment->setUser($defaultUser);
 
-        $em->persist($comment);
-        $em->flush();
+        $errors = $validator->validate($comment);
 
-        return $this->redirectToRoute('social_index');
-    }
-
-    // =========================
-    // EDIT COMMENTAIRE
-    // =========================
-    #[Route('/comment/{id}/edit', name: 'comment_edit')]
-    public function editComment(
-        Commentaire $comment,
-        Request $request,
-        EntityManagerInterface $em
-    ): Response {
-        if (!$comment->getUser()) {
-            $comment->setUser($em->getRepository(User::class)->find(1));
-        }
-
-        if ($request->isMethod('POST')) {
-            $text = trim($request->request->get('text'));
-            if ($text) {
-                $comment->setText($text);
-                $em->flush();
-            }
+        if (count($errors) > 0) {
+            $this->addFlash('error', $errors[0]->getMessage());
             return $this->redirectToRoute('social_index');
         }
 
-        return $this->redirectToRoute('social_index');}
+        $em->persist($comment);
 
-    // =========================
-    // DELETE COMMENTAIRE
-    // =========================
-    #[Route('/comment/delete/{id}', name: 'comment_delete')]
-    public function deleteComment(
-        Commentaire $comment,
-        EntityManagerInterface $em
-    ): Response {
-        if (!$comment->getUser()) {
-            $comment->setUser($em->getRepository(User::class)->find(1));
-        }
+        $notif = new Notification();
+        $notif->setSender($defaultUser);
+        $notif->setReceiver($post->getUser());
+        $notif->setPost($post);
+        $notif->setType('COMMENT');
+        $notif->setIsRead(false);
+        $notif->setCreatedAt(new \DateTimeImmutable());
+        $em->persist($notif);
 
-        $em->remove($comment);
         $em->flush();
 
+        $this->addFlash('success', 'Commentaire ajouté');
         return $this->redirectToRoute('social_index');
     }
 
-    // =========================
-    // LIKE POST
-    // =========================
-  #[Route('/like/{id}', name: 'post_like')]
-public function like(
-    Post $post,
-    EntityManagerInterface $em
-): Response {
-    $user = $em->getRepository(User::class)->find(1);
-    if (!$user) {
-        throw $this->createNotFoundException('Utilisateur par défaut introuvable');
+    #[Route('/like/{id}', name: 'post_like')]
+    public function like(Post $post, EntityManagerInterface $em): Response
+    {
+        $defaultUser = $this->getUser();
+
+        if ($post->isLikedBy($defaultUser)) {
+            $post->removeLikedBy($defaultUser);
+        } else {
+            $post->addLikedBy($defaultUser);
+
+            $notif = new Notification();
+            $notif->setSender($defaultUser);
+            $notif->setReceiver($post->getUser());
+            $notif->setPost($post);
+            $notif->setType('LIKE');
+            $notif->setIsRead(false);
+            $notif->setCreatedAt(new \DateTimeImmutable());
+            $em->persist($notif);
+        }
+
+        $em->flush();
+        return $this->redirectToRoute('social_index');
     }
 
-    if ($post->isLikedBy($user)) {
-        $post->removeLikedBy($user);
-    } else {
-        $post->addLikedBy($user);
-    }
-
-    $em->flush();
-    
-    return $this->redirectToRoute('social_index');
-}
-    // =========================
-    // SEARCH USERS
-    // =========================
     #[Route('/social/search', name: 'social_search')]
-    public function search(
-        Request $request,
-        UserRepository $userRepository
-    ): Response {
+    public function search(Request $request, UserRepository $userRepository): Response
+    {
         $term = $request->query->get('q', '');
         $users = $term ? $userRepository->findByNameOrEmail($term) : [];
 
@@ -258,50 +222,120 @@ public function like(
             'term' => $term,
         ]);
     }
-   #[Route('/social/friends', name: 'social_friends')]
-public function friends(
-    EntityManagerInterface $em
-): Response {
-    $currentUser = $em->getRepository(User::class)->find(1);
 
-    $friends = $em->getRepository(Friend::class)->findBy([
-        'user' => $currentUser
-    ]);
+    #[Route('/social/friends', name: 'social_friends')]
+    public function friends(EntityManagerInterface $em): Response
+    {
+        $currentUser = $this->getUser();
 
-    return $this->render('social/friends.html.twig', [
-        'users' => $friends
-    ]);
-}
+        $friends = $em->getRepository(Friend::class)->findBy([
+            'user' => $currentUser
+        ]);
 
-#[Route('/friend/add/{id}', name: 'friend_add')]
-public function addFriend(
-    User $friendUser,
-    EntityManagerInterface $em
-): Response {
-    // utilisateur par défaut (temporaire)
-    $currentUser = $em->getRepository(User::class)->find(1);
+        return $this->render('social/friends.html.twig', [
+            'friends' => $friends
+        ]);
+    }
 
-    if (!$currentUser || $currentUser === $friendUser) {
+    #[Route('/friend/add/{id}', name: 'friend_add')]
+    public function addFriend(User $friendUser, EntityManagerInterface $em): Response
+    {
+        $currentUser = $this->getUser();
+
+        if (!$currentUser || $currentUser === $friendUser) {
+            return $this->redirectToRoute('social_index');
+        }
+
+        $existing = $em->getRepository(Friend::class)->findOneBy([
+            'user' => $currentUser,
+            'friend' => $friendUser
+        ]);
+
+        if (!$existing) {
+            $friend = new Friend();
+            $friend->setUser($currentUser);
+            $friend->setFriend($friendUser);
+            $friend->setCreatedAt(new \DateTimeImmutable());
+
+            $em->persist($friend);
+            $em->flush();
+        }
+
         return $this->redirectToRoute('social_index');
     }
 
-    // éviter doublon
-    $existing = $em->getRepository(Friend::class)->findOneBy([
-        'user' => $currentUser,
-        'friend' => $friendUser
-    ]);
+    #[Route('/notifications', name: 'social_notifications')]
+    public function notifications(EntityManagerInterface $em): Response
+    {
+        $currentUser = $this->getUser();
 
-    if (!$existing) {
-        $friend = new Friend();
-        $friend->setUser($currentUser);
-        $friend->setFriend($friendUser);
-        $friend->setCreatedAt(new \DateTimeImmutable());
+        $notifications = $em->getRepository(Notification::class)
+            ->findBy(['receiver' => $currentUser], ['createdAt' => 'DESC']);
 
-        $em->persist($friend);
+        return $this->render('social/notifications.html.twig', [
+            'notifications' => $notifications
+        ]);
+    }
+
+    #[Route('/notification/read/{id}', name: 'notification_read')]
+    public function readNotification(Notification $notification, EntityManagerInterface $em): Response
+    {
+        $notification->setIsRead(true);
         $em->flush();
+
+        return $this->redirectToRoute('social_notifications');
+    }
+
+    #[Route('/notification/delete/{id}', name: 'notification_delete', methods: ['POST'])]
+    public function deleteNotification(Notification $notification, EntityManagerInterface $em): Response
+    {
+        $em->remove($notification);
+        $em->flush();
+
+        $this->addFlash('success', 'Notification supprimée avec succès !');
+        return $this->redirectToRoute('social_notifications');
+    }
+    // Modifier un commentaire
+#[Route('/comment/edit/{id}', name: 'comment_edit', methods: ['POST'])]
+public function editComment(
+    Commentaire $comment,
+    Request $request,
+    EntityManagerInterface $em,
+    ValidatorInterface $validator
+): Response {
+    $currentUser = $this->getUser();
+
+    // 🔐 Seul le propriétaire peut modifier
+    if ($comment->getUser() !== $currentUser) {
+        throw $this->createAccessDeniedException('Vous ne pouvez pas modifier ce commentaire.');
+    }
+
+    $text = trim($request->request->get('text'));
+    $comment->setText($text);
+
+    $errors = $validator->validate($comment);
+    if (count($errors) > 0) {
+        $this->addFlash('error', $errors[0]->getMessage());
+    } else {
+        $em->flush();
+        $this->addFlash('success', 'Commentaire modifié avec succès !');
     }
 
     return $this->redirectToRoute('social_index');
 }
 
-}
+// Supprimer un commentaire
+#[Route('/comment/delete/{id}', name: 'comment_delete', methods: ['POST'])]
+public function deleteComment(Commentaire $comment, EntityManagerInterface $em): Response {
+    $currentUser = $this->getUser();
+
+    if ($comment->getUser() !== $currentUser) {
+        throw $this->createAccessDeniedException('Vous ne pouvez pas supprimer ce commentaire.');
+    }
+
+    $em->remove($comment);
+    $em->flush();
+
+    $this->addFlash('success', 'Commentaire supprimé avec succès !');
+    return $this->redirectToRoute('social_index');
+}}

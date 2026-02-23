@@ -1,0 +1,54 @@
+{% extends 'base.html.twig' %}
+{% block title %}Notifications{% endblock %}
+
+{% block body %}
+
+<div class="mb-4">
+    <h3 class="text-white fw-bold">Social</h3>
+    <p class="text-secondary mb-3">Connectez-vous avec la communauté esports</p>
+
+    <div class="social-tabs">
+        <a href="{{ path('social_index') }}" class="tab {{ app.request.attributes.get('_route') == 'social_index' ? 'active' : '' }}">Fil d’actualité</a>
+        <a href="{{ path('social_friends') }}" class="tab">Amis</a>
+        <a href="{{ path('social_search') }}" class="tab {{ app.request.attributes.get('_route') == 'social_search' ? 'active' : '' }}">Rechercher</a>
+        <a href="{{ path('social_notifications') }}" class="tab {{ app.request.attributes.get('_route') == 'social_notifications' ? 'active' : '' }}">Notifications</a>
+    </div>
+</div>
+
+<div class="container py-4">
+    <h3 class="text-white mb-4">Notifications</h3>
+
+    {% if notifications|length == 0 %}
+        <p class="text-secondary">Aucune notification pour le moment.</p>
+    {% else %}
+        <div class="list-group">
+            {% for notif in notifications|sort((a,b) => b.createdAt <=> a.createdAt) %}
+                <div class="list-group-item list-group-item-action bg-dark text-white d-flex justify-content-between align-items-center {{ notif.isRead ? '' : 'fw-bold' }}">
+                    <div>
+                        <strong>{{ notif.sender.name }}</strong>
+                        {% if notif.type == 'LIKE' %} a aimé votre post{% endif %}
+                        {% if notif.type == 'COMMENT' %} a commenté: "{{ notif.post.content|slice(0,50) }}"{% endif %}
+                        <br>
+                        <small class="text-muted">{{ notif.createdAt|date('d/m/Y H:i') }}</small>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <!-- Bouton Marquer comme lu -->
+                        {% if not notif.isRead %}
+                            <a href="{{ path('notification_read', {'id': notif.id}) }}" class="btn btn-sm btn-success" title="Marquer comme lu">
+                                <i class="bi bi-check2"></i>
+                            </a>
+                        {% endif %}
+                        <!-- Bouton Supprimer -->
+                        <form action="{{ path('notification_delete', {'id': notif.id}) }}" method="post" onsubmit="return confirm('Voulez-vous vraiment supprimer cette notification ?');">
+                            <button type="submit" class="btn btn-sm btn-danger" title="Supprimer">
+                                <i class="bi bi-trash3"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+
+{% endblock %}

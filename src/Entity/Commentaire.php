@@ -17,12 +17,14 @@ class Commentaire
     private ?int $id = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Assert\NotBlank(message: 'Le commentaire ne peut pas être vide')]
-    #[Assert\Length(
-    min: 2,
-    minMessage: 'Le commentaire est trop court'
+   #[Assert\NotBlank(message: 'Le commentaire ne peut pas être vide')]
+#[Assert\Length(
+    min: 5,
+    minMessage: 'Le commentaire doit contenir au moins {{ limit }} caractères',
+    max: 500,
+    maxMessage: 'Le commentaire ne doit pas dépasser {{ limit }} caractères'
 )]
-    private ?string $text = null;
+private ?string $text = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
