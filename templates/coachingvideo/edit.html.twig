@@ -1,18 +1,92 @@
+{# 📁 templates/coachingvideo/edit.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Modifier vidéo{% endblock %}
+{% block title %}Modifier — {{ video.titre }}{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <h1>✏️ Modifier la vidéo</h1>
+<div class="container mt-4" style="max-width: 700px;">
 
-    {{ form_start(form) }}
-        {{ form_widget(form) }}
-        <button class="btn btn-success mt-3">💾 Mettre à jour</button>
+    <h1 class="mb-4">✏️ Modifier la vidéo</h1>
+
+    {% if video.url %}
+        <div class="mb-4">
+            <p class="small text-muted mb-2">Aperçu actuel :</p>
+            <div class="ratio ratio-16x9 rounded-3 overflow-hidden" style="max-width:400px;">
+                {% if video.url starts with 'http' %}
+                    <iframe src="{{ video.url }}" allowfullscreen></iframe>
+                {% else %}
+                    <video controls preload="metadata">
+                        <source src="{{ asset(video.url) }}" type="video/mp4">
+                    </video>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'novalidate': 'novalidate'}}) }}
+
+        <div class="mb-3">
+            {{ form_label(form.titre) }}
+            {{ form_widget(form.titre) }}
+            {% for error in form.titre.vars.errors %}
+                <div class="text-danger small mt-1">{{ error.message }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.description) }}
+            {{ form_widget(form.description) }}
+            {% for error in form.description.vars.errors %}
+                <div class="text-danger small mt-1">{{ error.message }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="card bg-dark border-secondary mb-3 p-3">
+            <p class="small text-muted mb-2">
+                <i class="bi bi-info-circle me-1"></i>
+                Laissez vide pour conserver la vidéo actuelle.
+            </p>
+            <div class="mb-3">
+                {{ form_label(form.videoFile) }}
+                {{ form_widget(form.videoFile) }}
+            </div>
+            <div class="mb-0">
+                {{ form_label(form.url) }}
+                {{ form_widget(form.url) }}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.niveau) }}
+            {{ form_widget(form.niveau) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.duration) }}
+            {{ form_widget(form.duration) }}
+            {{ form_help(form.duration) }}
+        </div>
+
+        <div class="mb-3 form-check">
+            {{ form_widget(form.premium) }}
+            {{ form_label(form.premium) }}
+        </div>
+
+        <div class="mb-4">
+            {{ form_label(form.playlist) }}
+            {{ form_widget(form.playlist) }}
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-warning text-dark fw-bold">
+                <i class="bi bi-save me-1"></i> Mettre à jour
+            </button>
+            <a href="{{ path('video_index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Retour
+            </a>
+        </div>
+
     {{ form_end(form) }}
 
-    <a href="{{ path('video_index') }}" class="btn btn-secondary mt-3">
-        ⬅️ Retour
-    </a>
 </div>
 {% endblock %}

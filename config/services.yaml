@@ -1,7 +1,10 @@
+# 📁 config/services.yaml
 # yaml-language-server: $schema=../vendor/symfony/dependency-injection/Loader/schema/services.schema.json
 
 parameters:
-     videos_directory: '%kernel.project_dir%/public/uploads/videos'
+    videos_directory:          '%kernel.project_dir%/public/uploads/videos'
+    playlist_images_directory: '%kernel.project_dir%/public/uploads/playlists'
+    groq_api_key:              '%env(GROQ_API_KEY)%'
 
 services:
     _defaults:
@@ -20,3 +23,8 @@ services:
     App\Controller\:
         resource: '../src/Controller/'
         tags: ['controller.service_arguments']
+
+    # ✅ Injection de la clé Groq dans SubtitleController
+    App\Controller\SubtitleController:
+        arguments:
+            $groqApiKey: '%groq_api_key%'

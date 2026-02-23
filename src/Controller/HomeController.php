@@ -1,4 +1,5 @@
 <?php
+// 📁 src/Controller/HomeController.php
 
 namespace App\Controller;
 
@@ -12,6 +13,14 @@ class HomeController extends AbstractController
     public function index(): Response
     {
         return $this->render('home/index.html.twig', [
+            'controller_name' => 'HomeController',
+        ]);
+    }
+
+    #[Route('/front', name: 'app_homepagefront')]
+    public function indexfront(): Response
+    {
+        return $this->render('base_front.html.twig', [
             'controller_name' => 'HomeController',
         ]);
     }
