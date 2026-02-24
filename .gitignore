@@ -24,3 +24,7 @@
 /.env.test
 /.env.local
 /.env.dev.local.env.dev
+/..env.*
+.env
+.env.*
+!.env.example
