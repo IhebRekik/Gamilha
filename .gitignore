@@ -21,5 +21,6 @@
 
 
 /.env
+/.env.test
 /.env.local
 /.env.dev.local.env.dev
