@@ -1,4 +1,4 @@
-{# templates/user/_form.html.twig #}
+{# templates/admin/user/_form.html.twig #}
 
 {{ form_start(form, {
     'attr': {
@@ -78,7 +78,7 @@
             {{ form_widget(form.password, {
                 'attr': {
                     'class': 'form-control bg-dark text-white border-primary border-opacity-50',
-                    'placeholder': '••••••••••••',
+                    'placeholder': 'Laisser vide pour conserver l\'actuel',
                     'required': false
                 }
             }) }}
@@ -86,25 +86,205 @@
             <div class="text-danger small mt-1">
                 {{ form_errors(form.password) }}
             </div>
+            <small class="text-white-50">
+                <i class="bi bi-info-circle me-1"></i>
+                Laisser vide pour conserver le mot de passe actuel
+            </small>
+        </div>
+    </div>
+
+    {# ===================== IMAGE DE PROFIL — AVATAR IA ===================== #}
+    <div class="col-md-6">
+        <div class="mb-3">
+            {{ form_label(form.profileImage, null, {
+                'label_attr': {'class': 'form-label text-white fw-semibold'}
+            }) }}
+
+            {# Prévisualisation avatar #}
+            <div class="d-flex align-items-center gap-4 mb-3">
+                <div id="adminAvatarPreview"
+                     style="width:90px;height:90px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,#8b5cf6,#c084fc);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                    {% if user is defined and user.profileImage %}
+                        <img src="{{ asset('uploads/profile_images/' ~ user.profileImage) }}"
+                             style="width:100%;height:100%;object-fit:cover;">
+                    {% else %}
+                        <i class="bi bi-person-fill text-white" style="font-size:2.5rem;"></i>
+                    {% endif %}
+                </div>
+                <div class="flex-grow-1">
+                    {{ form_widget(form.profileImage, {
+                        'attr': {
+                            'id': 'adminProfileImageInput',
+                            'class': 'form-control bg-dark text-white border-primary border-opacity-50',
+                            'accept': 'image/jpeg,image/png,image/gif,image/webp'
+                        }
+                    }) }}
+                    <small class="text-white-50 mt-1 d-block">
+                        <i class="bi bi-robot me-1" style="color:#c084fc;"></i>
+                        Converti automatiquement en avatar cartoon ✨
+                    </small>
+                </div>
+            </div>
+
+            <div class="text-danger small mt-1">
+                {{ form_errors(form.profileImage) }}
+            </div>
+        </div>
+    </div>
+
+</div>
+
+{# ===================== RÔLES ===================== #}
+<div class="mb-4">
+    <div class="card bg-dark border-primary border-opacity-25">
+        <div class="card-body">
+            {{ form_label(form.roles, null, {
+                'label_attr': {
+                    'class': 'form-label text-white fw-semibold mb-3'
+                }
+            }) }}
+
+            <div class="row">
+                {% for roleChoice in form.roles %}
+                    <div class="col-md-6 mb-2">
+                        <div class="form-check form-check-inline">
+                            {{ form_widget(roleChoice, {
+                                'attr': {
+                                    'class': 'form-check-input bg-dark border-primary'
+                                }
+                            }) }}
+                            {{ form_label(roleChoice, null, {
+                                'label_attr': {
+                                    'class': 'form-check-label text-white'
+                                }
+                            }) }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="text-danger small mt-1">
+                {{ form_errors(form.roles) }}
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ===================== PARAMÈTRES DU COMPTE ===================== #}
+<div class="row g-4">
+
+    {# Compte actif #}
+    <div class="col-md-4">
+        <div class="card bg-dark border-success border-opacity-25">
+            <div class="card-body">
+                <div class="form-check form-switch">
+                    {{ form_widget(form.isActive, {
+                        'attr': {
+                            'class': 'form-check-input bg-dark border-success',
+                            'role': 'switch'
+                        }
+                    }) }}
+                    {{ form_label(form.isActive, null, {
+                        'label_attr': {
+                            'class': 'form-check-label text-white fw-semibold'
+                        }
+                    }) }}
+                </div>
+                <small class="text-white-50 d-block mt-2">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Désactiver empêche la connexion
+                </small>
+                <div class="text-danger small mt-1">
+                    {{ form_errors(form.isActive) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Ban jusqu'à #}
+    <div class="col-md-4">
+        <div class="card bg-dark border-danger border-opacity-25">
+            <div class="card-body">
+                {{ form_label(form.banUntil, null, {
+                    'label_attr': {
+                        'class': 'form-label text-white fw-semibold'
+                    }
+                }) }}
+                {{ form_widget(form.banUntil, {
+                    'attr': {
+                        'class': 'form-control bg-dark text-white border-danger border-opacity-50'
+                    }
+                }) }}
+                <small class="text-white-50 d-block mt-2">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Bannir temporairement l'utilisateur
+                </small>
+                <div class="text-danger small mt-1">
+                    {{ form_errors(form.banUntil) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# Signalements #}
+    <div class="col-md-4">
+        <div class="card bg-dark border-warning border-opacity-25">
+            <div class="card-body">
+                {{ form_label(form.reports, null, {
+                    'label_attr': {
+                        'class': 'form-label text-white fw-semibold'
+                    }
+                }) }}
+                {{ form_widget(form.reports, {
+                    'attr': {
+                        'class': 'form-control bg-dark text-white border-warning border-opacity-50'
+                    }
+                }) }}
+                <small class="text-white-50 d-block mt-2">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Nombre de signalements reçus
+                </small>
+                <div class="text-danger small mt-1">
+                    {{ form_errors(form.reports) }}
+                </div>
+            </div>
         </div>
     </div>
 
 </div>
 
 {# ===================== ACTIONS ===================== #}
-<div class="mt-4 pt-3 border-top border-secondary border-opacity-25 d-flex justify-content-center">
-
-    <button type="submit" class="btn btn-primary px-5 py-2">
-        <i class="bi bi-save-fill me-2"></i>
-        Enregistrer
-    </button>
+<div class="mt-4 pt-3 border-top border-secondary border-opacity-25 d-flex justify-content-between align-items-center">
 
     <a href="{{ path('admin_user_index') }}"
-       class="btn btn-outline-secondary ms-3">
+       class="btn btn-outline-secondary">
         <i class="bi bi-arrow-left-circle me-2"></i>
         Retour à la liste
     </a>
 
+    <button type="submit" class="btn btn-primary px-5 py-2 shadow">
+        <i class="bi bi-save-fill me-2"></i>
+        Enregistrer
+    </button>
+
 </div>
 
 {{ form_end(form) }}
+
+<script src="{{ asset('js/avatar-ai.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (window.AvatarAI) {
+        AvatarAI.init('adminProfileImageInput', 'adminAvatarPreview', { size: 90 });
+    }
+});
+</script>
+
+<script src="{{ asset('js/avatar-ai.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    if (window.AvatarAI) {
+        AvatarAI.init('adminProfileImageInput', 'adminAvatarPreview', { size: 90 });
+    }
+});
+</script>

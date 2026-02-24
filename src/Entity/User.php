@@ -57,6 +57,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         maxMessage: "Le nom ne doit pas dépasser {{ limit }} caractères."
     )]
     private ?string $name = null;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $profileImage = null;
+
+
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $banUntil = null;
+
+    #[ORM\Column(type: 'integer')]
+    private int $reports = 0;
+
+    #[ORM\Column(type: 'boolean')]
+    private bool $isActive = true;
+
+
+    
 #[ORM\OneToMany(mappedBy: 'user', targetEntity: Stream::class)]
 private Collection $streams;
 #[ORM\OneToMany(mappedBy: 'user', targetEntity: Donation::class)]
@@ -146,6 +162,52 @@ public function getStreams(): Collection
     public function setName(string $name): static
     {
         $this->name = $name;
+        return $this;
+    }
+
+    public function getProfileImage(): ?string
+    {
+        return $this->profileImage;
+    }
+
+    public function setProfileImage(?string $profileImage): static
+    {
+        $this->profileImage = $profileImage;
+        return $this;
+    }
+
+    public function getBanUntil(): ?\DateTimeInterface
+    {
+        return $this->banUntil;
+    }
+
+    public function setBanUntil(?\DateTimeImmutable $banUntil): self
+    {
+        $this->banUntil = $banUntil;
+        return $this;
+    }
+
+    public function getReports(): int
+    {
+        return $this->reports;
+    }
+
+    public function setReports(int $reports): static
+    {
+        $this->reports = $reports;
+
+        return $this;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): static
+    {
+        $this->isActive = $isActive;
+
         return $this;
     }
   

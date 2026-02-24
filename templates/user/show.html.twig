@@ -8,6 +8,16 @@
     <table class="table">
         <tbody>
             <tr>
+                <th>Avatar</th>
+                <td>
+                    {% if user.profileImage %}
+                        <img src="{{ asset('uploads/profile_images/' ~ user.profileImage) }}" alt="Avatar" class="rounded-circle" width="80" height="80">
+                    {% else %}
+                        <span class="text-secondary">Aucun avatar</span>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
                 <th>Id</th>
                 <td>{{ user.id }}</td>
             </tr>

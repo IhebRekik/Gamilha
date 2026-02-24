@@ -2,6 +2,7 @@
 
 parameters:
     # tes paramètres ici si besoin
+    profiles_directory: '%kernel.project_dir%/public/uploads/profile_images'
 
 services:
     _defaults:

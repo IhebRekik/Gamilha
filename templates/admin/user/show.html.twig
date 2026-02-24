@@ -13,48 +13,427 @@
 
     <div class="card bg-dark border border-primary border-opacity-25 shadow-lg rounded-4 overflow-hidden">
         <div class="card-body py-4">
+            {# En-tête avec avatar et nom #}
+            <div class="d-flex align-items-center mb-4 pb-3 border-bottom border-secondary border-opacity-25">
+                {% if user.profileImage %}
+                    <img src="{{ asset('uploads/profile_images/' ~ user.profileImage) }}" 
+                         class="rounded-circle me-3" 
+                         width="80" 
+                         height="80" 
+                         alt="Avatar">
+                {% else %}
+                    <div class="bg-secondary rounded-circle me-3 d-flex align-items-center justify-content-center" 
+                         style="width:80px;height:80px;">
+                        <i class="bi bi-person-fill fs-2 text-white-50"></i>
+                    </div>
+                {% endif %}
+                <div>
+                    <h4 class="mb-1 text-white">{{ user.name }}</h4>
+                    <div class="text-secondary small">{{ user.email }}</div>
+                    
+                    {# Badges de statut #}
+                    <div class="mt-2">
+                        {% if user.banUntil and user.banUntil > date() %}
+                            <span class="badge bg-danger me-1">
+                                <i class="bi bi-ban me-1"></i>Banni jusqu'au {{ user.banUntil|date('d/m/Y H:i') }}
+                            </span>
+                        {% elseif user.isActive %}
+                            <span class="badge bg-success me-1">
+                                <i class="bi bi-check-circle me-1"></i>Actif
+                            </span>
+                        {% else %}
+                            <span class="badge bg-warning text-dark me-1">
+                                <i class="bi bi-x-circle me-1"></i>Inactif
+                            </span>
+                        {% endif %}
+                        
+                        {% if user.reports > 0 %}
+                            <span class="badge bg-danger">
+                                <i class="bi bi-flag-fill me-1"></i>{{ user.reports }} signalement(s)
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# Détails de l'utilisateur #}
             <dl class="row mb-0">
-                <dt class="col-sm-3 text-white">ID</dt>
-                <dd class="col-sm-9 text-white">{{ user.id }}</dd>
+                <dt class="col-sm-3 text-white-50 mb-3">ID</dt>
+                <dd class="col-sm-9 text-white mb-3">{{ user.id }}</dd>
 
-                <dt class="col-sm-3 text-white">Nom</dt>
-                <dd class="col-sm-9 text-white">{{ user.name }}</dd>
+                <dt class="col-sm-3 text-white-50 mb-3">Nom complet</dt>
+                <dd class="col-sm-9 text-white mb-3">{{ user.name }}</dd>
 
-                <dt class="col-sm-3 text-white">Email</dt>
-                <dd class="col-sm-9 text-white">{{ user.email }}</dd>
+                <dt class="col-sm-3 text-white-50 mb-3">Email</dt>
+                <dd class="col-sm-9 text-white mb-3">
+                    <i class="bi bi-envelope me-2"></i>{{ user.email }}
+                </dd>
 
-                <dt class="col-sm-3 text-white">Équipes</dt>
-                <dd class="col-sm-9 text-white">
+                <dt class="col-sm-3 text-white-50 mb-3">Rôles</dt>
+                <dd class="col-sm-9 mb-3">
+                    {% for role in user.roles %}
+                        {% if role != 'ROLE_USER' %}
+                            <span class="badge bg-primary bg-opacity-75 me-1">{{ role|replace({'ROLE_': ''}) }}</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="badge bg-secondary">Utilisateur</span>
+                    {% endfor %}
+                </dd>
+
+                <dt class="col-sm-3 text-white-50 mb-3">Statut du compte</dt>
+                <dd class="col-sm-9 mb-3">
+                    {% if user.isActive %}
+                        <span class="text-success"><i class="bi bi-check-circle-fill me-1"></i>Compte actif</span>
+                    {% else %}
+                        <span class="text-warning"><i class="bi bi-x-circle-fill me-1"></i>Compte inactif</span>
+                    {% endif %}
+                </dd>
+
+                {% if user.banUntil %}
+                <dt class="col-sm-3 text-white-50 mb-3">Banni jusqu'au</dt>
+                <dd class="col-sm-9 mb-3">
+                    {% if user.banUntil > date() %}
+                        <span class="text-danger fw-bold">
+                            <i class="bi bi-ban me-1"></i>{{ user.banUntil|date('d/m/Y à H:i') }}
+                        </span>
+                    {% else %}
+                        <span class="text-success">
+                            <i class="bi bi-check-circle me-1"></i>Ban expiré le {{ user.banUntil|date('d/m/Y à H:i') }}
+                        </span>
+                    {% endif %}
+                </dd>
+                {% endif %}
+
+                {% if user.reports > 0 %}
+                <dt class="col-sm-3 text-white-50 mb-3">Signalements</dt>
+                <dd class="col-sm-9 mb-3">
+                    <span class="badge bg-danger">
+                        <i class="bi bi-flag-fill me-1"></i>{{ user.reports }}
+                    </span>
+                </dd>
+                {% endif %}
+
+                <dt class="col-sm-3 text-white-50 mb-3">Équipes</dt>
+                <dd class="col-sm-9 text-white mb-3">
                     {% for team in user.teams %}
-                        {{ team.name }}{% if not loop.last %}, {% endif %}
+                        <span class="badge bg-secondary me-1 mb-1">{{ team.name }}</span>
                     {% else %}
-                        <span class="text-secondary">Aucune équipe</span>
+                        <span class="text-white-50">Aucune équipe</span>
                     {% endfor %}
                 </dd>
 
-                <dt class="col-sm-3 text-white">Abonnements</dt>
-                <dd class="col-sm-9 text-white">
+                <dt class="col-sm-3 text-white-50 mb-3">Abonnements</dt>
+                <dd class="col-sm-9 text-white mb-3">
                     {% for ab in user.userAbonnements %}
-                        {{ ab.abonnement.type }} ({{ ab.dateDebut ? ab.dateDebut|date('d/m/Y') : '-' }} → {{ ab.dateFin ? ab.dateFin|date('d/m/Y') : '-' }})<br>
+                        <div class="mb-2">
+                            <span class="badge bg-primary">{{ ab.abonnement.type }}</span>
+                            <span class="text-white-50 ms-2">
+                                Du {{ ab.dateDebut ? ab.dateDebut|date('d/m/Y') : '-' }} 
+                                au {{ ab.dateFin ? ab.dateFin|date('d/m/Y') : '-' }}
+                            </span>
+                        </div>
                     {% else %}
-                        <span class="text-secondary">Aucun abonnement</span>
+                        <span class="text-white-50">Aucun abonnement</span>
                     {% endfor %}
                 </dd>
+
+                {% if user.streams is not empty %}
+                <dt class="col-sm-3 text-white-50 mb-3">Streams</dt>
+                <dd class="col-sm-9 text-white mb-3">
+                    <span class="badge bg-info">{{ user.streams|length }} stream(s)</span>
+                </dd>
+                {% endif %}
             </dl>
         </div>
 
-        <div class="card-footer bg-dark border-top border-secondary border-opacity-10 d-flex justify-content-between">
-            <a href="{{ path('admin_user_index') }}" class="btn btn-secondary">
-                <i class="bi bi-arrow-left-circle-fill me-2"></i>Retour
-            </a>
+        {# Footer avec actions #}
+        <div class="card-footer bg-dark border-top border-secondary border-opacity-10">
+            <div class="d-flex justify-content-between flex-wrap gap-2">
+                <a href="{{ path('admin_user_index') }}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left-circle-fill me-2"></i>Retour
+                </a>
 
-            <form method="post" action="{{ path('admin_user_delete', {'id': user.id}) }}" onsubmit="return confirm('Confirmer la suppression ?');" class="d-inline">
-                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
-                <button class="btn btn-danger">
-                    <i class="bi bi-trash-fill me-1"></i>Supprimer
-                </button>
+                <div class="d-flex gap-2">
+                    <a href="{{ path('admin_user_edit', {'id': user.id}) }}" class="btn btn-warning">
+                        <i class="bi bi-pencil-fill me-1"></i>Modifier
+                    </a>
+
+                    {# Activer/Désactiver #}
+                    <button type="button" 
+                            class="btn {{ user.isActive ? 'btn-warning' : 'btn-success' }}"
+                            data-bs-toggle="modal"
+                            data-bs-target="#toggleActiveModal">
+                        <i class="bi bi-{{ user.isActive ? 'toggle-off' : 'toggle-on' }} me-1"></i>
+                        {{ user.isActive ? 'Désactiver' : 'Activer' }}
+                    </button>
+
+                    {# Bannir/Débannir #}
+                    {% if user.banUntil and user.banUntil > date() %}
+                        <form method="post" action="{{ path('admin_user_unban', {'id': user.id}) }}" class="d-inline">
+                            <input type="hidden" name="_token" value="{{ csrf_token('unban' ~ user.id) }}">
+                            <button class="btn btn-success">
+                                <i class="bi bi-check-circle-fill me-1"></i>Débannir
+                            </button>
+                        </form>
+                    {% else %}
+                        <button type="button" 
+                                class="btn btn-danger"
+                                data-bs-toggle="modal"
+                                data-bs-target="#banModal">
+                            <i class="bi bi-ban me-1"></i>Bannir
+                        </button>
+                    {% endif %}
+
+                    <button type="button" 
+                            class="btn btn-danger"
+                            data-bs-toggle="modal"
+                            data-bs-target="#deleteModal">
+                        <i class="bi bi-trash-fill me-1"></i>Supprimer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de bannissement -->
+{% if not (user.banUntil and user.banUntil > date()) %}
+<div class="modal fade" id="banModal" tabindex="-1" aria-labelledby="banModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark border-danger">
+            <div class="modal-header border-danger border-opacity-25">
+                <h5 class="modal-title text-white" id="banModalLabel">
+                    <i class="bi bi-ban me-2 text-danger"></i>Bannir {{ user.name }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" action="{{ path('admin_user_ban', {'id': user.id}) }}">
+                <input type="hidden" name="_token" value="{{ csrf_token('ban' ~ user.id) }}">
+                
+                <div class="modal-body">
+                    <p class="text-white-50 mb-3">
+                        <i class="bi bi-exclamation-triangle me-2"></i>
+                        Choisissez la durée du bannissement pour <strong class="text-white">{{ user.name }}</strong>
+                    </p>
+
+                    <!-- Durées prédéfinies -->
+                    <div class="mb-3">
+                        <label class="form-label text-white fw-semibold">Durée prédéfinie</label>
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-outline-warning ban-duration-btn" data-duration="1">
+                                <i class="bi bi-clock me-2"></i>1 jour
+                            </button>
+                            <button type="button" class="btn btn-outline-warning ban-duration-btn" data-duration="7">
+                                <i class="bi bi-clock me-2"></i>7 jours
+                            </button>
+                            <button type="button" class="btn btn-outline-warning ban-duration-btn" data-duration="30">
+                                <i class="bi bi-clock me-2"></i>30 jours
+                            </button>
+                            <button type="button" class="btn btn-outline-danger ban-duration-btn" data-duration="permanent">
+                                <i class="bi bi-ban me-2"></i>Permanent
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="text-center text-white-50 my-3">
+                        <small>— OU —</small>
+                    </div>
+
+                    <!-- Date personnalisée -->
+                    <div class="mb-3">
+                        <label for="customBanDate" class="form-label text-white fw-semibold">
+                            <i class="bi bi-calendar-event me-2"></i>Date personnalisée
+                        </label>
+                        <input type="datetime-local" 
+                               class="form-control bg-dark text-white border-danger border-opacity-50" 
+                               id="customBanDate" 
+                               name="custom_ban_date"
+                               min="{{ 'now'|date('Y-m-d\\TH:i') }}">
+                        <small class="text-white-50">Bannir jusqu'à une date précise</small>
+                    </div>
+
+                    <input type="hidden" name="ban_duration" id="banDuration">
+                </div>
+
+                <div class="modal-footer border-danger border-opacity-25">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i>Annuler
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-ban me-1"></i>Confirmer le ban
+                    </button>
+                </div>
             </form>
         </div>
     </div>
 </div>
+{% endif %}
+
+{# Modal de confirmation pour activer/désactiver #}
+<div class="modal fade" id="toggleActiveModal" tabindex="-1" aria-labelledby="toggleActiveModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark border-warning">
+            <div class="modal-header border-warning border-opacity-25">
+                <h5 class="modal-title text-white" id="toggleActiveModalLabel">
+                    <i class="bi bi-{{ user.isActive ? 'toggle-off' : 'toggle-on' }} me-2 text-warning"></i>
+                    {{ user.isActive ? 'Désactiver' : 'Activer' }} le compte
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <i class="bi bi-{{ user.isActive ? 'person-x' : 'person-check' }} text-warning" style="font-size: 4rem;"></i>
+                </div>
+                <p class="text-white text-center mb-3">
+                    {% if user.isActive %}
+                        Êtes-vous sûr de vouloir <strong class="text-warning">désactiver</strong> le compte de<br>
+                        <strong class="fs-5">{{ user.name }}</strong> ?
+                    {% else %}
+                        Êtes-vous sûr de vouloir <strong class="text-success">activer</strong> le compte de<br>
+                        <strong class="fs-5">{{ user.name }}</strong> ?
+                    {% endif %}
+                </p>
+                <div class="alert alert-warning bg-opacity-10 border-warning border-opacity-50">
+                    <small>
+                        <i class="bi bi-info-circle me-1"></i>
+                        {% if user.isActive %}
+                            L'utilisateur ne pourra plus se connecter après désactivation.
+                        {% else %}
+                            L'utilisateur pourra à nouveau se connecter après activation.
+                        {% endif %}
+                    </small>
+                </div>
+            </div>
+            <div class="modal-footer border-warning border-opacity-25">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i>Annuler
+                </button>
+                <form method="post" action="{{ path('admin_user_toggle_active', {'id': user.id}) }}" class="d-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('toggle-active' ~ user.id) }}">
+                    <button type="submit" class="btn btn-{{ user.isActive ? 'warning' : 'success' }}">
+                        <i class="bi bi-check-circle me-1"></i>
+                        Confirmer {{ user.isActive ? 'la désactivation' : 'l\'activation' }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Modal de confirmation pour suppression #}
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark border-danger">
+            <div class="modal-header border-danger border-opacity-25">
+                <h5 class="modal-title text-white" id="deleteModalLabel">
+                    <i class="bi bi-trash-fill me-2 text-danger"></i>Supprimer l'utilisateur
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-3">
+                    <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 4rem;"></i>
+                </div>
+                <p class="text-white text-center mb-3">
+                    Êtes-vous sûr de vouloir <strong class="text-danger">supprimer définitivement</strong><br>
+                    <strong class="fs-5">{{ user.name }}</strong> ?
+                </p>
+                <div class="alert alert-danger bg-opacity-10 border-danger border-opacity-50">
+                    <small>
+                        <i class="bi bi-exclamation-triangle me-1"></i>
+                        <strong>Attention :</strong> Cette action est <strong>irréversible</strong>. 
+                        Toutes les données de l'utilisateur (posts, commentaires, abonnements, etc.) seront perdues.
+                    </small>
+                </div>
+                <p class="text-white-50 text-center mb-0">
+                    <small>Email : {{ user.email }}</small>
+                </p>
+            </div>
+            <div class="modal-footer border-danger border-opacity-25">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i>Annuler
+                </button>
+                <form method="post" action="{{ path('admin_user_delete', {'id': user.id}) }}" class="d-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash-fill me-1"></i>
+                        Oui, supprimer définitivement
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gestion des boutons de durée prédéfinie
+    document.querySelectorAll('.ban-duration-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const duration = this.dataset.duration;
+            const banDurationInput = document.getElementById('banDuration');
+            const customDateInput = document.getElementById('customBanDate');
+            
+            // Mettre à jour le champ caché avec la durée
+            banDurationInput.value = duration;
+            
+            // Effacer la date personnalisée
+            customDateInput.value = '';
+            
+            // Mettre en évidence le bouton sélectionné
+            document.querySelectorAll('.ban-duration-btn').forEach(b => {
+                b.classList.remove('active', 'btn-warning', 'btn-danger');
+                b.classList.add('btn-outline-warning');
+                if (b.dataset.duration === 'permanent') {
+                    b.classList.remove('btn-outline-warning');
+                    b.classList.add('btn-outline-danger');
+                }
+            });
+            
+            this.classList.remove('btn-outline-warning', 'btn-outline-danger');
+            this.classList.add('active');
+            if (duration === 'permanent') {
+                this.classList.add('btn-danger');
+            } else {
+                this.classList.add('btn-warning');
+            }
+        });
+    });
+
+    // Réinitialiser le formulaire lors de la fermeture du modal
+    const banModal = document.getElementById('banModal');
+    if (banModal) {
+        banModal.addEventListener('hidden.bs.modal', function() {
+            document.getElementById('banDuration').value = '';
+            document.getElementById('customBanDate').value = '';
+            document.querySelectorAll('.ban-duration-btn').forEach(btn => {
+                btn.classList.remove('active', 'btn-warning', 'btn-danger');
+                btn.classList.add('btn-outline-warning');
+                if (btn.dataset.duration === 'permanent') {
+                    btn.classList.remove('btn-outline-warning');
+                    btn.classList.add('btn-outline-danger');
+                }
+            });
+        });
+    }
+
+    // Effacer la durée prédéfinie si une date personnalisée est saisie
+    const customDateInput = document.getElementById('customBanDate');
+    if (customDateInput) {
+        customDateInput.addEventListener('input', function() {
+            if (this.value) {
+                document.getElementById('banDuration').value = '';
+                document.querySelectorAll('.ban-duration-btn').forEach(btn => {
+                    btn.classList.remove('active', 'btn-warning', 'btn-danger');
+                    btn.classList.add('btn-outline-warning');
+                    if (btn.dataset.duration === 'permanent') {
+                        btn.classList.remove('btn-outline-warning');
+                        btn.classList.add('btn-outline-danger');
+                    }
+                });
+            }
+        });
+    }
+});
+</script>
 {% endblock %}
