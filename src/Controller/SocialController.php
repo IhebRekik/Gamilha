@@ -84,7 +84,7 @@ $suggestedUsers = $em->getRepository(User::class)->createQueryBuilder('u')
     ->where('u != :currentUser')
     ->andWhere('u.id NOT IN (:friendIds)')
     ->setParameter('currentUser', $defaultUser)
-    ->setParameter('friendIds', $friendIds ?: [0])
+    ->setParameter('friendIds', $friendIds )
     ->setMaxResults(4)
     ->getQuery()
     ->getResult();

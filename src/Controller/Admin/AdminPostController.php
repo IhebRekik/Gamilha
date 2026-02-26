@@ -12,32 +12,33 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Entity\User;
 
 #[Route('/admin/post')]
 final class AdminPostController extends AbstractController
 {
     #[Route('/', name: 'admin_post_index', methods: ['GET'])]
-public function index(Request $request, PostRepository $postRepository): Response
-{
-    $search = $request->query->get('q');
-    $userSearch = $request->query->get('user');
+    public function index(Request $request, PostRepository $postRepository): Response
+    {
+        $search = $request->query->get('q');
+        $userSearch = $request->query->get('user');
 
-    $posts =  $postRepository->findAll();
+        $posts =  $postRepository->findAll();
 
-    if($search) {
-        $posts = $postRepository->findByContent($search);
+        if ($search) {
+            $posts = $postRepository->findByContent($search);
+        }
+        if ($userSearch) {
+            $posts = $postRepository->findByUserEmail($userSearch);
+        }
+
+
+        return $this->render('admin/post/index.html.twig', [
+            'posts' => $posts,
+            'search' => $search,
+            'userSearch' => $userSearch,
+        ]);
     }
-    if($userSearch) {
-        $posts = $postRepository->findByUserEmail($userSearch);
-    }
-    
-
-    return $this->render('admin/post/index.html.twig', [
-        'posts' => $posts,
-        'search' => $search,
-        'userSearch' => $userSearch,
-    ]);
-}
 
 
     #[Route('/new', name: 'admin_post_new', methods: ['GET', 'POST'])]
@@ -48,7 +49,13 @@ public function index(Request $request, PostRepository $postRepository): Respons
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $post->setUser($this->getUser() ?? $em->getRepository('App\Entity\User')->find(1));
+            $user = $this->getUser();
+
+            if (!$user instanceof User) {
+                $user = $em->getRepository(User::class)->find(1);
+            }
+
+            $post->setUser($user);
             $em->persist($post);
             $em->flush();
 
@@ -88,23 +95,20 @@ public function index(Request $request, PostRepository $postRepository): Respons
     #[Route('/{id}', name: 'admin_post_delete', methods: ['POST'])]
     public function delete(Request $request, Post $post, EntityManagerInterface $em): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$post->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $post->getId(), $request->request->get('_token'))) {
             $em->remove($post);
             $em->flush();
         }
 
         return $this->redirectToRoute('admin_post_index');
     }
-  #[Route('/comment/{id}/delete', name: 'admin_comment_delete', methods: ['POST'])]
-public function deleteComment(Commentaire $comment, EntityManagerInterface $em): Response
-{
-    $postId = $comment->getPost()->getId();
-    $em->remove($comment);
-    $em->flush();
+    #[Route('/comment/{id}/delete', name: 'admin_comment_delete', methods: ['POST'])]
+    public function deleteComment(Commentaire $comment, EntityManagerInterface $em): Response
+    {
+        $postId = $comment->getPost()->getId();
+        $em->remove($comment);
+        $em->flush();
 
-    return $this->redirectToRoute('admin_post_show', ['id' => $postId]);
-}
-
-
-
+        return $this->redirectToRoute('admin_post_show', ['id' => $postId]);
+    }
 }

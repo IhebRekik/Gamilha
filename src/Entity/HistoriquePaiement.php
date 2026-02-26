@@ -12,8 +12,7 @@ class HistoriquePaiement
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
-
+    private int $id;
     #[ORM\ManyToOne(inversedBy: 'historiquePaiements')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;

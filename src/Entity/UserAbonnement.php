@@ -12,8 +12,7 @@ class UserAbonnement
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
-
+    private int $id;
     #[ORM\ManyToOne(User::class, inversedBy: 'userAbonnements')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     #[Assert\NotNull(message: "L'utilisateur est obligatoire.")]

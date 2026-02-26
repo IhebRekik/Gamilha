@@ -18,6 +18,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
+use function Symfony\Component\String\s;
+
 final class UserAbonnementController extends AbstractController
 {
     #[Route('/admin/abonnements', name: 'app_user_abonnement_index', methods: ['GET'])]
@@ -55,8 +57,8 @@ final class UserAbonnementController extends AbstractController
 
         $session = Session::retrieve($sessionId);
 
-        $userId = $session->metadata->user_id;
-        $abonnementId = $session->metadata->abonnement_id;
+        $userId = (int) ($session->metadata['user_id'] ?? 0);
+        $abonnementId = (int) ($session->metadata['abonnement_id'] ?? 0);
 
         $user = $userRepository->find($userId);
         $abonnement = $em->getRepository(Abonnement::class)->find($abonnementId);
@@ -72,7 +74,7 @@ final class UserAbonnementController extends AbstractController
         $paiement = new HistoriquePaiement();
         $paiement->setUser($user);
         $paiement->setAbonnement($abonnement);
-        $paiement->setMontant($abonnement->getPrix());
+        $paiement->setMontant((string) ($abonnement->getPrix() * 100));
         $paiement->setCreatedAt(new \DateTime());
         $em->persist($paiement);
         $em->flush();
@@ -125,7 +127,7 @@ final class UserAbonnementController extends AbstractController
                     'product_data' => [
                         'name' => $abonnement->getType(),
                     ],
-                    'unit_amount' => $abonnement->getPrix() / 3.2 * 100,
+                    'unit_amount' => (int) ($abonnement->getPrix() / 3.2 * 100),
                 ],
                 'quantity' => 1,
             ]],
@@ -133,8 +135,8 @@ final class UserAbonnementController extends AbstractController
 
             // On passe user + abonnement dans metadata
             'metadata' => [
-                'user_id' => $user->getId(),
-                'abonnement_id' => $abonnement->getId(),
+                'user_id' => (string) $user->getId(),
+                'abonnement_id' => (string) $abonnement->getId(),
             ],
 
             'success_url' => $this->generateUrl(

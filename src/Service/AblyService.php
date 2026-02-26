@@ -16,6 +16,6 @@ class AblyService
 
     public function publish(string $channel, array $data): void
     {
-        $this->ably->channel($channel)->publish('message', $data);
+        $this->ably->channel($channel)->publish('message', json_encode($data));
     }
 }

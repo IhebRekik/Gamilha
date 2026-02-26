@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,7 +16,7 @@ class SecurityController extends AbstractController
     #[Route('/', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
-        /** @var \App\Entity\User|null $user */
+        /** @var User|null $user */
         $user = $this->getUser();
 
         if ($user instanceof \App\Entity\User) {
@@ -64,12 +65,4 @@ class SecurityController extends AbstractController
         return $response;
     }
 
-    private function redirectAfterLogin(): Response
-    {
-        if ($this->isGranted('ROLE_ADMIN')) {
-            return $this->redirectToRoute('admin_dashboard');
-        }
-
-        return $this->redirectToRoute('app_login');
-    }
 }

@@ -14,14 +14,13 @@ class Commentaire
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
-
+    private int $id;
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank(message: 'Le commentaire ne peut pas être vide')]
     #[Assert\Length(
-    min: 2,
-    minMessage: 'Le commentaire est trop court'
-)]
+        min: 2,
+        minMessage: 'Le commentaire est trop court'
+    )]
     private ?string $text = null;
 
     #[ORM\Column]
@@ -49,7 +48,7 @@ class Commentaire
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?\DateTimeInterface
     {
         return $this->createdAt;
     }
@@ -63,25 +62,31 @@ class Commentaire
 
 
 
-    public function getPost(): ?Post { return $this->post; }
-    public function setPost(?Post $post): self { $this->post = $post; return $this; }
-     public function __construct()
+    public function getPost(): ?Post
+    {
+        return $this->post;
+    }
+    public function setPost(?Post $post): self
+    {
+        $this->post = $post;
+        return $this;
+    }
+    public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
     }
     #[ORM\ManyToOne(targetEntity: User::class)]
-#[ORM\JoinColumn(nullable: false)]
-private ?User $user = null;
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
 
-public function getUser(): ?User
-{
-    return $this->user;
-}
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
 
-public function setUser(?User $user): self
-{
-    $this->user = $user;
-    return $this;
-}
-
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
+        return $this;
+    }
 }

@@ -1,0 +1,64 @@
+{% if pageCount > 1 %}
+<nav aria-label="Pagination" class="knp-pagination">
+    <ul class="pagination mb-0">
+
+        {# Première page #}
+        {% if first is defined %}
+        <li class="page-item {{ current == 1 ? 'disabled' : '' }}">
+            <a class="page-link" href="{{ path(route, query|merge({(pageParameterName): first})) }}" title="Première page">
+                <i class="bi bi-chevron-double-left"></i>
+            </a>
+        </li>
+        {% endif %}
+
+        {# Page précédente #}
+        {% if previous is defined %}
+        <li class="page-item {{ current == 1 ? 'disabled' : '' }}">
+            <a class="page-link" href="{{ path(route, query|merge({(pageParameterName): previous})) }}" title="Page précédente">
+                <i class="bi bi-chevron-left"></i>
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link"><i class="bi bi-chevron-left"></i></span>
+        </li>
+        {% endif %}
+
+        {# Pages numérotées #}
+        {% for page in pagesInRange %}
+            {% if page != current %}
+            <li class="page-item">
+                <a class="page-link" href="{{ path(route, query|merge({(pageParameterName): page})) }}">{{ page }}</a>
+            </li>
+            {% else %}
+            <li class="page-item active" aria-current="page">
+                <span class="page-link active-page">{{ page }}</span>
+            </li>
+            {% endif %}
+        {% endfor %}
+
+        {# Page suivante #}
+        {% if next is defined %}
+        <li class="page-item {{ current == pageCount ? 'disabled' : '' }}">
+            <a class="page-link" href="{{ path(route, query|merge({(pageParameterName): next})) }}" title="Page suivante">
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <span class="page-link"><i class="bi bi-chevron-right"></i></span>
+        </li>
+        {% endif %}
+
+        {# Dernière page #}
+        {% if last is defined %}
+        <li class="page-item {{ current == pageCount ? 'disabled' : '' }}">
+            <a class="page-link" href="{{ path(route, query|merge({(pageParameterName): last})) }}" title="Dernière page">
+                <i class="bi bi-chevron-double-right"></i>
+            </a>
+        </li>
+        {% endif %}
+
+    </ul>
+</nav>
+{% endif %}

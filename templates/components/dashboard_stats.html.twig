@@ -18,7 +18,7 @@ const gamesStats = {{ this.getGamesStats()|json_encode|raw }};
 	<div class="col-md-3">
 		<div class="card bg-dark border-0 shadow-lg text-white h-100">
 			<div class="card-body text-center d-flex flex-column justify-content-center">
-				<div class="fs-6 mb-2 text-muted">{{ this.getUsersEvolution() }}%</div>
+				<h2 class="fw-bold mb-1">{{ this.getUsersEvolution() }}%</h2>
 				<div class="text-success small">Evolution de Utilisateurs de ce mois</div>
 			</div>
 		</div>

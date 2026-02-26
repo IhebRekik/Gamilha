@@ -11,45 +11,72 @@ use App\Entity\Stream;
 class Donation
 {
     #[ORM\Id, ORM\GeneratedValue]
-    #[ORM\Column(type:"integer")]
-    private ?int $id = null;
-
-    #[ORM\Column(type:"float")]
+    #[ORM\Column(type: "integer")]
+    private int $id;
+    #[ORM\Column(type: "float")]
     private float $amount;
 
-    #[ORM\Column(type:"string", length:255)]
+    #[ORM\Column(type: "string", length: 255)]
     private string $donorName;
 
-    #[ORM\Column(type:"datetime")]
-    private \DateTime $createdAt;
-   #[ORM\ManyToOne(inversedBy: 'donations')]
-#[ORM\JoinColumn(nullable: false)]
-private ?User $user = null;
+    #[ORM\Column(type: "datetime")]
+    private \DateTimeInterface $createdAt;
+    #[ORM\ManyToOne(inversedBy: 'donations')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
 
-#[ORM\ManyToOne(inversedBy: 'donations')]
-#[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-private ?Stream $stream = null;
+    #[ORM\ManyToOne(inversedBy: 'donations')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?Stream $stream = null;
 
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->createdAt = new \DateTime();
     }
 
     // Getters et setters
-    public function getId(): ?int { return $this->id; }
-    public function getAmount(): float { return $this->amount; }
-    public function setAmount(float $amount): self { $this->amount = $amount; return $this; }
-    public function getDonorName(): string { return $this->donorName; }
-    public function setDonorName(string $donorName): self { $this->donorName = $donorName; return $this; }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+    public function getAmount(): float
+    {
+        return $this->amount;
+    }
+    public function setAmount(float $amount): self
+    {
+        $this->amount = $amount;
+        return $this;
+    }
+    public function getDonorName(): string
+    {
+        return $this->donorName;
+    }
+    public function setDonorName(string $donorName): self
+    {
+        $this->donorName = $donorName;
+        return $this;
+    }
     public function setCreatedAt(\DateTimeInterface $createdAt): self
-{
-    $this->createdAt = $createdAt;
-    return $this;
-}
+    {
+        $this->createdAt = $createdAt;
+        return $this;
+    }
 
-    public function getCreatedAt(): \DateTime { return $this->createdAt; }
-    public function getStream(): Stream { return $this->stream; }
-    public function setStream(Stream $stream): self { $this->stream = $stream; return $this; }
+    public function getCreatedAt(): \DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+    public function getStream(): Stream
+    {
+        return $this->stream;
+    }
+    public function setStream(Stream $stream): self
+    {
+        $this->stream = $stream;
+        return $this;
+    }
     public function getUser(): ?User
     {
         return $this->user;
@@ -60,5 +87,4 @@ private ?Stream $stream = null;
         $this->user = $user;
         return $this;
     }
-
 }

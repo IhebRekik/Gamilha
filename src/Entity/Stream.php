@@ -16,8 +16,7 @@ class Stream
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
-
+    private int $id;
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Le titre est obligatoire.")]
     #[Assert\Length(min: 3, max: 255)]
@@ -58,50 +57,50 @@ class Stream
     private ?\DateTime $createdAt = null;
 
     #[ORM\Column(length: 255)]
-private ?string $streamKey = null;
-#[ORM\Column(type: "boolean")]
-private bool $isLive = false;
+    private ?string $streamKey = null;
+    #[ORM\Column(type: "boolean")]
+    private bool $isLive = false;
 
 
-#[ORM\Column(type: 'string', length: 255, nullable: true)]
-private ?string $apiVideoId = null;         
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $apiVideoId = null;
 
-#[ORM\Column(type: 'string', length: 255, nullable: true)]
-private ?string $rtmpServer = null;          
+    #[ORM\Column(type: 'string', length: 255, nullable: true)]
+    private ?string $rtmpServer = null;
 
-// Getters & Setters pour les nouveaux champs
+    // Getters & Setters pour les nouveaux champs
 
-public function getApiVideoId(): ?string
-{
-    return $this->apiVideoId;
-}
+    public function getApiVideoId(): ?string
+    {
+        return $this->apiVideoId;
+    }
 
-public function setApiVideoId(?string $apiVideoId): self
-{
-    $this->apiVideoId = $apiVideoId;
-    return $this;
-}
+    public function setApiVideoId(?string $apiVideoId): self
+    {
+        $this->apiVideoId = $apiVideoId;
+        return $this;
+    }
 
-public function getRtmpServer(): ?string
-{
-    return $this->rtmpServer;
-}
+    public function getRtmpServer(): ?string
+    {
+        return $this->rtmpServer;
+    }
 
-public function setRtmpServer(?string $rtmpServer): self
-{
-    $this->rtmpServer = $rtmpServer;
-    return $this;
-}
-public function isLive(): bool
-{
-    return $this->isLive;
-}
+    public function setRtmpServer(?string $rtmpServer): self
+    {
+        $this->rtmpServer = $rtmpServer;
+        return $this;
+    }
+    public function isLive(): bool
+    {
+        return $this->isLive;
+    }
 
-public function setIsLive(bool $isLive): self
-{
-    $this->isLive = $isLive;
-    return $this;
-}
+    public function setIsLive(bool $isLive): self
+    {
+        $this->isLive = $isLive;
+        return $this;
+    }
 
 
     public function __construct()

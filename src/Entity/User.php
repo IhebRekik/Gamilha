@@ -25,8 +25,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
-
+    private int $id;
     #[ORM\Column(length: 180)]
     #[Assert\NotBlank(message: "L'adresse email est obligatoire.")]
     #[Assert\Email(message: "Veuillez saisir une adresse email valide.")]
@@ -57,10 +56,26 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         maxMessage: "Le nom ne doit pas dépasser {{ limit }} caractères."
     )]
     private ?string $name = null;
-#[ORM\OneToMany(mappedBy: 'user', targetEntity: Stream::class)]
-private Collection $streams;
-#[ORM\OneToMany(mappedBy: 'user', targetEntity: Donation::class)]
-private Collection $donations;
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $profileImage = null;
+
+
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $banUntil = null;
+
+    #[ORM\Column(type: 'integer')]
+    private int $reports = 0;
+
+    #[ORM\Column(type: 'boolean')]
+    private bool $isActive = true;
+
+
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Stream::class)]
+    private Collection $streams;
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Donation::class)]
+    private Collection $donations;
     /**
      * @var Collection<int, Team>
      */
@@ -85,10 +100,10 @@ private Collection $donations;
     #[ORM\OneToMany(targetEntity: Equipe::class, mappedBy: 'owner')]
     private Collection $equipesOwned;
 
-public function getStreams(): Collection
-{
-    return $this->streams;
-}
+    public function getStreams(): Collection
+    {
+        return $this->streams;
+    }
 
 
     // Getters and setters...
@@ -148,7 +163,53 @@ public function getStreams(): Collection
         $this->name = $name;
         return $this;
     }
-  
+
+    public function getProfileImage(): ?string
+    {
+        return $this->profileImage;
+    }
+
+    public function setProfileImage(?string $profileImage): static
+    {
+        $this->profileImage = $profileImage;
+        return $this;
+    }
+
+    public function getBanUntil(): ?\DateTimeInterface
+    {
+        return $this->banUntil;
+    }
+
+    public function setBanUntil(?\DateTimeImmutable $banUntil): self
+    {
+        $this->banUntil = $banUntil;
+        return $this;
+    }
+
+    public function getReports(): int
+    {
+        return $this->reports;
+    }
+
+    public function setReports(int $reports): static
+    {
+        $this->reports = $reports;
+
+        return $this;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): static
+    {
+        $this->isActive = $isActive;
+
+        return $this;
+    }
+
 
 
 
@@ -199,7 +260,6 @@ public function getStreams(): Collection
 
         $this->equipes = new ArrayCollection();
         $this->equipesOwned = new ArrayCollection();
-     
     }
 
     /* ===================== TEAMS ===================== */
@@ -309,9 +369,9 @@ public function getStreams(): Collection
         return $this;
     }
     public function getDonations(): Collection
-{
-    return $this->donations;
-}
+    {
+        return $this->donations;
+    }
 
     /**
      * @return Collection<int, ChatAi>
@@ -408,9 +468,9 @@ public function getStreams(): Collection
         $this->createdAt = $createdAt;
         return $this;
     }
- /**
+    /**
      * @return Collection<int, Equipe>
-*/
+     */
     public function getEquipesOwned(): Collection
     {
         return $this->equipesOwned;
@@ -434,5 +494,4 @@ public function getStreams(): Collection
         }
         return $this;
     }
-
 }

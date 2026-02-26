@@ -16,14 +16,13 @@ class Post
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
-
+    private int $id;
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank(message: "Le contenu est obligatoire")]
-#[Assert\Length(
-    min: 3,
-    minMessage: "Le contenu doit contenir au moins {{ limit }} caractères"
-)]
+    #[Assert\Length(
+        min: 3,
+        minMessage: "Le contenu doit contenir au moins {{ limit }} caractères"
+    )]
     private ?string $content = null;
 
     #[ORM\Column(length: 255, nullable: true)]

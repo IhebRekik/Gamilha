@@ -5,6 +5,7 @@ namespace App\Controller\Front;
 use App\Entity\Bracket;
 use App\Entity\Evenement;
 use App\Entity\GameMatch;
+use App\Entity\User;
 use App\Form\FrontEvenementType;
 use App\Form\GameMatchEditType;
 use App\Form\EvenementType;
@@ -37,8 +38,13 @@ class EvenementController extends AbstractController
     public function myEvents(EvenementRepository $evenementRepository): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
+        /** @var User|null $user */
+        $user = $this->getUser();
 
-        $evenements = $evenementRepository->findByCreatedBy($this->getUser());
+        if (!$user instanceof User) {
+            throw new \LogicException('User not found');
+        }
+        $evenements = $evenementRepository->findByCreatedBy($user);
 
         return $this->render('front/evenement/my_events.html.twig', [
             'evenements' => $evenements,
@@ -51,7 +57,13 @@ class EvenementController extends AbstractController
         $this->denyAccessUnlessGranted('ROLE_USER');
 
         $evenement = new Evenement();
-        $evenement->setCreatedBy($this->getUser());
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            throw new \LogicException('User not found');
+        }
+        $evenement->setCreatedBy($user);
         $evenement->setStatut('prévu');
 
         $form = $this->createForm(FrontEvenementType::class, $evenement);
@@ -88,7 +100,13 @@ class EvenementController extends AbstractController
     public function tirage(Request $request, #[MapEntity(mapping: ['idEvenement' => 'idEvenement'])] Evenement $evenement, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
-        if ($evenement->getCreatedBy() !== $this->getUser()) {
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            throw new \LogicException('User not found');
+        }
+        if ($evenement->getCreatedBy() !== $user) {
             throw $this->createAccessDeniedException('Seul le créateur de l\'événement peut effectuer le tirage.');
         }
 
@@ -173,7 +191,13 @@ class EvenementController extends AbstractController
     public function editMatches(Request $request, #[MapEntity(mapping: ['idEvenement' => 'idEvenement'])] Evenement $evenement, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
-        if ($evenement->getCreatedBy() !== $this->getUser()) {
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            throw new \LogicException('User not found');
+        }
+        if ($evenement->getCreatedBy() !== $user) {
             throw $this->createAccessDeniedException('Seul le créateur peut modifier les matchs.');
         }
 
@@ -184,7 +208,7 @@ class EvenementController extends AbstractController
         }
 
         $matchs = $bracket->getMatchs()->toArray();
-        usort($matchs, fn (GameMatch $a, GameMatch $b) => [$a->getTour(), $a->getIdMatch()] <=> [$b->getTour(), $b->getIdMatch()]);
+        usort($matchs, fn(GameMatch $a, GameMatch $b) => [$a->getTour(), $a->getIdMatch()] <=> [$b->getTour(), $b->getIdMatch()]);
 
         $form = $this->createFormBuilder(['matchs' => $matchs])
             ->add('matchs', CollectionType::class, [
@@ -224,7 +248,7 @@ class EvenementController extends AbstractController
             }
             ksort($matchsByTour);
             foreach ($matchsByTour as $tour => $matchs) {
-                usort($matchsByTour[$tour], fn ($a, $b) => $a->getIdMatch() <=> $b->getIdMatch());
+                usort($matchsByTour[$tour], fn($a, $b) => $a->getIdMatch() <=> $b->getIdMatch());
             }
             $bracketsWithRounds[] = [
                 'bracket' => $bracket,
@@ -233,8 +257,14 @@ class EvenementController extends AbstractController
             ];
         }
 
-        $isOwner = $this->getUser() && $evenement->getCreatedBy() === $this->getUser();
-        
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            throw new \LogicException('User not found');
+        }
+        $isOwner =  $evenement->getCreatedBy() === $user;
+
         // Récupérer les événements similaires basés sur la description
         $similarEvents = $evenementRepository->findSimilarEvents($evenement, 4);
 
@@ -250,7 +280,13 @@ class EvenementController extends AbstractController
     public function edit(Request $request, #[MapEntity(mapping: ['idEvenement' => 'idEvenement'])] Evenement $evenement, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
-        if ($evenement->getCreatedBy() !== $this->getUser()) {
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            throw new \LogicException('User not found');
+        }
+        if ($evenement->getCreatedBy() !== $user) {
             throw $this->createAccessDeniedException('Seul le créateur peut modifier l\'événement.');
         }
 
@@ -273,7 +309,13 @@ class EvenementController extends AbstractController
     public function delete(Request $request, #[MapEntity(mapping: ['idEvenement' => 'idEvenement'])] Evenement $evenement, EntityManagerInterface $entityManager): Response
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
-        if ($evenement->getCreatedBy() !== $this->getUser()) {
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            throw new \LogicException('User not found');
+        }
+        if ($evenement->getCreatedBy() !== $user) {
             throw $this->createAccessDeniedException('Seul le créateur peut supprimer l\'événement.');
         }
 

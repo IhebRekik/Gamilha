@@ -10,14 +10,8 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class ListUtilisateursController extends AbstractController
 {
-       private UserRepository $userRepository;
-    private EntityManagerInterface $entityManager;
 
-    public function __construct(UserRepository $userRepository, EntityManagerInterface $entityManager)
-    {
-        $this->userRepository = $userRepository;
-        $this->entityManager = $entityManager;
-    }
+   
 #[Route('/chat/users', name: 'chat_user_list')]
 public function listUsers(
     Request $request,

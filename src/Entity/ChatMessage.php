@@ -12,8 +12,7 @@ class ChatMessage
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
-
+    private int $id;
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Le contenu ne peut pas être vide.")]
     #[Assert\Length(
@@ -32,7 +31,7 @@ class ChatMessage
     #[ORM\JoinColumn(nullable: false)]
     private ?User $recipient = null;
 
- 
+
     public function getId(): ?int
     {
         return $this->id;
