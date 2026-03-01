@@ -31,8 +31,6 @@ Ta mission :
 - Continue directement le texte fourni.
 - Reste toujours dans le thème gaming / e-sports.
 - Style naturel, comme un vrai post de communauté.
-- Ajoute quelques emojis pertinents pour le gaming.
-
 PROMPT;
 
         // Si l'utilisateur n'a rien écrit → sujet fun par défaut
