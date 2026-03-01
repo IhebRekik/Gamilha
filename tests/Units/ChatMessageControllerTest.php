@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Cookie;
 
 class ChatMessageControllerTest extends TestCase
 {
@@ -37,41 +38,52 @@ class ChatMessageControllerTest extends TestCase
         $this->assertEquals('{"status":"success"}', $response->getContent());
     }
     public function testNewMessagePersistsWhenFormIsValid()
-    {
-        $recipientId = 2;
+{
+    $recipientId = 2;
 
-        $request = new Request();
+    $request = new Request();
+    $request->cookies->set('user_email', 'test@email.com');
 
-        $user = $this->createMock(\App\Entity\User::class);
+    // Fake sender user
+    $sender = $this->createMock(\App\Entity\User::class);
 
-        $userRepository = $this->createMock(\App\Repository\UserRepository::class);
-        $userRepository->method('find')
-            ->willReturn($user);
+    // Fake recipient user
+    $recipient = $this->createMock(\App\Entity\User::class);
 
-        $emMock = $this->createMock(EntityManagerInterface::class);
-        $emMock->expects($this->once())->method('persist');
-        $emMock->expects($this->once())->method('flush');
+    $userRepository = $this->createMock(\App\Repository\UserRepository::class);
 
-        $controller = $this->getMockBuilder(ChatMessageController::class)
-            ->onlyMethods(['createForm', 'redirectToRoute'])
-            ->getMock();
+    // IMPORTANT : mock findOneBy (pour sender via email)
+    $userRepository->method('findOneBy')
+        ->willReturn($sender);
 
-        $formMock = $this->createMock(\Symfony\Component\Form\FormInterface::class);
-        $formMock->method('handleRequest');
-        $formMock->method('isSubmitted')->willReturn(true);
-        $formMock->method('isValid')->willReturn(true);
+    // Mock find (pour recipient via ID)
+    $userRepository->method('find')
+        ->willReturn($recipient);
 
-        $controller->method('createForm')->willReturn($formMock);
-        $controller->method('redirectToRoute')
-           ->willReturn(new RedirectResponse('/'));
+    $emMock = $this->createMock(EntityManagerInterface::class);
+    $emMock->expects($this->once())->method('persist');
+    $emMock->expects($this->once())->method('flush');
 
-        $response = $controller->new(
-            $recipientId,
-            $request,
-            $emMock,
-            $userRepository
-        );
+    $controller = $this->getMockBuilder(ChatMessageController::class)
+        ->onlyMethods(['createForm', 'redirectToRoute'])
+        ->getMock();
 
-        $this->assertInstanceOf(Response::class, $response);
-    }
+    $formMock = $this->createMock(\Symfony\Component\Form\FormInterface::class);
+    $formMock->method('handleRequest');
+    $formMock->method('isSubmitted')->willReturn(true);
+    $formMock->method('isValid')->willReturn(true);
+
+    $controller->method('createForm')->willReturn($formMock);
+    $controller->method('redirectToRoute')
+        ->willReturn(new RedirectResponse('/'));
+
+    $response = $controller->new(
+        $recipientId,
+        $request,
+        $emMock,
+        $userRepository
+    );
+
+    $this->assertInstanceOf(Response::class, $response);
+}
 }
