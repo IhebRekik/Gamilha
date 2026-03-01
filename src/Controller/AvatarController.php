@@ -85,8 +85,7 @@ class AvatarController extends AbstractController
     /**
      * Appel via router.huggingface.co — AnimeGAN2
      */
-    /** @phpstan-ignore-next-line */
-    private function callAnimeGan(string $imageData, string $token): ?string
+        private function callAnimeGan(string $imageData, string $token): ?string
     {
         // Ce modele accepte une image et retourne une image cartoon/anime
         $url = 'https://router.huggingface.co/hf-inference/models/bryandlee/animegan2-pytorch/v1/image-to-image';
@@ -151,7 +150,6 @@ class AvatarController extends AbstractController
     /**
      * Fallback — LineMangaAI via router.huggingface.co
      */
-    /** @phpstan-ignore-next-line */
     private function callImg2Img(string $imageData, string $token): ?string
     {
         $url = 'https://router.huggingface.co/hf-inference/models/ogkalu/comic-diffusion/v1/image-to-image';
