@@ -28,9 +28,14 @@ final class ChatAiController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            /** @var User|null $user */
+            $user = $this->getUser();
 
+            if (!$user instanceof User) {
+                throw new \LogicException('User not found');
+            }
             $message->setRole('user');
-            $message->setUser($this->getUser());
+            $message->setUser($user);
 
             // 🔥 Vich gère automatiquement imageFile et audioFile
             $em->persist($message);
@@ -40,15 +45,12 @@ final class ChatAiController extends AbstractController
             // 🧠 HISTORIQUE
             // -----------------------
             $history = $em->getRepository(ChatAi::class)
-                ->findBy(['user' => $this->getUser()], ['createdAt' => 'ASC']);
+                ->findBy(['user' => $user], ['createdAt' => 'ASC']);
 
             $prompt = "
 Tu es un coach professionnel pour des jeux de E-sports tu repondre juste dans ce domaine.
 
-Si une image est fournie :
-- Décris la scène
-- Analyse les erreurs
-- Donne des corrections
+else reponds que tu ne peux pas aider en dehors de ce domaine.
 
 Répond toujours de manière professionnelle.
 \n\n";
@@ -67,7 +69,7 @@ Répond toujours de manière professionnelle.
             // 🤖 APPEL OLLAMA
             // -----------------------
             try {
-
+                $response = null;
                 if ($message->getImageName()) {
                     $imageName = $message->getImageName();
                     if (in_array(strtolower(pathinfo($imageName, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'gif', 'webp'])) {
@@ -126,16 +128,28 @@ Répond toujours de manière professionnelle.
             $assistant = new ChatAi();
             $assistant->setContent($aiReply);
             $assistant->setRole('assistant');
-            $assistant->setUser($this->getUser());
+            /** @var User|null $user */
+            $user = $this->getUser();
+
+            if (!$user instanceof User) {
+                throw new \LogicException('User not found');
+            }
+            $assistant->setUser($user);
 
             $em->persist($assistant);
             $em->flush();
 
             return $this->redirectToRoute('chat');
         }
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            throw new \LogicException('User not found');
+        }
 
         $messages = $em->getRepository(ChatAi::class)
-            ->findBy(['user' => $this->getUser()], ['createdAt' => 'ASC']);
+            ->findBy(['user' => $user], ['createdAt' => 'ASC']);
 
         return $this->render('chat_ai/index.html.twig', [
             'form' => $form->createView(),

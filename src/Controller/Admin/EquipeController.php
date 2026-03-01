@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Equipe;
+use App\Entity\User;
 use App\Form\EquipeType;
 use App\Repository\EquipeRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -27,9 +28,14 @@ final class EquipeController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $equipe = new Equipe();
+        /** @var User|null $admin */
         $admin = $this->getUser();
+
+        if (!$admin instanceof User) {
+            throw new \LogicException('User not found');
+        };
         $equipe->setOwner($admin);
-        
+
         $form = $this->createForm(EquipeType::class, $equipe, ['include_members' => true]);
         $form->handleRequest($request);
 
@@ -81,7 +87,7 @@ final class EquipeController extends AbstractController
     public function delete(Request $request, #[MapEntity(mapping: ['idEquipe' => 'idEquipe'])] Equipe $equipe, EntityManagerInterface $entityManager): Response
     {
         $token = $request->request->getString('_token');
-        if ($token && $this->isCsrfTokenValid('delete'.$equipe->getIdEquipe(), $token)) {
+        if ($token && $this->isCsrfTokenValid('delete' . $equipe->getIdEquipe(), $token)) {
             $entityManager->remove($equipe);
             $entityManager->flush();
         }

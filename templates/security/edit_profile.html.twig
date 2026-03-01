@@ -1,0 +1,116 @@
+{% extends 'base_front.html.twig' %}
+
+{% block title %}Modifier mon profil — Gamilha{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            
+            {# Header #}
+            <div class="mb-4">
+                <a href="{{ path('app_profile') }}" class="btn btn-outline-light mb-3">
+                    <i class="bi bi-arrow-left me-2"></i>Retour au profil
+                </a>
+                <h1 class="display-6 fw-bold mb-2">
+                    <i class="bi bi-pencil-square me-3 text-gradient-violet"></i>Modifier mon profil
+                </h1>
+                <p class="text-muted">Mettez à jour vos informations personnelles</p>
+            </div>
+
+            {# Flash Messages #}
+            {% for message in app.flashes('success') %}
+                <div class="alert alert-success alert-dismissible fade show border-success border-opacity-50" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i>{{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="alert alert-danger alert-dismissible fade show border-danger border-opacity-50" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>{{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+
+            {# Formulaire #}
+            <div class="card-front p-4">
+                {{ form_start(form, {'attr': {'enctype': 'multipart/form-data'}}) }}
+
+                <div class="row">
+                    {# Avatar IA — prévisualisation #}
+                    <div class="col-md-4 text-center mb-4">
+                        <label class="form-label fw-semibold text-white d-block mb-3">
+                            <i class="bi bi-robot me-2"></i>Avatar IA
+                        </label>
+                        <div id="editAvatarPreview" class="mx-auto mb-3"
+                             style="width:150px;height:150px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;">
+                            {% if user.profileImage %}
+                                <img src="{{ asset('uploads/profile_images/' ~ user.profileImage) }}"
+                                     alt="{{ user.name }}"
+                                     style="width:150px;height:150px;object-fit:cover;border-radius:50%;border:4px solid #8b5cf6;">
+                            {% else %}
+                                <div style="width:150px;height:150px;background:linear-gradient(135deg,#8b5cf6,#c084fc);border-radius:50%;display:flex;align-items:center;justify-content:center;">
+                                    <i class="bi bi-person-fill text-white" style="font-size:4rem;"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted d-block">
+                            <i class="bi bi-stars me-1"></i>Converti automatiquement en avatar ✨
+                        </small>
+                    </div>
+
+                    <div class="col-md-8">
+                        {# Nom #}
+                        <div class="mb-3">
+                            {{ form_label(form.name, null, {'label_attr': {'class': 'form-label fw-semibold text-white'}}) }}
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark text-white border-secondary">
+                                    <i class="bi bi-person-fill"></i>
+                                </span>
+                                {{ form_widget(form.name) }}
+                            </div>
+                            {{ form_errors(form.name) }}
+                        </div>
+
+                        {# Email #}
+                        <div class="mb-3">
+                            {{ form_label(form.email, null, {'label_attr': {'class': 'form-label fw-semibold text-white'}}) }}
+                            <div class="input-group">
+                                <span class="input-group-text bg-dark text-white border-secondary">
+                                    <i class="bi bi-envelope-fill"></i>
+                                </span>
+                                {{ form_widget(form.email) }}
+                            </div>
+                            {{ form_errors(form.email) }}
+                        </div>
+
+                        {# Photo de profil — Avatar IA #}
+                        <div class="mb-3">
+                            {{ form_label(form.profileImage, null, {'label_attr': {'class': 'form-label fw-semibold text-white'}}) }}
+                            {{ form_widget(form.profileImage, {'attr': {'id': 'editProfileImageInput', 'class': 'form-control bg-dark text-white border-secondary', 'accept': 'image/jpeg,image/png,image/gif,image/webp'}}) }}
+                            <small class="form-text text-muted">Votre photo sera convertie en avatar cartoon par l'IA ✨</small>
+                            {{ form_errors(form.profileImage) }}
+                        </div>
+                    </div>
+                </div>
+
+                {# Boutons d'action #}
+                <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top border-secondary">
+                    <a href="{{ path('app_profile') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle me-1"></i>Annuler
+                    </a>
+                    <button type="submit" class="btn btn-gamilha">
+                        <i class="bi bi-check-circle me-2"></i>Enregistrer les modifications
+                    </button>
+                </div>
+
+                {{ form_end(form) }}
+            </div>
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

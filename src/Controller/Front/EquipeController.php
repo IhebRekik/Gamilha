@@ -36,7 +36,12 @@ class EquipeController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function myParticipations(EvenementRepository $evenementRepository): Response
     {
+        /** @var User|null $user */
         $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            throw new \LogicException('User not found');
+        }
         $evenements = $evenementRepository->findByUserParticipations($user);
         $eventsForCalendar = [];
         $participations = [];
@@ -51,8 +56,12 @@ class EquipeController extends AbstractController
             $participations[] = ['evenement' => $evt, 'equipesUser' => $equipesUser];
 
             $dateFin = $evt->getDateFin();
-            $endDate = $dateFin ? (clone $dateFin)->modify('+1 day')->format('Y-m-d') : null;
 
+            if ($dateFin instanceof \DateTime) {
+                $endDate = (clone $dateFin)->modify('+1 day')->format('Y-m-d');
+            } else {
+                $endDate = null;
+            }
             $eventsForCalendar[] = [
                 'id' => $evt->getIdEvenement(),
                 'title' => $evt->getNom() . ' (' . implode(', ', $equipesUser) . ')',
@@ -75,7 +84,12 @@ class EquipeController extends AbstractController
     #[IsGranted('ROLE_USER')]
     public function myTeams(EquipeRepository $equipeRepository): Response
     {
+        /** @var User|null $user */
         $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            throw new \LogicException('User not found');
+        }
         $equipesOwned = $equipeRepository->findBy(['owner' => $user]);
 
         return $this->render('front/equipe/my_teams.html.twig', [
@@ -88,9 +102,14 @@ class EquipeController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $equipe = new Equipe();
+        /** @var User|null $user */
         $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            throw new \LogicException('User not found');
+        }
         $equipe->setOwner($user);
-        
+
         $form = $this->createForm(EquipeType::class, $equipe, ['include_members' => true]);
         $form->handleRequest($request);
 
@@ -99,7 +118,7 @@ class EquipeController extends AbstractController
             if (!$equipe->getMembers()->contains($user)) {
                 $equipe->addMember($user);
             }
-            
+
             $entityManager->persist($equipe);
             $entityManager->flush();
 
@@ -117,13 +136,18 @@ class EquipeController extends AbstractController
     public function show(int $idEquipe, EquipeRepository $equipeRepository): Response
     {
         $equipe = $equipeRepository->find($idEquipe);
-        
+
         if (!$equipe) {
             throw $this->createNotFoundException('Équipe non trouvée.');
         }
-        
-        $isOwner = $this->getUser() && $equipe->getOwner() === $this->getUser();
-        
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        if (!$user instanceof User) {
+            throw new \LogicException('User not found');
+        }
+        $isOwner =  $equipe->getOwner() === $user;
+
         return $this->render('front/equipe/show.html.twig', [
             'equipe' => $equipe,
             'isOwner' => $isOwner,
@@ -135,13 +159,18 @@ class EquipeController extends AbstractController
     public function edit(Request $request, int $idEquipe, EquipeRepository $equipeRepository, EntityManagerInterface $entityManager): Response
     {
         $equipe = $equipeRepository->find($idEquipe);
-        
+
         if (!$equipe) {
             throw $this->createNotFoundException('Équipe non trouvée.');
         }
-        
+
+        /** @var User|null $user */
         $user = $this->getUser();
-        
+
+        if (!$user instanceof User) {
+            throw new \LogicException('User not found');
+        }
+
         // Vérifier que l'utilisateur est le propriétaire
         if ($equipe->getOwner() !== $user) {
             $this->addFlash('error', 'Vous n\'avez pas le droit de modifier cette équipe.');
@@ -156,7 +185,7 @@ class EquipeController extends AbstractController
             if (!$equipe->getMembers()->contains($user)) {
                 $equipe->addMember($user);
             }
-            
+
             $entityManager->flush();
 
             $this->addFlash('success', 'Équipe modifiée avec succès !');
@@ -174,13 +203,18 @@ class EquipeController extends AbstractController
     public function delete(Request $request, int $idEquipe, EquipeRepository $equipeRepository, EntityManagerInterface $entityManager): Response
     {
         $equipe = $equipeRepository->find($idEquipe);
-        
+
         if (!$equipe) {
             throw $this->createNotFoundException('Équipe non trouvée.');
         }
-        
+
+        /** @var User|null $user */
         $user = $this->getUser();
-        
+
+        if (!$user instanceof User) {
+            throw new \LogicException('User not found');
+        }
+
         // Vérifier que l'utilisateur est le propriétaire
         if ($equipe->getOwner() !== $user) {
             $this->addFlash('error', 'Vous n\'avez pas le droit de supprimer cette équipe.');
@@ -188,7 +222,7 @@ class EquipeController extends AbstractController
         }
 
         $token = $request->request->getString('_token');
-        if ($token && $this->isCsrfTokenValid('delete'.$equipe->getIdEquipe(), $token)) {
+        if ($token && $this->isCsrfTokenValid('delete' . $equipe->getIdEquipe(), $token)) {
             $entityManager->remove($equipe);
             $entityManager->flush();
             $this->addFlash('success', 'Équipe supprimée avec succès !');
@@ -202,19 +236,24 @@ class EquipeController extends AbstractController
     public function removeMember(Request $request, int $idEquipe, int $userId, EquipeRepository $equipeRepository, UserRepository $userRepository, EntityManagerInterface $entityManager): Response
     {
         $equipe = $equipeRepository->find($idEquipe);
-        
+
         if (!$equipe) {
             throw $this->createNotFoundException('Équipe non trouvée.');
         }
-        
+
         $member = $userRepository->find($userId);
-        
+
         if (!$member) {
             throw $this->createNotFoundException('Utilisateur non trouvé.');
         }
-        
+
+        /** @var User|null $user */
         $user = $this->getUser();
-        
+
+        if (!$user instanceof User) {
+            throw new \LogicException('User not found');
+        }
+
         // Vérifier que l'utilisateur est le propriétaire
         if ($equipe->getOwner() !== $user) {
             $this->addFlash('error', 'Vous n\'avez pas le droit de modifier cette équipe.');
@@ -228,7 +267,7 @@ class EquipeController extends AbstractController
         }
 
         $token = $request->request->getString('_token');
-        if ($token && $this->isCsrfTokenValid('remove_member'.$equipe->getIdEquipe().$member->getId(), $token)) {
+        if ($token && $this->isCsrfTokenValid('remove_member' . $equipe->getIdEquipe() . $member->getId(), $token)) {
             $equipe->removeMember($member);
             $entityManager->flush();
             $this->addFlash('success', 'Membre retiré avec succès !');

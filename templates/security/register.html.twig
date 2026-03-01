@@ -1,86 +1,226 @@
-{% extends 'base.html.twig' %}
-
-{% block title %}Register{% endblock %}
+{% extends 'base_login.html.twig' %}
 
 {% block body %}
+<div class="d-flex align-items-center justify-content-center" style="min-height:70vh;">
+    <div class="card-front p-4" style="width: 100%; max-width: 420px;">
+        <h3 class="text-center mb-4 text-gradient-violet">Créer un compte</h3>
+
+        {# Affichage des erreurs #}
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <div class="d-flex align-items-start">
+                    <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                    <div class="flex-grow-1">
+                        <strong>Erreur</strong>
+                        <p class="mb-0 mt-1">{{ message }}</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+
+        {# Messages de succès #}
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <div class="d-flex align-items-start">
+                    <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                    <div class="flex-grow-1">
+                        <strong>Succès</strong>
+                        <p class="mb-0 mt-1">{{ message }}</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+
+        <form method="post" enctype="multipart/form-data" novalidate>
+
+            {# Photo de profil (optionnel) — Avatar IA #}
+            <div class="mb-3 text-center">
+                <div class="mb-2">
+                    <div id="registerAvatarPreview" class="mx-auto d-flex align-items-center justify-content-center"
+                         style="width:130px;height:130px;background:linear-gradient(135deg,#8b5cf6,#c084fc);border-radius:50%;overflow:hidden;">
+                        <i class="bi bi-person-fill text-white" style="font-size:4rem;"></i>
+                    </div>
+                </div>
+                <label for="profileImageInput" class="btn btn-sm mt-2"
+                       style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;border:none;border-radius:20px;">
+                    <i class="bi bi-robot me-1"></i>Générer mon avatar IA
+                </label>
+                <input type="file"
+                       name="profileImage"
+                       id="profileImageInput"
+                       class="d-none"
+                       accept="image/jpeg,image/png,image/gif,image/webp">
+                <small class="d-block text-muted mt-2">
+                    <i class="bi bi-stars me-1"></i>Votre photo sera automatiquement convertie en avatar cartoon ✨
+                </small>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">
+                    <i class="bi bi-person me-1"></i>Nom complet
+                </label>
+                <input type="text" 
+                       name="name" 
+                       class="form-control"
+                       placeholder="Votre nom complet"
+                       required
+                       autofocus>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">
+                    <i class="bi bi-envelope me-1"></i>Email
+                </label>
+                <input type="email" 
+                       name="email" 
+                       class="form-control"
+                       placeholder="votre.email@exemple.com"
+                       required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">
+                    <i class="bi bi-lock me-1"></i>Mot de passe
+                </label>
+                <div class="input-group">
+                    <input type="password" 
+                           name="password" 
+                           id="passwordInput"
+                           class="form-control"
+                           placeholder="••••••••"
+                           required>
+                    <button class="btn btn-outline-secondary" 
+                            type="button" 
+                            id="togglePassword"
+                            title="Afficher/Masquer le mot de passe">
+                        <i class="bi bi-eye" id="toggleIcon"></i>
+                    </button>
+                </div>
+                <small class="text-muted">
+                    <i class="bi bi-info-circle me-1"></i>Min 8 caractères, dont 1 majuscule, 1 minuscule et 1 chiffre
+                </small>
+            </div>
+
+            <button class="btn btn-gamilha w-100 mb-3" type="submit">
+                <i class="bi bi-person-plus me-2"></i>Créer mon compte
+            </button>
+
+            <div class="text-center">
+                <small class="text-muted">
+                    Vous avez déjà un compte ? 
+                    <a href="{{ path('app_login') }}" class="text-decoration-none">
+                        <i class="bi bi-box-arrow-in-right"></i> Se connecter
+                    </a>
+                </small>
+            </div>
+        </form>
+    </div>
+</div>
+
 <style>
-    .register-container {
-        max-width: 400px;
-        margin: 50px auto;
-        padding: 30px;
-        border: 1px solid #ddd;
+    /* Styles pour l'alerte d'erreur */
+    .alert-danger {
+        background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);
+        border: 1px solid rgba(220, 53, 69, 0.3);
         border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        background-color: #fff;
+        color: #dc3545;
     }
 
-    .register-container h2 {
-        text-align: center;
-        margin-bottom: 25px;
-        color: #333;
+    .alert-success {
+        background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(40, 167, 69, 0.05) 100%);
+        border: 1px solid rgba(40, 167, 69, 0.3);
+        border-radius: 10px;
+        color: #28a745;
     }
 
-    .register-container input {
-        width: 100%;
-        padding: 10px 15px;
-        margin-bottom: 15px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        box-sizing: border-box;
-        font-size: 16px;
+    .alert .btn-close {
+        filter: brightness(0) saturate(100%);
     }
 
-    .register-container input:focus {
-        border-color: #007bff;
-        outline: none;
-        box-shadow: 0 0 5px rgba(0,123,255,0.5);
+    /* Style pour le bouton d'œil */
+    #togglePassword {
+        border-left: none;
+        background: transparent;
+        color: #6c757d;
+        transition: all 0.3s ease;
     }
 
-    .register-container button {
-        width: 100%;
-        padding: 12px;
-        background-color: #007bff;
-        border: none;
-        border-radius: 5px;
-        color: white;
-        font-size: 16px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
+    #togglePassword:hover {
+        color: #495057;
+        background: rgba(108, 117, 125, 0.1);
     }
 
-    .register-container button:hover {
-        background-color: #0056b3;
+    #togglePassword:focus {
+        box-shadow: none;
+        border-color: #ced4da;
     }
 
+    /* Animation pour l'icône */
+    #toggleIcon {
+        transition: transform 0.2s ease;
+    }
+
+    #togglePassword:hover #toggleIcon {
+        transform: scale(1.1);
+    }
+
+    /* Amélioration du style général */
+    .card-front {
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-control:focus {
+        box-shadow: 0 0 0 0.25rem rgba(130, 87, 230, 0.25);
+        border-color: #8257e6;
+    }
+
+    .btn-gamilha:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(130, 87, 230, 0.4);
+    }
 </style>
 
-<div class="register-container">
-    <h2>Créer un compte</h2>
+<script src="{{ asset('js/avatar-ai.js') }}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gestion du toggle password
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('passwordInput');
+    const toggleIcon = document.getElementById('toggleIcon');
 
-    {% for message in app.flashes('error') %}
-        <div class="alert alert-danger">{{ message }}</div>
-    {% endfor %}
+    if (togglePassword) {
+        togglePassword.addEventListener('click', function() {
+            // Basculer le type de l'input
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
 
-    {% for message in app.flashes('success') %}
-        <div class="alert alert-success">{{ message }}</div>
-    {% endfor %}
+            // Changer l'icône
+            if (type === 'password') {
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
+            } else {
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
+            }
+        });
+    }
 
-    <form method="post" novalidate>
+    // Avatar IA — initialisation
+    if (window.AvatarAI) {
+        AvatarAI.init('profileImageInput', 'registerAvatarPreview', { size: 130 });
+    }
 
-        <input type="text"
-               name="name"
-               placeholder="Nom complet"
-              >
-
-        <input type="email"
-               name="email"
-            >
-
-        <input type="password"
-               name="password"
-            >
-
-        <button type="submit">Register</button>
-    </form>
-</div>
+    // Animation de disparition automatique des alertes après 10 secondes
+    document.querySelectorAll('.alert').forEach(function(alert) {
+        setTimeout(function() {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }, 10000);
+    });
+});
+</script>
 {% endblock %}

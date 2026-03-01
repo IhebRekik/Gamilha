@@ -16,8 +16,7 @@ class Abonnement
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private ?int $id = null;
-
+    private int $id;
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Le type d'abonnement est obligatoire.")]
     #[Assert\Length(
@@ -148,44 +147,44 @@ class Abonnement
 
         return $this;
     }
-  public function getOptions(): ?array
-{
-    return $this->options;
-}
-
-public function setOptions(?array $options): self
-{
-    $this->options = $options;
-    return $this;
-}
-
-/**
- * @return Collection<int, HistoriquePaiement>
- */
-public function getHistoriquePaiements(): Collection
-{
-    return $this->historiquePaiements;
-}
-
-public function addHistoriquePaiement(HistoriquePaiement $historiquePaiement): static
-{
-    if (!$this->historiquePaiements->contains($historiquePaiement)) {
-        $this->historiquePaiements->add($historiquePaiement);
-        $historiquePaiement->setAbonnement($this);
+    public function getOptions(): ?array
+    {
+        return $this->options;
     }
 
-    return $this;
-}
+    public function setOptions(?array $options): self
+    {
+        $this->options = $options;
+        return $this;
+    }
 
-public function removeHistoriquePaiement(HistoriquePaiement $historiquePaiement): static
-{
-    if ($this->historiquePaiements->removeElement($historiquePaiement)) {
-        // set the owning side to null (unless already changed)
-        if ($historiquePaiement->getAbonnement() === $this) {
-            $historiquePaiement->setAbonnement(null);
+    /**
+     * @return Collection<int, HistoriquePaiement>
+     */
+    public function getHistoriquePaiements(): Collection
+    {
+        return $this->historiquePaiements;
+    }
+
+    public function addHistoriquePaiement(HistoriquePaiement $historiquePaiement): static
+    {
+        if (!$this->historiquePaiements->contains($historiquePaiement)) {
+            $this->historiquePaiements->add($historiquePaiement);
+            $historiquePaiement->setAbonnement($this);
         }
+
+        return $this;
     }
 
-    return $this;
-}
+    public function removeHistoriquePaiement(HistoriquePaiement $historiquePaiement): static
+    {
+        if ($this->historiquePaiements->removeElement($historiquePaiement)) {
+            // set the owning side to null (unless already changed)
+            if ($historiquePaiement->getAbonnement() === $this) {
+                $historiquePaiement->setAbonnement(null);
+            }
+        }
+
+        return $this;
+    }
 }

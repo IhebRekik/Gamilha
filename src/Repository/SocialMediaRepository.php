@@ -24,9 +24,11 @@ class SocialMediaRepository extends ServiceEntityRepository
 
     public function getTotalLikes(): int
     {
-        return (int) $this->createQueryBuilder('s')
+        $result = $this->createQueryBuilder('s')
             ->select('SUM(s.likes)')
             ->getQuery()
-            ->getSingleScalarResult() ?? 0;
+            ->getSingleScalarResult();
+
+        return (int) ($result ?? 0);
     }
 }

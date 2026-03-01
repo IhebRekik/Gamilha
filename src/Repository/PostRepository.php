@@ -34,6 +34,27 @@ class PostRepository extends ServiceEntityRepository
 
     return $qb->getQuery()->getResult();
 }
+    
+    public function findByContent(string $content): array
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.content LIKE :content')
+            ->setParameter('content', '%' . $content . '%')
+            ->orderBy('p.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByUserEmail(string $email): array
+    {
+        return $this->createQueryBuilder('p')
+            ->join('p.user', 'u')
+            ->where('u.email LIKE :email')
+            ->setParameter('email', '%' . $email . '%')
+            ->orderBy('p.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 
 
 }

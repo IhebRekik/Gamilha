@@ -4,30 +4,20 @@ namespace App\Service;
 
 use App\Entity\User;
 use App\Entity\Stream;
-use App\Repository\StreamRepository;
-use App\Repository\DonationRepository;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 class StreamPredictionService
 {
-    private EntityManagerInterface $entityManager;
-    private StreamRepository $streamRepository;
     private ?string $aiApiKey;
-    private ?string $aiApiUrl;
+private string $aiApiUrl;
 
-    public function __construct(
-        EntityManagerInterface $entityManager,
-        StreamRepository $streamRepository,
-        #[Autowire('%ai.api_key%')] ?string $aiApiKey = null,
-        #[Autowire('%ai.api_url%')] ?string $aiApiUrl = null
-    ) {
-        $this->entityManager = $entityManager;
-        $this->streamRepository = $streamRepository;
-        $this->aiApiKey = $aiApiKey;
-        $this->aiApiUrl = $aiApiUrl ?? 'https://api.openai.com/v1/chat/completions';
-    }
+public function __construct(
+    #[Autowire('%ai.api_key%')] ?string $aiApiKey = null,
+    #[Autowire('%ai.api_url%')] ?string $aiApiUrl = null
+) {
+    $this->aiApiKey = $aiApiKey;
+    $this->aiApiUrl = $aiApiUrl ?? 'https://api.openai.com/v1/chat/completions';
+}
 
     /**
      * Collecte les contributions d'un streamer pour l'analyse

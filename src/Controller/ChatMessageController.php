@@ -3,11 +3,10 @@
 namespace App\Controller;
 
 use App\Entity\ChatMessage;
-use App\Form\ChatMessage1Type;
+use App\Entity\User;
 use App\Form\ChatMessageType;
 use App\Repository\ChatMessageRepository;
 use App\Repository\UserRepository;
-use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/chat/message')]
-final class ChatMessageController extends AbstractController
+ class ChatMessageController extends AbstractController
 {
     #[Route(name: 'app_chat_message_index', methods: ['GET'])]
     public function index(ChatMessageRepository $chatMessageRepository): Response
@@ -39,14 +38,13 @@ final class ChatMessageController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            // Get sender from cookie
-            $userId = 3;
+            $userId = $request->cookies->get('user_email');
 
             if (!$userId) {
-                throw new \Exception('user_id cookie not found');
+                throw new \Exception('user_email cookie not found');
             }
 
-            $sender = $userRepository->find($userId);
+            $sender = $userRepository->findOneBy(['email' => $userId]);
 
             if (!$sender) {
                 throw new \Exception('Sender not found');
@@ -112,9 +110,7 @@ final class ChatMessageController extends AbstractController
 
         $sender = $userRepository->findOneBy(['email' => $request->cookies->get('user_email')]);
 
-         if (!$sender) {
-            throw $this->createNotFoundException('Utilisateur introuvable.');
-        }
+       
         $recipient = $userRepository->find($recipientId);
 
         if (!$sender || !$recipient) {
@@ -166,33 +162,31 @@ final class ChatMessageController extends AbstractController
         $message->setContent($newContent);
         $em->flush();
 
-        return $this->json(['status' => 'success']);
+        return new JsonResponse(['status' => 'success']);
     }
-  #[Route('/conversation/delete/{id}', name: 'chat_conversation_delete', methods: ['POST'])]
-public function deleteConversation(
-    ChatMessage $message,
-    Request $request,
-    EntityManagerInterface $entityManager
-): Response {
+    #[Route('/conversation/delete/{id}', name: 'chat_conversation_delete', methods: ['POST'])]
+    public function deleteConversation(
+        ChatMessage $message,
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): Response {
 
-    if (!$this->isCsrfTokenValid('delete'.$message->getId(), $request->request->get('_token'))) {
-        throw $this->createAccessDeniedException('Token CSRF invalide.');
+        if (!$this->isCsrfTokenValid('delete' . $message->getId(), $request->request->get('_token'))) {
+            throw $this->createAccessDeniedException('Token CSRF invalide.');
+        }
+
+        $currentUser = $this->getUser();
+        /** @var User|null $currentUser */
+
+
+
+        $recipientId = $message->getRecipient()->getId();
+
+        $entityManager->remove($message);
+        $entityManager->flush();
+
+        return $this->redirectToRoute('chat_conversation', [
+            'recipientId' => $recipientId
+        ]);
     }
-
-    $currentUser = $this->getUser();
-     /** @var User $currentUser */
-
-   
-
-    $recipientId = $message->getRecipient()->getId();
-
-    $entityManager->remove($message);
-    $entityManager->flush();
-
-    return $this->redirectToRoute('chat_conversation', [
-        'recipientId' => $recipientId
-    ]);
-}
-
-
 }

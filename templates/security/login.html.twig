@@ -5,19 +5,213 @@
     <div class="card-front p-4" style="width: 100%; max-width: 420px;">
         <h3 class="text-center mb-4 text-gradient-violet">Connexion</h3>
 
+        {# Affichage des erreurs #}
+        {% if error %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <div class="d-flex align-items-start">
+                    <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                    <div class="flex-grow-1">
+                        <strong>Erreur de connexion</strong>
+                        <p class="mb-0 mt-1">
+                            {% if error.messageKey is defined %}
+                                {% if 'Invalid credentials' in error.messageKey or 'Identifiants invalides' in error.message %}
+                                    <i class="bi bi-key-fill"></i> Adresse email ou mot de passe incorrect.
+                                {% elseif 'banni' in error.message|lower %}
+                                    <i class="bi bi-ban"></i> {{ error.message }}
+                                {% elseif 'désactivé' in error.message|lower or 'inactif' in error.message|lower %}
+                                    <i class="bi bi-x-circle-fill"></i> {{ error.message }}
+                                {% else %}
+                                    {{ error.message }}
+                                {% endif %}
+                            {% else %}
+                                {{ error.message }}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endif %}
+
         <form method="post">
             <div class="mb-3">
-                <label class="form-label">Email</label>
-                <input type="email" name="_username" class="form-control" required>
+                <label class="form-label">
+                    <i class="bi bi-envelope me-1"></i>Email
+                </label>
+                <input type="email" 
+                       name="_username" 
+                       class="form-control {{ error ? 'is-invalid' : '' }}" 
+                       value="{{ last_username }}"
+                       placeholder="votre.email@exemple.com"
+                       required 
+                       autofocus>
+                {% if error %}
+                    <div class="invalid-feedback">
+                        Veuillez vérifier votre adresse email
+                    </div>
+                {% endif %}
             </div>
 
             <div class="mb-3">
-                <label class="form-label">Mot de passe</label>
-                <input type="password" name="_password" class="form-control" required>
+                <label class="form-label">
+                    <i class="bi bi-lock me-1"></i>Mot de passe
+                </label>
+                <div class="input-group">
+                    <input type="password" 
+                           name="_password" 
+                           id="passwordInput"
+                           class="form-control {{ error ? 'is-invalid' : '' }}" 
+                           placeholder="••••••••"
+                           required>
+                    <button class="btn btn-outline-secondary" 
+                            type="button" 
+                            id="togglePassword"
+                            title="Afficher/Masquer le mot de passe">
+                        <i class="bi bi-eye" id="toggleIcon"></i>
+                    </button>
+                    {% if error %}
+                        <div class="invalid-feedback">
+                            Veuillez vérifier votre mot de passe
+                        </div>
+                    {% endif %}
+                </div>
+                <small class="text-muted">
+                    <i class="bi bi-info-circle me-1"></i>Cliquez sur l'œil pour afficher/masquer
+                </small>
             </div>
 
-            <button class="btn btn-gamilha w-100">Se connecter</button>
+            <div class="mb-3 form-check">
+                <input type="checkbox" class="form-check-input" id="_remember_me" name="_remember_me">
+                <label class="form-check-label" for="_remember_me">
+                    <i class="bi bi-bookmark"></i> Se souvenir de moi
+                </label>
+            </div>
+
+            <button class="btn btn-gamilha w-100 mb-3" type="submit">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Se connecter
+            </button>
+
+            <div class="text-center mb-2">
+                <small class="text-muted">
+                    <a href="{{ path('app_forgot_password') }}" class="text-decoration-none">
+                        <i class="bi bi-key"></i> Mot de passe oublié ?
+                    </a>
+                </small>
+            </div>
+
+            <div class="text-center">
+                <small class="text-muted">
+                    Pas encore de compte ? 
+                    <a href="{{ path('app_register') }}" class="text-decoration-none">
+                        <i class="bi bi-person-plus"></i> Créer un compte
+                    </a>
+                </small>
+            </div>
         </form>
     </div>
 </div>
+
+<style>
+    /* Styles pour l'alerte d'erreur */
+    .alert-danger {
+        background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.05) 100%);
+        border: 1px solid rgba(220, 53, 69, 0.3);
+        border-radius: 10px;
+        color: #dc3545;
+    }
+
+    .alert-danger .btn-close {
+        filter: brightness(0) saturate(100%) invert(25%) sepia(85%) saturate(2800%) hue-rotate(340deg);
+    }
+
+    /* Style pour les champs invalides */
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        padding-right: calc(1.5em + 0.75rem);
+        background-image: none;
+    }
+
+    .form-control.is-invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+    }
+
+    /* Style pour le bouton d'œil */
+    #togglePassword {
+        border-left: none;
+        background: transparent;
+        color: #6c757d;
+        transition: all 0.3s ease;
+    }
+
+    #togglePassword:hover {
+        color: #495057;
+        background: rgba(108, 117, 125, 0.1);
+    }
+
+    #togglePassword:focus {
+        box-shadow: none;
+        border-color: #ced4da;
+    }
+
+    /* Animation pour l'icône */
+    #toggleIcon {
+        transition: transform 0.2s ease;
+    }
+
+    #togglePassword:hover #toggleIcon {
+        transform: scale(1.1);
+    }
+
+    /* Amélioration du style général */
+    .card-front {
+        backdrop-filter: blur(10px);
+        border-radius: 15px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-control:focus {
+        box-shadow: 0 0 0 0.25rem rgba(130, 87, 230, 0.25);
+        border-color: #8257e6;
+    }
+
+    .btn-gamilha:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(130, 87, 230, 0.4);
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordInput = document.getElementById('passwordInput');
+    const toggleIcon = document.getElementById('toggleIcon');
+
+    if (togglePassword) {
+        togglePassword.addEventListener('click', function() {
+            // Basculer le type de l'input
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+
+            // Changer l'icône
+            if (type === 'password') {
+                toggleIcon.classList.remove('bi-eye-slash');
+                toggleIcon.classList.add('bi-eye');
+            } else {
+                toggleIcon.classList.remove('bi-eye');
+                toggleIcon.classList.add('bi-eye-slash');
+            }
+        });
+    }
+
+    // Animation de disparition automatique de l'alerte après 10 secondes
+    const alert = document.querySelector('.alert');
+    if (alert) {
+        setTimeout(function() {
+            const bsAlert = new bootstrap.Alert(alert);
+            bsAlert.close();
+        }, 10000);
+    }
+});
+</script>
 {% endblock %}

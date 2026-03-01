@@ -5,6 +5,7 @@ parameters:
     ably.api_key: '%env(ABLY_API_KEY)%'
     ai.api_key: '%env(AI_API_KEY)%'
     ai.api_url: '%env(AI_API_URL)%'
+    profiles_directory: '%kernel.project_dir%/public/uploads/profiles'
     
 
 services:
