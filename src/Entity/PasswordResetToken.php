@@ -13,19 +13,19 @@ class PasswordResetToken
     #[ORM\Column]
     private int $id;
     #[ORM\Column(length: 255)]
-    private ?string $email = null;
+    private string $email ;
 
     #[ORM\Column(length: 6)]
-    private ?string $code = null;
+    private string $code ;
 
     #[ORM\Column(type: 'datetime')]
-    private ?\DateTimeInterface $expiresAt = null;
+    private \DateTimeInterface $expiresAt ;
 
     #[ORM\Column(type: 'boolean')]
     private bool $isUsed = false;
 
     #[ORM\Column(type: 'datetime')]
-    private ?\DateTimeInterface $createdAt = null;
+    private \DateTimeInterface $createdAt ;
 
     public function __construct()
     {

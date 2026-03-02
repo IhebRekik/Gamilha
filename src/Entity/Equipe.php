@@ -21,7 +21,7 @@ class Equipe
     #[ORM\Column(length: 100, name: 'nomEquipe')]
     #[Assert\NotBlank(message: 'Le nom de l\'équipe est obligatoire.')]
     #[Assert\Length(max: 100)]
-    private ?string $nomEquipe = null;
+    private string $nomEquipe ;
 
     #[ORM\Column(length: 10, nullable: true)]
     #[Assert\Length(max: 10)]
@@ -41,7 +41,7 @@ class Equipe
     #[ORM\Column(length: 20)]
     #[Assert\NotBlank]
     #[Assert\Choice(choices: ['amateur', 'semi-pro', 'pro'], message: 'Niveau invalide.')]
-    private ?string $niveau = null;
+    private string $niveau ;
 
     /** @var Collection<int, GameMatch> */
     #[ORM\OneToMany(targetEntity: GameMatch::class, mappedBy: 'equipeA')]

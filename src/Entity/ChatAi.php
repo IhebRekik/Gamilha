@@ -19,10 +19,10 @@ class ChatAi
     private ?string $content = null;
 
     #[ORM\Column(length: 20)]
-    private ?string $role = null;
+    private string $role ;
 
     #[ORM\Column(type: 'datetime_immutable')]
-    private ?\DateTimeImmutable $createdAt = null;
+    private \DateTimeImmutable $createdAt ;
 
 
 

@@ -23,13 +23,13 @@ private ?User $sender = null;
     private ?Post $post = null;
 
     #[ORM\Column(type:"string", length:20)]
-    private ?string $type = null; // 'LIKE' ou 'COMMENT'
+    private string $type; // 'LIKE' ou 'COMMENT'
 
     #[ORM\Column(type:"boolean")]
     private bool $isRead = false;
 
     #[ORM\Column(type:"datetime_immutable")]
-    private ?\DateTimeImmutable $createdAt = null;
+    private \DateTimeImmutable $createdAt ;
 
     // ===== Getters & Setters =====
     public function getId(): ?int { return $this->id; }

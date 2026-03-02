@@ -16,6 +16,7 @@ use App\Entity\UserAbonnement;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Entity\Stream;
 use App\Entity\Donation;
+use Symfony\Component\Serializer\Annotation\Ignore;
 use App\Entity\Equipe;
 use App\Entity\Notification;
 
@@ -35,18 +36,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'json')]
     private array $roles = [];
-
-    #[ORM\Column]
-    #[Assert\NotBlank(message: "Le mot de passe est obligatoire.")]
-    #[Assert\Length(
-        min: 8,
-        minMessage: "Le mot de passe doit contenir au moins {{ limit }} caractères."
-    )]
-    #[Assert\Regex(
-        pattern: "/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/",
-        message: "Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre."
-    )]
-    private ?string $password = null;
+    #[ORM\Column(type: "string")]
+#[Ignore]   // On ignore le champ lors de la sérialisation JSON / API
+#[Assert\NotBlank(message: "Le mot de passe est obligatoire.")]
+#[Assert\Length(
+    min: 8,
+    minMessage: "Le mot de passe doit contenir au moins {{ limit }} caractères."
+)]
+#[Assert\Regex(
+    pattern: "/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/",
+    message: "Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre."
+)]
+private ?string $password = null;
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Post::class, orphanRemoval: true)]
     private Collection $posts;
 

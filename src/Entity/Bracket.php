@@ -20,18 +20,18 @@ class Bracket
     #[ORM\Column(length: 50, name: 'typeBracket')]
     #[Assert\NotBlank(message: 'Le type de bracket est obligatoire.')]
     #[Assert\Choice(choices: ['single elimination', 'double elimination'], message: 'Choisir single elimination ou double elimination.')]
-    private ?string $typeBracket = null;
+    private string $typeBracket ;
 
     #[ORM\Column(name: 'nombreTours')]
     #[Assert\NotBlank(message: 'Le nombre de tours est obligatoire.')]
     #[Assert\Type('integer')]
     #[Assert\PositiveOrZero(message: 'Le nombre de tours doit être positif ou zéro.')]
-    private ?int $nombreTours = null;
+    private int $nombreTours ;
 
     #[ORM\Column(length: 20)]
     #[Assert\NotBlank(message: 'Le statut est obligatoire.')]
     #[Assert\Choice(choices: ['en attente', 'en cours', 'terminé'], message: 'Statut invalide.')]
-    private ?string $statut = null;
+    private string $statut ;
 
     #[ORM\ManyToOne(targetEntity: Evenement::class, inversedBy: "brackets")]
 #[ORM\JoinColumn(name: "evenement_id", referencedColumnName: "id", nullable: false)]

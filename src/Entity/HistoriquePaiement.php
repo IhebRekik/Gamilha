@@ -22,10 +22,10 @@ class HistoriquePaiement
     private ?Abonnement $abonnement = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 3)]
-    private ?string $montant = null;
+    private string $montant ;
 
     #[ORM\Column]
-    private ?\DateTime $createdAt = null;
+    private \DateTime $createdAt ;
 
     public function getId(): ?int
     {

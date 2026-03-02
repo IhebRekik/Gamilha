@@ -14,10 +14,10 @@ class Event
     #[ORM\Column]
     private int $id;
     #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    private string $name ;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $date = null;
+    private \DateTimeInterface $date ;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $game = null; // e.g., Valorant, Dota 2

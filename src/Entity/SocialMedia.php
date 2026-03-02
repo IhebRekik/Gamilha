@@ -13,13 +13,13 @@ class SocialMedia
     #[ORM\Column]
     private int $id;
     #[ORM\Column(length: 255)]
-    private ?string $platform = null; // e.g., Twitter, Instagram
+    private string $platform ; // e.g., Twitter, Instagram
 
     #[ORM\Column(length: 1000)]
-    private ?string $content = null;
+    private string $content ;
 
     #[ORM\Column]
-    private ?int $likes = 0;
+    private int $likes ;
 
     // Getters and setters...
 

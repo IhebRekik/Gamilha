@@ -19,10 +19,10 @@ class ChatMessage
         max: 255,
         maxMessage: "Le contenu ne peut pas dépasser {{ limit }} caractères."
     )]
-    private ?string $content = null;
+    private string $content ;
 
     #[ORM\Column]
-    private ?\DateTime $createdAt = null;
+    private \DateTime $createdAt ;
 
     #[ORM\ManyToOne(inversedBy: 'messagesSent')]
     private ?User $sender = null;

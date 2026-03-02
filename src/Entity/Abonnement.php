@@ -37,24 +37,19 @@ class Abonnement
     /**
      * @var Collection<int, UserAbonnement>
      */
-   #[ORM\OneToMany(
-    mappedBy: "abonnement",
-    targetEntity: UserAbonnement::class,
-    cascade: ["persist", "remove"],
-    orphanRemoval: true
-)]
+  #[ORM\OneToMany(mappedBy: "abonnement", targetEntity: UserAbonnement::class)]
 private Collection $userAbonnements;
 
     #[ORM\Column]
     #[Assert\NotNull(message: "Le prix est obligatoire.")]
     #[Assert\Positive(message: "Le prix doit être supérieur à 0.")]
-    private ?float $prix = null;
+    private float $prix ;
 
     #[ORM\Column(nullable: true)]
     private ?array $avantages = null;
 
     #[ORM\Column(type: Types::INTEGER)]
-    private ?int $duree = null;
+    private int $duree;
 
     /**
      * @var Collection<int, HistoriquePaiement>
@@ -193,4 +188,5 @@ private Collection $userAbonnements;
 
         return $this;
     }
+    
 }

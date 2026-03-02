@@ -19,7 +19,7 @@ class Team
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Le nom de l\'équipe est obligatoire.')]
     #[Assert\Length(min: 1, max: 255)]
-    private ?string $name = null;
+    private string $name ;
 
    #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'teams')]
 private Collection $members;

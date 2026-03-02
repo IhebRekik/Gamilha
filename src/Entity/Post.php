@@ -24,13 +24,13 @@ class Post
     min: 12,
     minMessage: "Le contenu doit contenir au moins {{ limit }} caractères"
 )]
-    private ?string $content = null;
+    private string $content ;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private \DateTimeImmutable $createdAt ;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $mediaurl = null;

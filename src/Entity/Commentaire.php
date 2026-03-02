@@ -24,10 +24,10 @@ class Commentaire
     max: 500,
     maxMessage: 'Le commentaire ne doit pas dépasser {{ limit }} caractères'
 )]
-private ?string $text = null;
+private string $text;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private \DateTimeImmutable $createdAt ;
 
 
     #[ORM\ManyToOne(targetEntity: Post::class, inversedBy: 'commentaires')]

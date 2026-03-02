@@ -20,7 +20,7 @@ class Stream
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Le titre est obligatoire.")]
     #[Assert\Length(min: 3, max: 255)]
-    private ?string $title = null;
+    private string $title ;
 
     #[ORM\OneToMany(mappedBy: "stream", targetEntity: Donation::class, cascade: ["persist"])]
     private Collection $donations;
@@ -31,7 +31,7 @@ class Stream
 
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message: "Le jeu est obligatoire.")]
-    private ?string $game = null;
+    private string $game ;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $thumbnail = null;
@@ -54,10 +54,10 @@ class Stream
 
     #[ORM\Column(type: 'datetime')]
     #[Assert\NotNull]
-    private ?\DateTime $createdAt = null;
+    private \DateTime $createdAt ;
 
     #[ORM\Column(length: 255)]
-    private ?string $streamKey = null;
+    private string $streamKey ;
     #[ORM\Column(type: "boolean")]
     private bool $isLive = false;
 
