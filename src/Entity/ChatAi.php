@@ -39,7 +39,7 @@ class ChatAi
     private ?string $audioName = null;
 
     #[ORM\ManyToOne(inversedBy: 'chatAis')]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
     #[ORM\Column(nullable: true)]

@@ -39,7 +39,9 @@
         {% if post is defined %}
             <div class="mb-3">
                 <label class="text-white fw-semibold">Likes</label>
-                <p class="text-white">❤️ {{ post.likes }}</p>
+<p class="text-white">
+    ❤️ {{ post.getLikesCount() }}
+</p>
             </div>
         {% endif %}
 

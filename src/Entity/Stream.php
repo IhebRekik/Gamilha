@@ -22,7 +22,7 @@ class Stream
     #[Assert\Length(min: 3, max: 255)]
     private ?string $title = null;
 
-    #[ORM\OneToMany(mappedBy: "stream", targetEntity: Donation::class, cascade: ["persist", "remove"])]
+    #[ORM\OneToMany(mappedBy: "stream", targetEntity: Donation::class, cascade: ["persist"])]
     private Collection $donations;
 
     #[ORM\Column(type: 'text', nullable: true)]

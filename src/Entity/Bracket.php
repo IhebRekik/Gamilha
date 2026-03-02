@@ -14,7 +14,7 @@ class Bracket
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'idBracket')]
+    #[ORM\Column(name: 'id_Bracket')]
     private ?int $idBracket = null;
 
     #[ORM\Column(length: 50, name: 'typeBracket')]
@@ -33,12 +33,12 @@ class Bracket
     #[Assert\Choice(choices: ['en attente', 'en cours', 'terminé'], message: 'Statut invalide.')]
     private ?string $statut = null;
 
-    #[ORM\ManyToOne(targetEntity: Evenement::class, inversedBy: 'brackets')]
-    #[ORM\JoinColumn(name: 'idEvenement', referencedColumnName: 'idEvenement', nullable: true, onDelete: 'CASCADE')]
-    private ?Evenement $evenement = null; // nullable in SQL: DEFAULT NULL
+    #[ORM\ManyToOne(targetEntity: Evenement::class, inversedBy: "brackets")]
+#[ORM\JoinColumn(name: "evenement_id", referencedColumnName: "id", nullable: false)]
+private ?Evenement $evenement = null;
 
     /** @var Collection<int, GameMatch> */
-    #[ORM\OneToMany(targetEntity: GameMatch::class, mappedBy: 'bracket', cascade: ['remove'])]
+    #[ORM\OneToMany(targetEntity: GameMatch::class, mappedBy: 'bracket', orphanRemoval: true)]
     private Collection $matchs;
 
     public function __construct()

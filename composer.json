@@ -7,11 +7,13 @@
         "php": ">=8.1",
         "ext-ctype": "*",
         "ext-iconv": "*",
-        "cloudinary/cloudinary_php": "^3.1",
         "ably/ably-php": "^1.1",
+        "ahmed-bhs/doctrine-doctor": "^1.0",
+        "cloudinary/cloudinary_php": "^3.1",
         "doctrine/doctrine-bundle": "^2.18",
         "doctrine/doctrine-migrations-bundle": "^3.7",
         "doctrine/orm": "^3.6",
+        "friendsofsymfony/ckeditor-bundle": "2.8",
         "knplabs/knp-paginator-bundle": "^6.10",
         "phpdocumentor/reflection-docblock": "^5.6",
         "phpstan/phpdoc-parser": "^2.3",
@@ -64,7 +66,8 @@
         "symfony/yaml": "6.4.*",
         "twig/extra-bundle": "^3.23",
         "twig/twig": "^3.23",
-        "vich/uploader-bundle": "^2.9"
+        "vich/uploader-bundle": "^2.9",
+        "webmozart/assert": "1.11"
     },
     "require-dev": {
         "phpstan/phpstan": "^2.1",
@@ -118,7 +121,8 @@
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
             "assets:install %PUBLIC_DIR%": "symfony-cmd",
-            "importmap:install": "symfony-cmd"
+            "importmap:install": "symfony-cmd",
+            "ckeditor:install": "symfony-cmd"
         },
         "post-install-cmd": [
             "@auto-scripts"

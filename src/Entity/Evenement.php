@@ -60,13 +60,12 @@ class Evenement
     private ?string $image = null;
 
     /** @var Collection<int, Bracket> */
-    #[ORM\OneToMany(targetEntity: Bracket::class, mappedBy: 'evenement', cascade: ['remove'])]
+    #[ORM\OneToMany(targetEntity: Bracket::class, mappedBy: 'evenement')]
     private Collection $brackets;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
-    private ?User $createdBy = null;
-
+#[ORM\JoinColumn(name: "created_by_id", nullable: false)]
+private ?User $createdBy = null;
     /** @var Collection<int, Equipe> */
     #[ORM\ManyToMany(targetEntity: Equipe::class)]
     #[ORM\JoinTable(name: 'evenement_equipe')]

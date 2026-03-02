@@ -57,11 +57,9 @@ class Equipe
     #[ORM\JoinColumn(name: 'equipe_id', referencedColumnName: 'idEquipe')]
     #[ORM\InverseJoinColumn(name: 'user_id', referencedColumnName: 'id')]
     private Collection $members;
-
-    #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
-    private ?User $owner = null;
-
+#[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'equipesOwned')]
+#[ORM\JoinColumn(name: 'owner_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
+private ?User $owner = null;
     public function __construct()
     {
         $this->matchsEquipeA = new ArrayCollection();

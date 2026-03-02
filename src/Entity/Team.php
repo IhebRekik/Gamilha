@@ -21,8 +21,8 @@ class Team
     #[Assert\Length(min: 1, max: 255)]
     private ?string $name = null;
 
-    #[ORM\ManyToMany(targetEntity: User::class, inversedBy: 'teams')]
-    private Collection $members;
+   #[ORM\ManyToMany(targetEntity: User::class, mappedBy: 'teams')]
+private Collection $members;
 
     public function __construct()
     {

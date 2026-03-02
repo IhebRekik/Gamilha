@@ -25,7 +25,7 @@ class Abonnement
         minMessage: "Le type doit contenir au moins {{ limit }} caractères.",
         maxMessage: "Le type ne peut pas dépasser {{ limit }} caractères."
     )]
-    private ?string $type = null;
+    private string $type ;
 
     #[ORM\Column(type: 'json', nullable: true)]
     private ?array $options = [];
@@ -37,8 +37,13 @@ class Abonnement
     /**
      * @var Collection<int, UserAbonnement>
      */
-    #[ORM\OneToMany(targetEntity: UserAbonnement::class, mappedBy: 'abonnement')]
-    private Collection $userAbonnements;
+   #[ORM\OneToMany(
+    mappedBy: "abonnement",
+    targetEntity: UserAbonnement::class,
+    cascade: ["persist", "remove"],
+    orphanRemoval: true
+)]
+private Collection $userAbonnements;
 
     #[ORM\Column]
     #[Assert\NotNull(message: "Le prix est obligatoire.")]
@@ -63,6 +68,7 @@ class Abonnement
     {
         $this->userAbonnements = new ArrayCollection();
         $this->historiquePaiements = new ArrayCollection();
+         $this->type = '';
     }
     public function hasFeature(string $feature): bool
     {

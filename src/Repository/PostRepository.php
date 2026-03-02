@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Post;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\User;
 
 /**
  * @extends ServiceEntityRepository<Post>
@@ -34,27 +35,44 @@ class PostRepository extends ServiceEntityRepository
 
     return $qb->getQuery()->getResult();
 }
-    
-    public function findByContent(string $content): array
-    {
-        return $this->createQueryBuilder('p')
-            ->where('p.content LIKE :content')
-            ->setParameter('content', '%' . $content . '%')
-            ->orderBy('p.createdAt', 'DESC')
-            ->getQuery()
-            ->getResult();
-    }
+public function findSmartFeed(User $currentUser): array
+{
+    return $this->createQueryBuilder('p')
+        ->leftJoin('p.user', 'author')
 
-    public function findByUserEmail(string $email): array
-    {
-        return $this->createQueryBuilder('p')
-            ->join('p.user', 'u')
-            ->where('u.email LIKE :email')
-            ->setParameter('email', '%' . $email . '%')
-            ->orderBy('p.createdAt', 'DESC')
-            ->getQuery()
-            ->getResult();
-    }
+        // Likes & commentaires
+        ->leftJoin('p.likedBy', 'l')
+        ->leftJoin('p.commentaires', 'c')
+
+        // Vérifier si l’auteur est un ami
+        ->leftJoin(
+            'App\Entity\Friend',
+            'f',
+            'WITH',
+            'f.friend = author AND f.user = :currentUser'
+        )
+
+        ->addSelect('COUNT(DISTINCT l.id) AS HIDDEN likesCount')
+        ->addSelect('COUNT(DISTINCT c.id) AS HIDDEN commentsCount')
+        ->addSelect('COUNT(DISTINCT f.id) AS HIDDEN isFriend')
+
+        // Priorité amis > likes > commentaires
+        ->addSelect(
+            '(COUNT(DISTINCT f.id) * 100
+            + COUNT(DISTINCT l.id) * 2
+            + COUNT(DISTINCT c.id) * 3
+            ) AS HIDDEN score'
+        )
+
+        ->setParameter('currentUser', $currentUser)
+
+        ->groupBy('p.id')
+        ->orderBy('score', 'DESC')
+        ->addOrderBy('p.createdAt', 'DESC')
+
+        ->getQuery()
+        ->getResult();
+}
 
 
 }

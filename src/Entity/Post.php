@@ -16,13 +16,14 @@ class Post
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    private int $id;
+    private ?int $id = null;
+
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank(message: "Le contenu est obligatoire")]
-    #[Assert\Length(
-        min: 3,
-        minMessage: "Le contenu doit contenir au moins {{ limit }} caractères"
-    )]
+#[Assert\Length(
+    min: 12,
+    minMessage: "Le contenu doit contenir au moins {{ limit }} caractères"
+)]
     private ?string $content = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -40,8 +41,7 @@ class Post
     #[ORM\OneToMany(targetEntity: Commentaire::class, mappedBy: 'post', orphanRemoval: true)]
     private Collection $commentaires;
 
-    #[ORM\Column]
-    private int $likes = 0;
+    
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'posts')]
     #[ORM\JoinColumn(nullable: false)]
@@ -53,12 +53,18 @@ class Post
     #[ORM\ManyToMany(targetEntity: User::class)]
     #[ORM\JoinTable(name: 'post_likes')]
     private Collection $likedBy;
+    #[ORM\OneToMany(mappedBy: "post", targetEntity: Notification::class)]
+private Collection $notifications;
+
 
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->commentaires = new ArrayCollection();
         $this->likedBy = new ArrayCollection(); // ← AJOUT
+                $this->notifications = new ArrayCollection();
+
+        
     }
 
     public function getId(): ?int
@@ -109,7 +115,7 @@ class Post
         $this->mediaurl = $mediaurl;
         return $this;
     }
-
+    
     public function getUser(): ?User
     {
         return $this->user;
@@ -147,31 +153,16 @@ class Post
         }
         return $this;
     }
+    public function getNotifications(): Collection
+    {
+        return $this->notifications;
+    }
 
     // ──────────────────────────────────────────────
     // Likes - tout ce qui concerne les likes
     // ──────────────────────────────────────────────
 
-    public function getLikes(): int
-    {
-        return $this->likes;
-    }
-
-    public function setLikes(int $likes): self
-    {
-        $this->likes = $likes;
-        return $this;
-    }
-
-    public function incrementLikes(): self
-    {
-        $this->likes++;
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, User>
-     */
+/** @return Collection<int, User> */
     public function getLikedBy(): Collection
     {
         return $this->likedBy;
@@ -181,16 +172,13 @@ class Post
     {
         if (!$this->likedBy->contains($user)) {
             $this->likedBy->add($user);
-            $this->likes = $this->likedBy->count(); // met à jour le compteur automatiquement
         }
         return $this;
     }
 
     public function removeLikedBy(User $user): self
     {
-        if ($this->likedBy->removeElement($user)) {
-            $this->likes = $this->likedBy->count(); // met à jour le compteur automatiquement
-        }
+        $this->likedBy->removeElement($user);
         return $this;
     }
 
@@ -198,4 +186,11 @@ class Post
     {
         return $this->likedBy->contains($user);
     }
+
+    // ✅ compteur dynamique
+    public function getLikesCount(): int
+    {
+        return $this->likedBy->count();
+    }
+    
 }
