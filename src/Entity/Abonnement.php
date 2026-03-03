@@ -34,12 +34,14 @@ class Abonnement
         'Evenement' => 'evenement',
         'Streaming' => 'streaming',
     ];
-    /**
-     * @var Collection<int, UserAbonnement>
-     */
-  #[ORM\OneToMany(mappedBy: "abonnement", targetEntity: UserAbonnement::class)]
+/**
+ * @var Collection<int, UserAbonnement>
+ */
+#[ORM\OneToMany(
+    mappedBy: "abonnement", 
+    targetEntity: UserAbonnement::class,
+)]
 private Collection $userAbonnements;
-
     #[ORM\Column]
     #[Assert\NotNull(message: "Le prix est obligatoire.")]
     #[Assert\Positive(message: "Le prix doit être supérieur à 0.")]

@@ -32,7 +32,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180)]
     #[Assert\NotBlank(message: "L'adresse email est obligatoire.")]
     #[Assert\Email(message: "Veuillez saisir une adresse email valide.")]
-    private ?string $email = null;
+    private string $email;
 
     #[ORM\Column(type: 'json')]
     private array $roles = [];
@@ -47,7 +47,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     pattern: "/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/",
     message: "Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre."
 )]
-private ?string $password = null;
+private string $password;
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Post::class, orphanRemoval: true)]
     private Collection $posts;
 
@@ -68,7 +68,7 @@ private Collection $sentNotifications;
         max: 50,
         maxMessage: "Le nom ne doit pas dépasser {{ limit }} caractères."
     )]
-    private ?string $name = null;
+    private string $name;
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $profileImage = null;
 
@@ -255,8 +255,8 @@ private Collection $equipesOwned;
     #[ORM\OneToMany(targetEntity: HistoriquePaiement::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $historiquePaiements;
 
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $createdAt = null;
+    #[ORM\Column(nullable: false)]
+    private \DateTimeImmutable $createdAt;
 
     public function __construct()
     {

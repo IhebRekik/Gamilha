@@ -21,8 +21,8 @@ class ChatMessage
     )]
     private string $content ;
 
-    #[ORM\Column]
-    private \DateTime $createdAt ;
+#[ORM\Column(type: 'datetime_immutable')]
+    private \DateTimeImmutable $createdAt ;
 
     #[ORM\ManyToOne(inversedBy: 'messagesSent')]
     private ?User $sender = null;
@@ -48,12 +48,12 @@ class ChatMessage
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTime $createdAt): static
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
         return $this;

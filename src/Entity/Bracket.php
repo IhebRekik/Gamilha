@@ -14,10 +14,10 @@ class Bracket
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'id_Bracket')]
+    #[ORM\Column(name: 'id_bracket')]
     private ?int $idBracket = null;
 
-    #[ORM\Column(length: 50, name: 'typeBracket')]
+    #[ORM\Column(length: 50, name: 'type_bracket')]
     #[Assert\NotBlank(message: 'Le type de bracket est obligatoire.')]
     #[Assert\Choice(choices: ['single elimination', 'double elimination'], message: 'Choisir single elimination ou double elimination.')]
     private string $typeBracket ;

@@ -1,4 +1,4 @@
-% extends 'base.html.twig' %}
+{% extends 'base.html.twig' %}
 
 {% block title %}Admin - Posts{% endblock %}
 
@@ -146,5 +146,35 @@ document.addEventListener('DOMContentLoaded', function () {
     userInput.addEventListener('input', filterPosts);
 });
 </script>
+<style>
+.pagination-simple {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    font-family: 'Orbitron', sans-serif; /* style gaming */
+    margin: 20px 0;
+}
 
+.pagination-simple a {
+    color: #38bdf8;
+    text-decoration: none;
+    padding: 4px 8px;
+    background: #0b1220;
+    border: 1px solid #7c3aed;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.pagination-simple a:hover {
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    color: white;
+}
+
+.pagination-simple .current {
+    color: white;
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+}</style>
 {% endblock %}

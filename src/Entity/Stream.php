@@ -52,9 +52,9 @@ class Stream
     #[Assert\Url(message: "URL invalide.")]
     private ?string $url = null;
 
-    #[ORM\Column(type: 'datetime')]
+    #[ORM\Column(type: 'datetime_immutable')]
     #[Assert\NotNull]
-    private \DateTime $createdAt ;
+    private \DateTimeImmutable $createdAt ;
 
     #[ORM\Column(length: 255)]
     private string $streamKey ;
@@ -108,7 +108,7 @@ class Stream
         $this->donations = new ArrayCollection();
         $this->viewers = 0;
         $this->status = 'live';
-        $this->createdAt = new \DateTime();
+        $this->createdAt = new \DateTimeImmutable();
         $this->streamKey = bin2hex(random_bytes(8));
     }
 
@@ -194,12 +194,12 @@ class Stream
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTime $createdAt): self
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
         return $this;

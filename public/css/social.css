@@ -191,55 +191,6 @@
     border-radius: 50%;
 }
 
-.cke_chrome {
-    .pagination-wrapper {
-        display: flex;
-        justify-content: center;
-        margin: 25px 0;
-    }
-    .pagination-list {
-        display: flex;
-        gap: 8px;
-        padding: 0;
-        margin: 0;
-    }
-    .pagination-list .page-item {
-        list-style: none;
-    }
-    .pagination-list .page-link {
-        min-width: 36px;
-        height: 36px;
-        padding: 0 10px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        background: #0f172a;
-        border: 1px solid #1e293b;
-        color: #94a3b8;
-        border-radius: 10px;
-        font-size: 14px;
-        font-weight: 500;
-        text-decoration: none;
-        transition: all 0.2s ease;
-    }
-    .pagination-list .page-link:hover {
-        background: #7c4dff;
-        border-color: #7c4dff;
-        color: white;
-    }
-    .pagination-list .active .page-link {
-        background: linear-gradient(135deg, #7c4dff, #9333ea);
-        border: none;
-        color: white;
-        font-weight: 600;
-        box-shadow: 0 0 12px rgba(124, 77, 255, 0.5);
-    }
-    .pagination-list .disabled .page-link {
-        opacity: 0.3;
-        pointer-events: none;
-    }
-}
-
 .cke_top {
     background: #111827 !important;
 }

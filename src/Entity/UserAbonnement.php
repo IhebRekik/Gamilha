@@ -25,17 +25,17 @@ class UserAbonnement
 
     #[ORM\Column]
     #[Assert\NotNull(message: "La date de début est obligatoire.")]
-    #[Assert\Type(\DateTime::class)]
-    private ?\DateTime $dateDebut = null;
+    #[Assert\Type(\DateTimeImmutable::class)]
+    private \DateTimeImmutable $dateDebut;
 
     #[ORM\Column]
     #[Assert\NotNull(message: "La date de fin est obligatoire.")]
-    #[Assert\Type(\DateTime::class)]
+    #[Assert\Type(\DateTimeImmutable::class)]
     #[Assert\GreaterThan(
         propertyPath: "dateDebut",
         message: "La date de fin doit être après la date de début."
     )]
-    private ?\DateTime $dateFin = null;
+    private \DateTimeImmutable $dateFin;
 
     public function getId(): ?int
     {
@@ -64,23 +64,23 @@ class UserAbonnement
         return $this;
     }
 
-    public function getDateDebut(): ?\DateTime
+    public function getDateDebut(): ?\DateTimeImmutable
     {
         return $this->dateDebut;
     }
 
-    public function setDateDebut(\DateTime $dateDebut): static
+    public function setDateDebut(\DateTimeImmutable $dateDebut): static
     {
         $this->dateDebut = $dateDebut;
         return $this;
     }
 
-    public function getDateFin(): ?\DateTime
+    public function getDateFin(): ?\DateTimeImmutable
     {
         return $this->dateFin;
     }
 
-    public function setDateFin(\DateTime $dateFin): static
+    public function setDateFin(\DateTimeImmutable $dateFin): static
     {
         $this->dateFin = $dateFin;
         return $this;

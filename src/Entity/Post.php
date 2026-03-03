@@ -38,7 +38,8 @@ class Post
     /**
      * @var Collection<int, Commentaire>
      */
-    #[ORM\OneToMany(targetEntity: Commentaire::class, mappedBy: 'post', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Commentaire::class, mappedBy: 'post',cascade: ['persist'],
+ orphanRemoval: true,fetch: 'LAZY')]
     private Collection $commentaires;
 
     

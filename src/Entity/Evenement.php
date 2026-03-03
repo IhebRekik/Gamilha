@@ -73,8 +73,8 @@ private ?User $createdBy = null;
     #[ORM\InverseJoinColumn(name: 'idEquipe', referencedColumnName: 'idEquipe', onDelete: 'CASCADE')]
     private Collection $equipesParticipantes;
 
-        #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $createdAt = null;
+        #[ORM\Column(nullable: false)]
+    private \DateTimeImmutable $createdAt;
 
     public function __construct()
     {

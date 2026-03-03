@@ -31,7 +31,7 @@ private string $text;
 
 
     #[ORM\ManyToOne(targetEntity: Post::class, inversedBy: 'commentaires')]
-    #[ORM\JoinColumn(nullable: false)]
+#[ORM\JoinColumn(nullable: false, onDelete: "CASCADE")]
     private ?Post $post = null;
 
     public function getId(): ?int
@@ -51,16 +51,14 @@ private string $text;
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    protected function setCreatedAt(\DateTimeImmutable $createdAt): void
     {
         $this->createdAt = $createdAt;
-
-        return $this;
     }
 
 
