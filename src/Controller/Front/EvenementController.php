@@ -10,6 +10,8 @@ use App\Form\FrontEvenementType;
 use App\Form\GameMatchEditType;
 use App\Form\EvenementType;
 use App\Repository\EvenementRepository;
+use App\Repository\UserAbonnementRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -52,8 +54,32 @@ class EvenementController extends AbstractController
     }
 
     #[Route('/evenements/nouveau', name: 'evenement_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager , UserRepository $userRepository, UserAbonnementRepository $userAbonnementRepository): Response
     {
+           $user = $userRepository->findOneBy(['email' => $request->cookies->get('user_email')]); // Récupérer un utilisateur (ex: ID 1)
+
+            $abonnementsActifs = $userAbonnementRepository->createQueryBuilder('ua')
+                ->where('ua.user = :user')
+                ->andWhere('ua.dateFin > :now')
+                ->setParameter('user', $user)
+                ->setParameter('now', new \DateTime())
+                ->getQuery()
+                ->getResult();
+           $hasStreaming = false;
+
+            foreach ($abonnementsActifs as $userAbonnement) {
+                $options = $userAbonnement->getAbonnement()->getOptions();
+
+                if ($options && in_array('evenement', $options)) {
+                    $hasStreaming = true;
+                    break; // inutile de continuer
+                }
+            }
+
+            if (!$hasStreaming) {
+                $this->addFlash('danger', 'Votre abonnement ne permet pas le streaming.');
+                return $this->redirectToRoute('app_abonnementuser_index');
+            }
         $this->denyAccessUnlessGranted('ROLE_USER');
 
         $evenement = new Evenement();

@@ -33,6 +33,7 @@ class Abonnement
         'Coching' => 'coching',
         'Evenement' => 'evenement',
         'Streaming' => 'streaming',
+        'AI' => 'ai',
     ];
 /**
  * @var Collection<int, UserAbonnement>

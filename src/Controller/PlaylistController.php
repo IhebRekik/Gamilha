@@ -7,6 +7,8 @@ use App\Entity\Playlist;
 use App\Form\PlaylistType;
 use App\Repository\PlaylistRepository;
 use App\Repository\CoachingVideoRepository;
+use App\Repository\UserAbonnementRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -35,8 +37,33 @@ class PlaylistController extends AbstractController
 
     // 📄 LISTE DES PLAYLISTS (front)
     #[Route('/Front', name: 'playlistFront_index')]
-    public function indexFront(Request $request, PlaylistRepository $repository): Response
+    public function indexFront(Request $request, PlaylistRepository $repository , UserRepository $userRepository, UserAbonnementRepository $userAbonnementRepository): Response
     {
+        $user = $userRepository->findOneBy(['email' => $request->cookies->get('user_email')]); // Récupérer un utilisateur (ex: ID 1)
+
+            $abonnementsActifs = $userAbonnementRepository->createQueryBuilder('ua')
+                ->where('ua.user = :user')
+                ->andWhere('ua.dateFin > :now')
+                ->setParameter('user', $user)
+                ->setParameter('now', new \DateTime())
+                ->getQuery()
+                ->getResult();
+           $hasStreaming = false;
+
+            foreach ($abonnementsActifs as $userAbonnement) {
+                $options = $userAbonnement->getAbonnement()->getOptions();
+
+                if ($options && in_array('coching', $options)) {
+                    $hasStreaming = true;
+                    break; // inutile de continuer
+                }
+            }
+
+            if (!$hasStreaming) {
+                $this->addFlash('danger', 'Votre abonnement ne permet pas le streaming.');
+                return $this->redirectToRoute('app_abonnementuser_index');
+            }
+
         $playlists = $repository->search(
             $request->query->get('q'),
             $request->query->get('niveau'),

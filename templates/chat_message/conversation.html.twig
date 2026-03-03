@@ -17,11 +17,7 @@
 			<div class="card-body d-flex flex-column">
 
 				{% for message in messages %}
-<<<<<<< HEAD
 					{% set isSender = message.sender.email == app.request.cookies.get('user_email') %}
-=======
-					{% set isSender = message.sender.id !== 3 %}
->>>>>>> userr
 					<div class="d-flex mb-2 {{ isSender ? 'justify-content-end' : 'justify-content-start' }}">
 						<div class="p-2 rounded
 							    {{ isSender ? 'bg-primary text-white' : 'bg-secondary text-white' }} message-bubble" style="max-width: 60%;" data-message-id="{{ message.id }}">

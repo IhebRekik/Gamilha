@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\ChatAi;
 use App\Entity\User;
 use App\Form\ChatAiType;
+use App\Repository\UserAbonnementRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,9 +21,33 @@ final class ChatAiController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         HttpClientInterface $client,
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        UserAbonnementRepository $userAbonnementRepository
     ): Response {
+           $user = $userRepository->findOneBy(['email' => $request->cookies->get('user_email')]); // Récupérer un utilisateur (ex: ID 1)
 
+            $abonnementsActifs = $userAbonnementRepository->createQueryBuilder('ua')
+                ->where('ua.user = :user')
+                ->andWhere('ua.dateFin > :now')
+                ->setParameter('user', $user)
+                ->setParameter('now', new \DateTime())
+                ->getQuery()
+                ->getResult();
+           $hasStreaming = false;
+
+            foreach ($abonnementsActifs as $userAbonnement) {
+                $options = $userAbonnement->getAbonnement()->getOptions();
+
+                if ($options && in_array('ai', $options)) {
+                    $hasStreaming = true;
+                    break; // inutile de continuer
+                }
+            }
+
+            if (!$hasStreaming) {
+                $this->addFlash('danger', 'Votre abonnement ne permet pas le streaming.');
+                return $this->redirectToRoute('app_abonnementuser_index');
+            }
         $message = new ChatAi();
         $form = $this->createForm(ChatAiType::class, $message);
         $form->handleRequest($request);
