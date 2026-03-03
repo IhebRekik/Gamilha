@@ -20,9 +20,9 @@ class Stream
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Le titre est obligatoire.")]
     #[Assert\Length(min: 3, max: 255)]
-    private ?string $title = null;
+    private string $title ;
 
-    #[ORM\OneToMany(mappedBy: "stream", targetEntity: Donation::class, cascade: ["persist", "remove"])]
+    #[ORM\OneToMany(mappedBy: "stream", targetEntity: Donation::class, cascade: ["persist"])]
     private Collection $donations;
 
     #[ORM\Column(type: 'text', nullable: true)]
@@ -31,7 +31,7 @@ class Stream
 
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message: "Le jeu est obligatoire.")]
-    private ?string $game = null;
+    private string $game ;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
     private ?string $thumbnail = null;
@@ -52,12 +52,12 @@ class Stream
     #[Assert\Url(message: "URL invalide.")]
     private ?string $url = null;
 
-    #[ORM\Column(type: 'datetime')]
+    #[ORM\Column(type: 'datetime_immutable')]
     #[Assert\NotNull]
-    private ?\DateTime $createdAt = null;
+    private \DateTimeImmutable $createdAt ;
 
     #[ORM\Column(length: 255)]
-    private ?string $streamKey = null;
+    private string $streamKey ;
     #[ORM\Column(type: "boolean")]
     private bool $isLive = false;
 
@@ -108,7 +108,7 @@ class Stream
         $this->donations = new ArrayCollection();
         $this->viewers = 0;
         $this->status = 'live';
-        $this->createdAt = new \DateTime();
+        $this->createdAt = new \DateTimeImmutable();
         $this->streamKey = bin2hex(random_bytes(8));
     }
 
@@ -194,12 +194,12 @@ class Stream
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTime $createdAt): self
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
         $this->createdAt = $createdAt;
         return $this;

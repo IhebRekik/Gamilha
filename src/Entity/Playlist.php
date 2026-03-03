@@ -15,22 +15,22 @@ class Playlist
     #[ORM\Column]
     private int $id;
     #[ORM\Column(length: 255)]
-    private ?string $title = null;
+    private string $title;
 
     #[ORM\Column(type: 'text')]
-    private ?string $description = null;
+    private string $description ;
 
     #[ORM\Column(length: 100)]
-    private ?string $niveau = null;
+    private string $niveau;
 
     #[ORM\Column(length: 100)]
-    private ?string $categorie = null;
+    private string $categorie;
 
     #[ORM\Column(length: 255)]
-    private ?string $image = null;
+    private string $image ;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private \DateTimeImmutable $createdAt ;
 
     #[ORM\OneToMany(mappedBy: 'playlist', targetEntity: CoachingVideo::class, orphanRemoval: true)]
     private Collection $videos;

@@ -23,7 +23,7 @@ class Evenement
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: 'Le nom est obligatoire.')]
     #[Assert\Length(max: 100)]
-    private ?string $nom = null;
+    private string $nom ;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $description = null;
@@ -31,26 +31,26 @@ class Evenement
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message: 'Le jeu est obligatoire.')]
     #[Assert\Length(max: 50)]
-    private ?string $jeu = null;
+    private string $jeu ;
 
     #[ORM\Column(length: 20, name: 'typeEvenement')]
     #[Assert\NotBlank]
     #[Assert\Choice(choices: ['online', 'offline'], message: 'Choisir online ou offline.')]
-    private ?string $typeEvenement = null;
+    private string $typeEvenement ;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, name: 'dateDebut')]
     #[Assert\NotBlank(message: 'La date de début est obligatoire.')]
-    private ?\DateTimeInterface $dateDebut = null;
+    private \DateTimeInterface $dateDebut ;
 
     #[ORM\Column(type: Types::DATE_MUTABLE, name: 'dateFin')]
     #[Assert\NotBlank(message: 'La date de fin est obligatoire.')]
     #[Assert\GreaterThanOrEqual(propertyPath: 'dateDebut', message: 'La date de fin doit être après la date de début.')]
-    private ?\DateTimeInterface $dateFin = null;
+    private \DateTimeInterface $dateFin ;
 
     #[ORM\Column(length: 20)]
     #[Assert\NotBlank]
     #[Assert\Choice(choices: ['prévu', 'en cours', 'terminé'], message: 'Statut invalide.')]
-    private ?string $statut = null;
+    private string $statut ;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $regles = null;
@@ -60,13 +60,12 @@ class Evenement
     private ?string $image = null;
 
     /** @var Collection<int, Bracket> */
-    #[ORM\OneToMany(targetEntity: Bracket::class, mappedBy: 'evenement', cascade: ['remove'])]
+    #[ORM\OneToMany(targetEntity: Bracket::class, mappedBy: 'evenement')]
     private Collection $brackets;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
-    #[ORM\JoinColumn(name: 'created_by_id', referencedColumnName: 'id', nullable: true, onDelete: 'SET NULL')]
-    private ?User $createdBy = null;
-
+#[ORM\JoinColumn(name: "created_by_id", nullable: false)]
+private ?User $createdBy = null;
     /** @var Collection<int, Equipe> */
     #[ORM\ManyToMany(targetEntity: Equipe::class)]
     #[ORM\JoinTable(name: 'evenement_equipe')]
@@ -74,8 +73,8 @@ class Evenement
     #[ORM\InverseJoinColumn(name: 'idEquipe', referencedColumnName: 'idEquipe', onDelete: 'CASCADE')]
     private Collection $equipesParticipantes;
 
-        #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $createdAt = null;
+        #[ORM\Column(nullable: false)]
+    private \DateTimeImmutable $createdAt;
 
     public function __construct()
     {

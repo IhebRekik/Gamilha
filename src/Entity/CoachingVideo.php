@@ -14,10 +14,10 @@ class CoachingVideo
     #[ORM\Column]
     private int $id;
     #[ORM\Column(length: 255)]
-    private ?string $titre = null;
+    private string $titre ;
 
     #[ORM\Column(type: 'text')]
-    private ?string $description = null;
+    private string $description ;
 
     // Peut contenir :
     // - une URL (YouTube)
@@ -29,10 +29,10 @@ class CoachingVideo
     private ?File $videoFile = null;
 
     #[ORM\Column(length: 50)]
-    private ?string $niveau = null;
+    private string $niveau ;
 
     #[ORM\Column]
-    private ?bool $premium = null;
+    private bool $premium ;
 
     #[ORM\ManyToOne(inversedBy: 'videos')]
     #[ORM\JoinColumn(nullable: false)]

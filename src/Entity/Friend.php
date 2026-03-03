@@ -21,7 +21,7 @@ class Friend
     private ?User $friend = null;
 
     #[ORM\Column(type: 'datetime_immutable')]
-    private ?\DateTimeImmutable $createdAt = null;
+    private \DateTimeImmutable $createdAt ;
 
     // ================= GETTERS / SETTERS =================
 

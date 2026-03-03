@@ -23,6 +23,11 @@ services:
     App\:
         resource: '../src/'
         exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+    # Déclaration correcte du service HuggingFace
+    App\Service\OpenRouterService:
+        arguments:
+            $openRouterApiKey: '%env(OPENROUTER_API_KEY)%'
+
 
     # Service ApiVideoService : plus besoin de définition explicite !
     # Symfony autowire déjà correctement grâce à #[Autowire] dans le constructeur

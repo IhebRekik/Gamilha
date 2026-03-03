@@ -5,6 +5,7 @@
 {% block body %}
 <div class="container py-4">
 
+    <!-- Titre -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="text-white">
             <i class="bi bi-card-checklist text-primary me-2"></i>
@@ -16,35 +17,47 @@
             Nouveau post
         </a>
     </div>
-{# ================= Search Form ================= #}
-  <form method="get" action="{{ path('admin_post_index') }}" class="mb-4">
-    <div class="row g-2">
-        <div class="col-md-6">
-            <input
-                type="text"
-                name="q"
-                value="{{ search }}"
-                class="form-control bg-dark text-white border-secondary"
-                placeholder="Rechercher par contenu du post..."
-            >
-        </div>
-        <div class="col-md-4">
-            <input
-                type="text"
-                name="user"
-                value="{{ userSearch }}"
-                class="form-control bg-dark text-white border-secondary"
-                placeholder="Rechercher par utilisateur..."
-            >
-        </div>
-        <div class="col-md-2">
-            <button class="btn btn-primary w-100">
-                <i class="bi bi-search"></i> Rechercher
-            </button>
+
+    <!-- 🔍 Barre de recherche -->
+    <div class="card bg-dark border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+
+                <!-- Recherche contenu -->
+                <div class="col-12 col-md-6">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text bg-secondary border-0 text-white">
+                            <i class="bi bi-search"></i>
+                        </span>
+                        <input
+                            id="searchPostInput"
+                            type="text"
+                            class="form-control bg-secondary text-white border-0 shadow-none"
+                            placeholder="Rechercher par contenu du post..."
+                        >
+                    </div>
+                </div>
+
+                <!-- Recherche utilisateur -->
+                <div class="col-12 col-md-6">
+                    <div class="input-group input-group-lg">
+                        <span class="input-group-text bg-secondary border-0 text-white">
+                            <i class="bi bi-person"></i>
+                        </span>
+                        <input
+                            id="searchUserInput"
+                            type="text"
+                            class="form-control bg-secondary text-white border-0 shadow-none"
+                            placeholder="Rechercher par utilisateur (email)"
+                        >
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
-</form>
 
+    <!-- 📋 Tableau -->
     <div class="card bg-dark border-0 shadow-lg">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -58,44 +71,110 @@
                             <th class="text-end pe-4">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {% for post in posts|default([]) %}
-                            <tr class="border-bottom border-secondary border-opacity-10">
-                                <td class="ps-4 text-secondary">#{{ post.id }}</td>
-                                <td>{{ post.content|slice(0,50) ~ '...' }}</td>
-                                <td>❤️ {{ post.likes }}</td>
-                                <td>{{ post.commentaires|length }}</td>
-                                <td class="text-end pe-4">
-                                    <div class="btn-group shadow-sm">
-                                        <a href="{{ path('admin_post_show', {'id': post.id}) }}" class="btn btn-sm btn-outline-info">
-                                            <i class="bi bi-eye"></i>
-                                        </a>
 
-                                        <a href="{{ path('admin_post_edit', {'id': post.id}) }}" class="btn btn-sm btn-outline-warning">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-
-                                        <form method="post" action="{{ path('admin_post_delete', {'id': post.id}) }}" onsubmit="return confirm('Confirmer la suppression ?');" class="d-inline">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
-                                            <button class="btn btn-sm btn-outline-danger">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td colspan="5" class="text-center py-5 text-secondary">
-                                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-                                    Aucun post trouvé
-                                </td>
-                            </tr>
-                        {% endfor %}
+                    <tbody id="postsTableBody">
+{% for post in pagination %}
+                        <tr class="post-row" data-user="{{ post.user.email|lower }}">
+                            <td class="ps-4 text-secondary">#{{ post.id }}</td>
+                            <td class="post-content">
+                                {{ post.content|slice(0,50)|raw }}{% if post.content|length > 50 %}...{% endif %}
+                            </td>
+                            <td>❤️ {{ post.getLikesCount() }}</td>
+                            <td>{{ post.commentaires|length }}</td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group shadow-sm">
+                                    <a href="{{ path('admin_post_show', {'id': post.id}) }}" class="btn btn-sm btn-outline-info">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ path('admin_post_edit', {'id': post.id}) }}" class="btn btn-sm btn-outline-warning">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form method="post"
+                                          action="{{ path('admin_post_delete', {'id': post.id}) }}"
+                                          onsubmit="return confirm('Confirmer la suppression ?');"
+                                          class="d-inline">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
+                                        <button class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-secondary">
+                                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                Aucun post trouvé
+                            </td>
+                        </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
-            </div>
+
+<div class="pagination-container">
+    {{ knp_pagination_render(pagination) }}
+</div>
+
+            </div> {# fin table-responsive #}
         </div>
     </div>
+
 </div>
+
+<!-- ⚡ Recherche instantanée -->
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const postInput = document.getElementById('searchPostInput');
+    const userInput = document.getElementById('searchUserInput');
+    const rows = document.querySelectorAll('.post-row');
+
+    function filterPosts() {
+        const postValue = postInput.value.toLowerCase().trim();
+        const userValue = userInput.value.toLowerCase().trim();
+
+        rows.forEach(row => {
+            const content = row.querySelector('.post-content')?.textContent.toLowerCase() || '';
+            const user = row.dataset.user || '';
+
+            row.style.display = (content.includes(postValue) && user.includes(userValue)) ? '' : 'none';
+        });
+    }
+
+    postInput.addEventListener('input', filterPosts);
+    userInput.addEventListener('input', filterPosts);
+});
+</script>
+<style>
+.pagination-simple {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    font-family: 'Orbitron', sans-serif; /* style gaming */
+    margin: 20px 0;
+}
+
+.pagination-simple a {
+    color: #38bdf8;
+    text-decoration: none;
+    padding: 4px 8px;
+    background: #0b1220;
+    border: 1px solid #7c3aed;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.pagination-simple a:hover {
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    color: white;
+}
+
+.pagination-simple .current {
+    color: white;
+    background: linear-gradient(135deg, #7c3aed, #9333ea);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+}</style>
 {% endblock %}

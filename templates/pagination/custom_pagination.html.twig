@@ -1,0 +1,31 @@
+{% if pagination.pageCount > 1 %}
+<nav class="pagination-simple" aria-label="Page navigation">
+    {# ===== PREVIOUS ===== #}
+    {% if pagination.previous is defined %}
+        <a href="{{ path(app.request.attributes.get('_route'),
+        app.request.query.all | merge({(pagination.pageParameterName): pagination.previous})) }}">
+            &laquo;
+        </a>
+    {% endif %}
+
+    {# ===== PAGES ===== #}
+    {% for page in pagination.pagesInRange %}
+        {% if page == pagination.current %}
+            <span class="current">{{ page }}</span>
+        {% else %}
+            <a href="{{ path(app.request.attributes.get('_route'),
+            app.request.query.all | merge({(pagination.pageParameterName): page})) }}">
+                {{ page }}
+            </a>
+        {% endif %}
+    {% endfor %}
+
+    {# ===== NEXT ===== #}
+    {% if pagination.next is defined %}
+        <a href="{{ path(app.request.attributes.get('_route'),
+        app.request.query.all | merge({(pagination.pageParameterName): pagination.next})) }}">
+            &raquo;
+        </a>
+    {% endif %}
+</nav>
+{% endif %}

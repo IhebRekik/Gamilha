@@ -16,7 +16,10 @@ use App\Entity\UserAbonnement;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Entity\Stream;
 use App\Entity\Donation;
+use Symfony\Component\Serializer\Annotation\Ignore;
 use App\Entity\Equipe;
+use App\Entity\Notification;
+
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
@@ -29,22 +32,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 180)]
     #[Assert\NotBlank(message: "L'adresse email est obligatoire.")]
     #[Assert\Email(message: "Veuillez saisir une adresse email valide.")]
-    private ?string $email = null;
+    private string $email;
 
     #[ORM\Column(type: 'json')]
     private array $roles = [];
+    #[ORM\Column(type: "string")]
+#[Ignore]   // On ignore le champ lors de la sérialisation JSON / API
+#[Assert\NotBlank(message: "Le mot de passe est obligatoire.")]
+#[Assert\Length(
+    min: 8,
+    minMessage: "Le mot de passe doit contenir au moins {{ limit }} caractères."
+)]
+#[Assert\Regex(
+    pattern: "/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/",
+    message: "Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre."
+)]
+private string $password;
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Post::class, orphanRemoval: true)]
+    private Collection $posts;
 
-    #[ORM\Column]
-    #[Assert\NotBlank(message: "Le mot de passe est obligatoire.")]
-    #[Assert\Length(
-        min: 8,
-        minMessage: "Le mot de passe doit contenir au moins {{ limit }} caractères."
-    )]
-    #[Assert\Regex(
-        pattern: "/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/",
-        message: "Le mot de passe doit contenir au moins une majuscule, une minuscule et un chiffre."
-    )]
-    private ?string $password = null;
+   #[ORM\OneToMany(mappedBy: 'user', targetEntity: Commentaire::class, orphanRemoval: true)]
+private Collection $commentaires;
+    #[ORM\OneToMany(mappedBy: 'receiver', targetEntity: Notification::class)]
+private Collection $receivedNotifications;
+
+#[ORM\OneToMany(mappedBy: 'sender', targetEntity: Notification::class)]
+private Collection $sentNotifications;
 
 
     #[ORM\Column(length: 255)]
@@ -55,7 +68,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         max: 50,
         maxMessage: "Le nom ne doit pas dépasser {{ limit }} caractères."
     )]
-    private ?string $name = null;
+    private string $name;
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $profileImage = null;
 
@@ -80,7 +93,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var Collection<int, Team>
      */
     #[ORM\ManyToMany(targetEntity: Team::class, inversedBy: 'members')]
-    private Collection $teams;
+private Collection $teams;
 
     /**
      * @var Collection<int, Friend>
@@ -97,9 +110,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Equipe>
      */
-    #[ORM\OneToMany(targetEntity: Equipe::class, mappedBy: 'owner')]
-    private Collection $equipesOwned;
-
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Equipe::class)]
+private Collection $equipesOwned;
     public function getStreams(): Collection
     {
         return $this->streams;
@@ -234,7 +246,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, ChatAi>
      */
-    #[ORM\OneToMany(targetEntity: ChatAi::class, mappedBy: 'user', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: ChatAi::class, mappedBy: 'user', orphanRemoval: false)]
     private Collection $chatAis;
 
     /**
@@ -243,8 +255,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: HistoriquePaiement::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $historiquePaiements;
 
-    #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $createdAt = null;
+    #[ORM\Column(nullable: false)]
+    private \DateTimeImmutable $createdAt;
 
     public function __construct()
     {
@@ -260,6 +272,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         $this->equipes = new ArrayCollection();
         $this->equipesOwned = new ArrayCollection();
+        $this->commentaires = new ArrayCollection();
+
+     $this->posts = new ArrayCollection();
+     $this->receivedNotifications = new ArrayCollection();
+     $this->sentNotifications = new ArrayCollection();
+             $this->friends = new ArrayCollection();
+
+
     }
 
     /* ===================== TEAMS ===================== */
@@ -299,6 +319,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->friends;
     }
+
 
     public function addFriend(Friend $friend): static
     {
@@ -494,4 +515,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
         return $this;
     }
+    public function getReceivedNotifications(): Collection
+{
+    return $this->receivedNotifications;
+}
 }

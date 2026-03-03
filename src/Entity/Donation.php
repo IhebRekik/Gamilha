@@ -13,8 +13,8 @@ class Donation
     #[ORM\Id, ORM\GeneratedValue]
     #[ORM\Column(type: "integer")]
     private int $id;
-    #[ORM\Column(type: "float")]
-    private float $amount;
+    #[ORM\Column(type: "decimal", precision: 10, scale: 2)]
+    private string $amount;
 
     #[ORM\Column(type: "string", length: 255)]
     private string $donorName;

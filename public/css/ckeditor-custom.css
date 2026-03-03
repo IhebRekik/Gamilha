@@ -1,0 +1,27 @@
+.cke_editable {
+    background-color: #1f2937 !important;
+    /* fond sombre */
+    color: #fff !important;
+    /* texte blanc */
+    font-family: "Inter", sans-serif;
+    /* police si tu veux */
+    padding: 10px;
+    border-radius: 0.5rem;
+    .post-content p {
+        margin: 0.25rem 0;
+        /* réduit l’espace entre les paragraphes */
+    }
+    .post-content ul,
+    .post-content ol {
+        margin: 0.1rem 0;
+        /* très peu d’espace entre lignes et listes */
+        /* listes plus compactes */
+    }
+    .post-content img,
+    .post-content iframe {
+        display: block;
+        margin: 0.1rem 0;
+        /* réduit l’espace autour des médias */
+        /* réduit l’espace autour des médias */
+    }
+}

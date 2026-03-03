@@ -13,7 +13,7 @@ class Analysis
     #[ORM\Column]
     private int $id;
     #[ORM\Column(length: 255)]
-    private ?string $videoName = null;
+    private string $videoName ;
 
     #[ORM\Column(length: 5000, nullable: true)]
     private ?string $result = null;

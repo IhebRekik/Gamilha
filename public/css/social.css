@@ -169,3 +169,36 @@
     background-color: #7c4dff;
     color: white;
 }
+
+.yt-card {
+    max-width: 100%;
+    cursor: pointer;
+}
+
+.yt-thumb {
+    position: relative;
+}
+
+.yt-play {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: 40px;
+    padding: 20px 26px;
+    border-radius: 50%;
+}
+
+.cke_top {
+    background: #111827 !important;
+}
+
+.cke_contents {
+    background: #1f2937 !important;
+}
+
+.cke_editable {
+    color: white !important;
+}

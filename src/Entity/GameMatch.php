@@ -23,7 +23,7 @@ class GameMatch
     #[Assert\NotBlank(message: 'Le tour est obligatoire.')]
     #[Assert\Type('integer')]
     #[Assert\PositiveOrZero]
-    private ?int $tour = null;
+    private int $tour ;
 
     #[ORM\Column(name: 'scoreEquipeA', options: ['default' => 0])]
     private int $scoreEquipeA = 0;
@@ -34,18 +34,18 @@ class GameMatch
     #[ORM\Column(length: 20)]
     #[Assert\NotBlank(message: 'Le statut du match est obligatoire.')]
     #[Assert\Choice(choices: ['à venir', 'en cours', 'terminé'], message: 'Statut invalide.')]
-    private ?string $statut = null;
+    private string $statut ;
 
     #[ORM\ManyToOne(targetEntity: Equipe::class, inversedBy: 'matchsEquipeA')]
-    #[ORM\JoinColumn(name: 'equipeA_id', referencedColumnName: 'idEquipe', nullable: true, onDelete: 'SET NULL')]
+    #[ORM\JoinColumn(name: 'equipea_id', referencedColumnName: 'idEquipe', nullable: true, onDelete: 'SET NULL')]
     private ?Equipe $equipeA = null;
 
     #[ORM\ManyToOne(targetEntity: Equipe::class, inversedBy: 'matchsEquipeB')]
-    #[ORM\JoinColumn(name: 'equipeB_id', referencedColumnName: 'idEquipe', nullable: true, onDelete: 'SET NULL')]
+    #[ORM\JoinColumn(name: 'equipeb_id', referencedColumnName: 'idEquipe', nullable: true, onDelete: 'SET NULL')]
     private ?Equipe $equipeB = null;
 
     #[ORM\ManyToOne(targetEntity: Bracket::class, inversedBy: 'matchs')]
-    #[ORM\JoinColumn(name: 'idBracket', referencedColumnName: 'idBracket', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(name: 'bracket_id', referencedColumnName: 'idBracket', nullable: false, onDelete: 'CASCADE')]
     #[Assert\NotBlank(message: 'Le bracket est obligatoire.')]
     private ?Bracket $bracket = null;
 

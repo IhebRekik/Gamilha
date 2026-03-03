@@ -22,10 +22,10 @@ class HistoriquePaiement
     private ?Abonnement $abonnement = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 3)]
-    private ?string $montant = null;
+    private string $montant ;
 
-    #[ORM\Column]
-    private ?\DateTime $createdAt = null;
+#[ORM\Column(type: 'datetime_immutable')]
+    private \DateTimeImmutable $createdAt ;
 
     public function getId(): ?int
     {
@@ -68,12 +68,12 @@ class HistoriquePaiement
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTime $createdAt): static
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
 

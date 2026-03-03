@@ -2,6 +2,9 @@ twig:
     file_name_pattern: '*.twig'
     globals:
         ably_api_key: '%ably.api_key%'
+    form_themes:
+        - '@FOSCKEditor/Form/ckeditor_widget.html.twig'
+
 
 when@test:
     twig:

@@ -19,10 +19,10 @@ class ChatMessage
         max: 255,
         maxMessage: "Le contenu ne peut pas dépasser {{ limit }} caractères."
     )]
-    private ?string $content = null;
+    private string $content ;
 
-    #[ORM\Column]
-    private ?\DateTime $createdAt = null;
+#[ORM\Column(type: 'datetime_immutable')]
+    private \DateTimeImmutable $createdAt ;
 
     #[ORM\ManyToOne(inversedBy: 'messagesSent')]
     private ?User $sender = null;
@@ -48,12 +48,12 @@ class ChatMessage
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTime
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTime $createdAt): static
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
         return $this;
