@@ -220,61 +220,40 @@
                 var side = card.querySelector('#aai-side');
                 if (side) {
                     side.querySelector('.aai-label').textContent = 'Photo prete !';
-                    side.querySelector('.aai-desc').innerHTML = 'Veuillez renseigner votre âge et sexe pour générer votre avatar IA.';
+                    side.querySelector('.aai-desc').innerHTML = 'Cliquez sur <strong style="color:#c084fc">Transformer</strong> pour generer votre avatar anime IA.';
                 }
                 btnGo.disabled = false;
-                showForm();
             };
             reader.readAsDataURL(f);
         });
 
         btnGo.addEventListener('click', function() {
-            // Récupérer âge/sexe
-            var ageSel = card.querySelector('#aai-age');
-            var sexSel = card.querySelector('#aai-sex');
-            userAge = ageSel ? ageSel.value : 'adult';
-            userSex = sexSel ? sexSel.value : 'man';
-            transform(userAge, userSex);
+            transform();
         });
 
-        // Génère un prompt random selon âge/sexe
-        function randomPrompt(age, sex) {
-            var base = [
+        function randomPrompt() {
+            var arr = [
                 'anime portrait',
                 'cartoon style',
                 'vibrant colors',
                 'studio ghibli inspired',
                 'high quality',
                 'detailed face',
-                'professional',
                 'soft lighting',
-                'digital art'
+                'digital art',
+                'professional',
+                'vivid expression'
             ];
-            var ageMap = {
-                child: ['child', 'cute', 'big eyes', 'playful'],
-                teenager: ['teenager', 'youthful', 'trendy', 'dynamic'],
-                adult: ['adult', 'mature', 'confident', 'stylish'],
-                senior: ['senior', 'wise', 'gentle', 'smiling']
-            };
-            var sexMap = {
-                boy: ['boy', 'short hair', 'smiling'],
-                girl: ['girl', 'long hair', 'sparkling eyes'],
-                man: ['man', 'beard', 'sharp jawline'],
-                woman: ['woman', 'elegant', 'long hair']
-            };
-            var arr = base.concat(
-                ageMap[age] || ageMap['adult'],
-                sexMap[sex] || sexMap['man']
-            );
-            // Mélange et prend 7-9 éléments
-            for (let i = arr.length - 1; i > 0; i--) {
-                let j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
+            for (var i = arr.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var tmp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = tmp;
             }
             return arr.slice(0, 7 + Math.floor(Math.random() * 3)).join(', ');
         }
 
-        function transform(age, sex) {
+        function transform() {
             btnGo.disabled = true;
             clearZone(card);
             var loadEl = document.createElement('div');
@@ -283,11 +262,11 @@
             loadEl.innerHTML =
                 '<div class="aai-spin"></div>' +
                 '<div class="aai-load-txt" id="aai-ltxt">Connexion a Hugging Face...</div>' +
-                '<div class="aai-load-sub" id="aai-lsub">Génération de votre avatar IA</div>' +
+                '<div class="aai-load-sub" id="aai-lsub">Generation de votre avatar IA</div>' +
                 '<div class="aai-pbar"><div class="aai-pfill" id="aai-pfill"></div></div>';
             card.appendChild(loadEl);
             animPbar(loadEl.querySelector('#aai-pfill'), 0, 35, 2000);
-            var prompt = randomPrompt(age, sex);
+            var prompt = randomPrompt();
             callApiPrompt(prompt, function onWarmup(attempt, eta) {
                     var ltxt = card.querySelector('#aai-ltxt');
                     var lsub = card.querySelector('#aai-lsub');

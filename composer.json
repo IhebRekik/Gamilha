@@ -67,6 +67,7 @@
         "vich/uploader-bundle": "^2.9"
     },
     "require-dev": {
+        "ahmed-bhs/doctrine-doctor": "1.0",
         "phpstan/phpstan": "^2.1",
         "phpstan/phpstan-doctrine": "^2.0",
         "phpunit/phpunit": "^11.5",

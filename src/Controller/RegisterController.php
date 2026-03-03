@@ -13,18 +13,64 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use App\Service\AvatarAiService;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Filesystem\Filesystem;
 
 class RegisterController extends AbstractController
 {
+    #[Route('/register/avatar-preview', name: 'app_register_avatar_preview', methods: ['POST'])]
+    public function avatarPreview(
+        Request $request,
+        AvatarAiService $avatarAi,
+        SluggerInterface $slugger
+    ): JsonResponse {
+        $imageFile = $request->files->get('profileImage');
+        if (!$imageFile) {
+            return $this->json(['success' => false, 'error' => 'Aucune image reçue.']);
+        }
+
+        $tmpDir = $this->getParameter('profiles_directory') . '/tmp';
+        if (!is_dir($tmpDir)) {
+            mkdir($tmpDir, 0777, true);
+        }
+
+        $safeFilename = $slugger->slug(pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME));
+        $tmpFilename  = $safeFilename . '-' . uniqid() . '.jpg';
+
+        try {
+            $imageFile->move($tmpDir, $tmpFilename);
+        } catch (\Exception $e) {
+            return $this->json(['success' => false, 'error' => 'Erreur de téléchargement.']);
+        }
+
+        $tmpPath = $tmpDir . '/' . $tmpFilename;
+        $avatarBinary = $avatarAi->generateAvatar($tmpPath);
+
+        if ($avatarBinary !== null) {
+            file_put_contents($tmpPath, $avatarBinary);
+            return $this->json([
+                'success'    => true,
+                'tempFile'   => $tmpFilename,
+                'previewUrl' => '/uploads/profiles/tmp/' . $tmpFilename,
+            ]);
+        }
+
+        // supprime le fichier temp en cas d'échec
+        @unlink($tmpPath);
+        return $this->json(['success' => false, 'error' => 'La génération IA a échoué.']);
+    }
+
     #[Route('/register', name: 'app_register')]
 public function register(
     Request $request,
     EntityManagerInterface $em,
     UserPasswordHasherInterface $passwordHasher,
     ValidatorInterface $validator,
-    SluggerInterface $slugger
+    SluggerInterface $slugger,
+    AvatarAiService $avatarAi
 ): Response {
     if ($request->isMethod('POST')) {
 
@@ -61,15 +107,37 @@ public function register(
         
         $user->setRoles(['ROLE_USER']);
 
-        // Gestion de l'upload de la photo de profil (optionnel)
-        $imageFile = $request->files->get('profileImage');
-        if ($imageFile) {
+        // Gestion de l'upload + conversion avatar IA (AvatarAiService)
+        $profilesDir = $this->getParameter('profiles_directory');
+        $tmpFile     = trim((string) $request->request->get('avatarTempFile'));
+        $imageFile   = $request->files->get('profileImage');
+
+        if ($tmpFile !== '' && preg_match('/^[\w\-]+\.jpg$/', $tmpFile)) {
+            // Avatar déjà généré côté aperçu : on déplace le fichier temp
+            $tmpPath  = $profilesDir . '/tmp/' . $tmpFile;
+            $newFilename = $tmpFile;
+            $destPath = $profilesDir . '/' . $newFilename;
+            if (file_exists($tmpPath)) {
+                rename($tmpPath, $destPath);
+                $user->setProfileImage($newFilename);
+            }
+        } elseif ($imageFile) {
             $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
             $safeFilename = $slugger->slug($originalFilename);
-            $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+            $newFilename  = $safeFilename . '-' . uniqid() . '.jpg';
+            $destPath     = $profilesDir . '/' . $newFilename;
 
             try {
-                $imageFile->move($this->getParameter('profiles_directory'), $newFilename);
+                $imageFile->move($profilesDir, $newFilename);
+
+                // Conversion en avatar anime via HuggingFace
+                $avatarBinary = $avatarAi->generateAvatar($destPath);
+                if ($avatarBinary !== null) {
+                    file_put_contents($destPath, $avatarBinary);
+                } else {
+                    $this->addFlash('warning', 'La conversion en avatar IA a échoué (service indisponible). Votre photo originale a été conservée.');
+                }
+
                 $user->setProfileImage($newFilename);
             } catch (FileException $e) {
                 $this->addFlash('error', 'Erreur lors du téléchargement de l\'image.');

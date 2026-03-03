@@ -33,6 +33,34 @@
             </div>
         {% endif %}
 
+        {# Avertissements (ex : échec conversion avatar IA après inscription) #}
+        {% for message in app.flashes('warning') %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <div class="d-flex align-items-start">
+                    <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i>
+                    <div class="flex-grow-1">
+                        <strong>Avertissement</strong>
+                        <p class="mb-0 mt-1">{{ message }}</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+
+        {# Messages de succès (ex : compte créé) #}
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <div class="d-flex align-items-start">
+                    <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                    <div class="flex-grow-1">
+                        <strong>Succès</strong>
+                        <p class="mb-0 mt-1">{{ message }}</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+
         <form method="post">
             <div class="mb-3">
                 <label class="form-label">

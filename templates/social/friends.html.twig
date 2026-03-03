@@ -41,7 +41,9 @@
                 <table class="table table-dark table-hover align-middle mb-0" id="usersTable">
                     <thead class="text-secondary text-uppercase small border-bottom border-primary border-opacity-25">
                         <tr>
+                            {% if is_granted('ROLE_ADMIN') %}
                             <th class="ps-4">ID</th>
+                            {% endif %}
                             <th>Nom</th>
                             <th>Email</th>
                             <th class="text-end pe-4">Actions</th>
@@ -51,7 +53,9 @@
                     <tbody>
                         {% for user in users %}
                             <tr class="border-bottom border-secondary border-opacity-10">
+                                {% if is_granted('ROLE_ADMIN') %}
                                 <td class="ps-4 text-secondary id">{{ user.id }}</td>
+                                {% endif %}
                                 <td class="name fw-semibold text-white">
                                     {{ user.name ?: user.username ?: '—' }}
                                 </td>
@@ -68,7 +72,7 @@
                             </tr>
                         {% else %}
                             <tr>
-                                <td colspan="4" class="text-center py-5 text-secondary">
+                                <td colspan="{% if is_granted('ROLE_ADMIN') %}4{% else %}3{% endif %}" class="text-center py-5 text-secondary">
                                     <i class="bi bi-people fs-1 d-block mb-2"></i>
                                     Aucun utilisateur trouvé
                                 </td>

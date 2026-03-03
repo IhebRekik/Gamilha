@@ -47,7 +47,7 @@
                         <div id="editAvatarPreview" class="mx-auto mb-3"
                              style="width:150px;height:150px;display:flex;align-items:center;justify-content:center;overflow:hidden;border-radius:50%;">
                             {% if user.profileImage %}
-                                <img src="{{ asset('uploads/profile_images/' ~ user.profileImage) }}"
+                                <img src="{{ asset('uploads/profiles/' ~ user.profileImage) }}"
                                      alt="{{ user.name }}"
                                      style="width:150px;height:150px;object-fit:cover;border-radius:50%;border:4px solid #8b5cf6;">
                             {% else %}

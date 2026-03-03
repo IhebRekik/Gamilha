@@ -8,7 +8,9 @@
     <table class="table">
         <thead>
             <tr>
+                {% if is_granted('ROLE_ADMIN') %}
                 <th>Id</th>
+                {% endif %}
                 <th>Email</th>
                 <th>Roles</th>
                 <th>Password</th>
@@ -19,7 +21,9 @@
         <tbody>
         {% for user in users %}
             <tr>
+                {% if is_granted('ROLE_ADMIN') %}
                 <td>{{ user.id }}</td>
+                {% endif %}
                 <td>{{ user.email }}</td>
                 <td>{{ user.roles ? user.roles|json_encode : '' }}</td>
                 <td>{{ user.password }}</td>
@@ -31,7 +35,7 @@
             </tr>
         {% else %}
             <tr>
-                <td colspan="6">no records found</td>
+                <td colspan="{% if is_granted('ROLE_ADMIN') %}6{% else %}5{% endif %}">no records found</td>
             </tr>
         {% endfor %}
         </tbody>

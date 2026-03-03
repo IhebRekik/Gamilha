@@ -119,7 +119,7 @@
         <div class="row align-items-center position-relative">
             <div class="col-lg-3 text-center mb-4 mb-lg-0">
                 {% if app.user.profileImage %}
-                    <img src="{{ asset('uploads/profile_images/' ~ app.user.profileImage) }}" 
+                    <img src="{{ asset('uploads/profiles/' ~ app.user.profileImage) }}" 
                          alt="{{ app.user.name }}" 
                          class="profile-avatar">
                 {% else %}

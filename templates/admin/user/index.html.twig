@@ -164,7 +164,7 @@
                             data-roles="{{ user.roles|join(',') }}">
                             <td style="width:72px;">
                                 {% if user.profileImage %}
-                                    <img src="{{ asset('uploads/profile_images/' ~ user.profileImage) }}" class="rounded-circle" width="48" height="48" alt="Avatar">
+                                    <img src="{{ asset('uploads/profiles/' ~ user.profileImage) }}" class="rounded-circle" width="48" height="48" alt="Avatar">
                                 {% else %}
                                     <div class="bg-secondary rounded-circle d-flex align-items-center justify-content-center" style="width:48px;height:48px;">
                                         <i class="bi bi-person-fill text-white-50"></i>

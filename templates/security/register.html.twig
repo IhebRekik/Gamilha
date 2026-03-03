@@ -33,28 +33,54 @@
             </div>
         {% endfor %}
 
+        {# Avertissements (ex : échec conversion avatar IA) #}
+        {% for message in app.flashes('warning') %}
+            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                <div class="d-flex align-items-start">
+                    <i class="bi bi-exclamation-circle-fill me-2 fs-5"></i>
+                    <div class="flex-grow-1">
+                        <strong>Avertissement</strong>
+                        <p class="mb-0 mt-1">{{ message }}</p>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+
         <form method="post" enctype="multipart/form-data" novalidate>
 
-            {# Photo de profil (optionnel) — Avatar IA #}
+            {# Photo de profil (optionnel) — Avatar IA généré côté serveur #}
             <div class="mb-3 text-center">
                 <div class="mb-2">
                     <div id="registerAvatarPreview" class="mx-auto d-flex align-items-center justify-content-center"
-                         style="width:130px;height:130px;background:linear-gradient(135deg,#8b5cf6,#c084fc);border-radius:50%;overflow:hidden;">
-                        <i class="bi bi-person-fill text-white" style="font-size:4rem;"></i>
+                         style="width:130px;height:130px;background:linear-gradient(135deg,#8b5cf6,#c084fc);border-radius:50%;overflow:hidden;position:relative;">
+                        <i class="bi bi-person-fill text-white" id="avatarPlaceholderIcon" style="font-size:4rem;"></i>
+                        <img id="avatarPreviewImg" src="" alt="Aperçu"
+                             style="display:none;position:absolute;top:0;left:0;width:130px;height:130px;object-fit:cover;border-radius:50%;">
                     </div>
                 </div>
                 <label for="profileImageInput" class="btn btn-sm mt-2"
-                       style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;border:none;border-radius:20px;">
-                    <i class="bi bi-robot me-1"></i>Générer mon avatar IA
+                       style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff;border:none;border-radius:20px;cursor:pointer;">
+                    <i class="bi bi-robot me-1"></i>Choisir ma photo
                 </label>
                 <input type="file"
                        name="profileImage"
                        id="profileImageInput"
                        class="d-none"
                        accept="image/jpeg,image/png,image/gif,image/webp">
-                <small class="d-block text-muted mt-2">
-                    <i class="bi bi-stars me-1"></i>Votre photo sera automatiquement convertie en avatar cartoon ✨
-                </small>
+
+                {# Bouton génération avatar — visible seulement après sélection d'une photo #}
+                <div id="avatarGenerateWrap" style="display:none;margin-top:.75rem;">
+                    <button type="button" id="btnGenerateAvatar"
+                            style="background:linear-gradient(135deg,#ec4899,#8b5cf6);color:#fff;border:none;border-radius:20px;padding:.45rem 1.2rem;font-weight:700;font-size:.85rem;cursor:pointer;box-shadow:0 4px 14px rgba(139,92,246,.4);transition:transform .15s,box-shadow .15s;">
+                        <i class="bi bi-stars me-1"></i>Générer mon avatar IA
+                    </button>
+                    <small class="d-block text-muted mt-1" style="font-size:.72rem;">
+                        <i class="bi bi-info-circle me-1"></i>La photo sera transformée en avatar anime
+                    </small>
+                </div>
+
+                <input type="hidden" name="avatarTempFile" id="avatarTempFile">
             </div>
 
             <div class="mb-3">
@@ -103,9 +129,38 @@
                 </small>
             </div>
 
-            <button class="btn btn-gamilha w-100 mb-3" type="submit">
-                <i class="bi bi-person-plus me-2"></i>Créer mon compte
+            <button class="btn btn-gamilha w-100 mb-3" type="submit" id="submitBtn">
+                <span id="submitBtnNormal">
+                    <i class="bi bi-person-plus me-2"></i>Créer mon compte
+                </span>
+                <span id="submitBtnLoading" class="d-none">
+                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                    Traitement en cours…
+                </span>
             </button>
+
+            {# Overlay barre de progression avatar IA #}
+            <div id="avatarProgressOverlay" style="display:none;">
+                <div class="avatar-progress-card mt-3 p-3">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="avatar-ai-dot"></span>
+                        <span style="font-size:.8rem;font-weight:700;color:#c084fc;text-transform:uppercase;letter-spacing:.06em;">
+                            <i class="bi bi-stars me-1"></i>Génération avatar IA
+                        </span>
+                    </div>
+                    <div class="progress" style="height:8px;border-radius:10px;background:rgba(139,92,246,.15);">
+                        <div id="avatarProgressBar"
+                             class="progress-bar"
+                             role="progressbar"
+                             style="width:0%;border-radius:10px;background:linear-gradient(90deg,#8b5cf6,#ec4899);transition:width .4s ease;"
+                             aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                    </div>
+                    <div id="avatarProgressMsg" class="mt-2" style="font-size:.75rem;color:rgba(200,200,220,.7);text-align:center;">
+                        Connexion à Hugging Face…
+                    </div>
+                </div>
+            </div>
 
             <div class="text-center">
                 <small class="text-muted">
@@ -137,6 +192,35 @@
 
     .alert .btn-close {
         filter: brightness(0) saturate(100%);
+    }
+
+    .alert-warning {
+        background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 193, 7, 0.05) 100%);
+        border: 1px solid rgba(255, 193, 7, 0.35);
+        border-radius: 10px;
+        color: #d39e00;
+    }
+
+    /* Carte de progression avatar IA */
+    .avatar-progress-card {
+        background: linear-gradient(145deg, rgba(15,15,26,.9), rgba(26,16,40,.9));
+        border: 1.5px solid rgba(139,92,246,.35);
+        border-radius: 14px;
+    }
+
+    .avatar-ai-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #8b5cf6;
+        box-shadow: 0 0 6px #8b5cf6;
+        animation: aaiPulse 1.4s ease-in-out infinite;
+        flex-shrink: 0;
+    }
+
+    @keyframes aaiPulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50%       { opacity: .4; transform: scale(.75); }
     }
 
     /* Style pour le bouton d'œil */
@@ -184,43 +268,160 @@
     }
 </style>
 
-<script src="{{ asset('js/avatar-ai.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Gestion du toggle password
+
+    // ----- Toggle mot de passe -----
     const togglePassword = document.getElementById('togglePassword');
-    const passwordInput = document.getElementById('passwordInput');
-    const toggleIcon = document.getElementById('toggleIcon');
+    const passwordInput  = document.getElementById('passwordInput');
+    const toggleIcon     = document.getElementById('toggleIcon');
 
     if (togglePassword) {
         togglePassword.addEventListener('click', function() {
-            // Basculer le type de l'input
-            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-            passwordInput.setAttribute('type', type);
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            toggleIcon.classList.toggle('bi-eye', type === 'password');
+            toggleIcon.classList.toggle('bi-eye-slash', type === 'text');
+        });
+    }
 
-            // Changer l'icône
-            if (type === 'password') {
-                toggleIcon.classList.remove('bi-eye-slash');
-                toggleIcon.classList.add('bi-eye');
+    // ----- Prévisualisation image -----
+    const profileInput       = document.getElementById('profileImageInput');
+    const avatarPreviewImg   = document.getElementById('avatarPreviewImg');
+    const avatarPlaceholder  = document.getElementById('avatarPlaceholderIcon');
+    const avatarGenerateWrap = document.getElementById('avatarGenerateWrap');
+    const btnGenerateAvatar  = document.getElementById('btnGenerateAvatar');
+
+    if (profileInput) {
+        profileInput.addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    avatarPreviewImg.src = ev.target.result;
+                    avatarPreviewImg.style.display = 'block';
+                    avatarPlaceholder.style.display = 'none';
+                };
+                reader.readAsDataURL(file);
+                avatarGenerateWrap.style.display = 'block';
             } else {
-                toggleIcon.classList.remove('bi-eye');
-                toggleIcon.classList.add('bi-eye-slash');
+                avatarPreviewImg.style.display = 'none';
+                avatarPreviewImg.src = '';
+                avatarPlaceholder.style.display = '';
+                avatarGenerateWrap.style.display = 'none';
             }
         });
     }
 
-    // Avatar IA — initialisation
-    if (window.AvatarAI) {
-        AvatarAI.init('profileImageInput', 'registerAvatarPreview', { size: 130 });
+    // ----- Progression Avatar IA -----
+    const form        = document.querySelector('form');
+    const submitBtn   = document.getElementById('submitBtn');
+    const btnNormal   = document.getElementById('submitBtnNormal');
+    const btnLoading  = document.getElementById('submitBtnLoading');
+    const overlay     = document.getElementById('avatarProgressOverlay');
+    const progressBar = document.getElementById('avatarProgressBar');
+    const progressMsg = document.getElementById('avatarProgressMsg');
+
+    const steps = [
+        { pct: 8,  msg: "Préparation de l'image…", delay: 0 },
+        { pct: 18, msg: "Connexion à Hugging Face…", delay: 2000 },
+        { pct: 32, msg: "Envoi au modèle anime IA…", delay: 5000 },
+        { pct: 50, msg: "Analyse du portrait…", delay: 10000 },
+        { pct: 68, msg: "Génération de l'avatar…", delay: 20000 },
+        { pct: 82, msg: "Finalisation des détails…", delay: 35000 },
+        { pct: 91, msg: "Presque terminé, patience…", delay: 55000 },
+    ];
+
+    function setProgress(pct, msg) {
+        if (progressBar) {
+            progressBar.style.width = pct + '%';
+            progressBar.setAttribute('aria-valuenow', pct);
+        }
+        if (progressMsg) progressMsg.textContent = msg;
+        console.log('[Avatar IA] ' + pct + '% — ' + msg);
     }
 
-    // Animation de disparition automatique des alertes après 10 secondes
-    document.querySelectorAll('.alert').forEach(function(alert) {
-        setTimeout(function() {
+    function startProgressAnimation() {
+        steps.forEach(step => {
+            setTimeout(() => setProgress(step.pct, step.msg), step.delay);
+        });
+    }
+
+    let avatarQueued = false;
+
+    // ----- Bouton "Générer mon avatar IA" — appel AJAX serveur -----
+    if (btnGenerateAvatar) {
+        btnGenerateAvatar.addEventListener('click', function() {
+            const file = profileInput && profileInput.files[0];
+            if (!file) return;
+
+            // Feedback chargement
+            btnGenerateAvatar.disabled = true;
+            btnGenerateAvatar.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Génération en cours…';
+
+            // Barre de progression
+            if (overlay) overlay.style.display = 'block';
+            startProgressAnimation();
+
+            // Envoi AJAX
+            const formData = new FormData();
+            formData.append('profileImage', file);
+
+            fetch('{{ path("app_register_avatar_preview") }}', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (overlay) overlay.style.display = 'none';
+
+                if (data.success) {
+                    // Afficher l'avatar généré dans l'aperçu
+                    avatarPreviewImg.src = data.previewUrl + '?t=' + Date.now();
+                    avatarPreviewImg.style.display = 'block';
+                    avatarPlaceholder.style.display = 'none';
+
+                    // Stocker le nom du fichier temp
+                    document.getElementById('avatarTempFile').value = data.tempFile;
+                    avatarQueued = true;
+
+                    // Bouton vert confirmé
+                    btnGenerateAvatar.disabled = true;
+                    btnGenerateAvatar.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)';
+                    btnGenerateAvatar.innerHTML = '<i class="bi bi-check-circle me-1"></i> Avatar IA prêt — créez votre compte !';
+                } else {
+                    // Réinitialiser le bouton + afficher erreur
+                    btnGenerateAvatar.disabled = false;
+                    btnGenerateAvatar.innerHTML = '<i class="bi bi-stars me-1"></i>Générer mon avatar IA';
+                    alert('Échec de la génération : ' + (data.error || 'erreur inconnue'));
+                }
+            })
+            .catch(() => {
+                if (overlay) overlay.style.display = 'none';
+                btnGenerateAvatar.disabled = false;
+                btnGenerateAvatar.innerHTML = '<i class="bi bi-stars me-1"></i>Générer mon avatar IA';
+                alert('Erreur réseau lors de la génération.');
+            });
+        });
+    }
+
+    // ----- Soumission : masquer le bouton principal pendant l'envoi -----
+    if (form) {
+        form.addEventListener('submit', function() {
+            btnNormal?.classList.add('d-none');
+            btnLoading?.classList.remove('d-none');
+            if (submitBtn) submitBtn.disabled = true;
+        });
+    }
+
+    // ----- Auto close alerts -----
+    document.querySelectorAll('.alert').forEach(alert => {
+        setTimeout(() => {
             const bsAlert = new bootstrap.Alert(alert);
             bsAlert.close();
         }, 10000);
     });
+
 });
 </script>
 {% endblock %}
