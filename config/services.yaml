@@ -6,32 +6,27 @@ parameters:
     ai.api_key: '%env(AI_API_KEY)%'
     ai.api_url: '%env(AI_API_URL)%'
     profiles_directory: '%kernel.project_dir%/public/uploads/profiles'
-    
+    videos_directory: '%kernel.project_dir%/public/uploads/videos'
+    playlist_images_directory: '%kernel.project_dir%/public/uploads/playlists'
+    groq_api_key: '%env(GROQ_API_KEY)%'
 
 services:
-    # Configuration globale par défaut (très bien)
     _defaults:
-        autowire: true          # injection automatique des dépendances
-        autoconfigure: true     # tags automatiques pour les services
+        autowire: true
+        autoconfigure: true
 
-    # Contrôleurs (parfait comme ça)
-    App\Controller\:
-        resource: '../src/Controller'
-        tags: ['controller.service_arguments']
-
-    # Tous les services de src/ sauf les dossiers exclus (très bien)
     App\:
         resource: '../src/'
         exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
-    # Déclaration correcte du service HuggingFace
+
+    App\Controller\:
+        resource: '../src/Controller/'
+        tags: ['controller.service_arguments']
+
     App\Service\OpenRouterService:
         arguments:
             $openRouterApiKey: '%env(OPENROUTER_API_KEY)%'
 
-
-    # Service ApiVideoService : plus besoin de définition explicite !
-    # Symfony autowire déjà correctement grâce à #[Autowire] dans le constructeur
-    # → tu peux SUPPRIMER complètement cette partie si tu utilises #[Autowire]
-    # App\Service\ApiVideoService:
-    #     arguments:
-    #         $apiKey: '%apivideo.api_key%'
+    App\Controller\SubtitleController:
+        arguments:
+            $groqApiKey: '%groq_api_key%'

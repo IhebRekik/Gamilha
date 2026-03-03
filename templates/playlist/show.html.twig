@@ -1,3 +1,4 @@
+{# 📁 templates/playlist/show.html.twig #}
 {% extends 'base.html.twig' %}
 
 {% block title %}{{ playlist.title }}{% endblock %}
@@ -5,111 +6,169 @@
 {% block body %}
 <div class="container mt-4">
 
+    {# ====================================================
+       🔔 NOTIFICATION SWEETALERT2 — après ajout vidéo
+       Le flash 'video_added' est envoyé par CoachingVideoController::new()
+       ====================================================#}
+    {% for msg in app.flashes('video_added') %}
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                // ✅ On passe le JSON brut à JS qui le parse lui-même
+                var data = JSON.parse({{ msg|json_encode|raw }});
+                Swal.fire({
+                    icon:             'success',
+                    title:            '🎬 Vidéo ajoutée avec succès !',
+                    html:             '<b>' + data.titre + '</b><br>'
+                                    + 'Niveau&nbsp;: <span style="color:#17a2b8">' + data.niveau + '</span>'
+                                    + (data.premium ? '&nbsp;&nbsp;<span stylea="color:#ffc107">💎 Premium</span>' : ''),
+                    showConfirmButton: false,
+                    timer:            4500,
+                    timerProgressBar: true,
+                    toast:            true,
+                    position:         'top-end',
+                });
+            });
+        </script>
+    {% endfor %}
 
-    <!-- 🎶 INFOS PLAYLIST -->
-    <div class="mb-4">
-        <h1>🎶 {{ playlist.title }}</h1>
-        <p class="opacity-75">{{ playlist.description }}</p>
+    {# Alertes génériques #}
+    {% for msg in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle me-1"></i> {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+    {% for msg in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle me-1"></i> {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
 
-        <p class="small">
-            🎯 <strong>Niveau :</strong> {{ playlist.niveau }} |
-            📂 <strong>Catégorie :</strong> {{ playlist.categorie }}
-        </p>
+    {# ===== EN-TÊTE PLAYLIST ===== #}
+    <div class="d-flex align-items-start gap-4 mb-4">
+        {% if playlist.image %}
+            <img src="{{ asset('uploads/playlists/' ~ playlist.image) }}"
+                 alt="{{ playlist.title }}"
+                 class="rounded-3 shadow flex-shrink-0"
+                 style="width:180px; height:120px; object-fit:cover;">
+        {% endif %}
+        <div>
+            <h1 class="mb-1">🎶 {{ playlist.title }}</h1>
+            <p class="opacity-75 mb-1">{{ playlist.description }}</p>
+            <p class="small mb-2">
+                🎯 <strong>Niveau :</strong> {{ playlist.niveau }} &nbsp;|&nbsp;
+                📂 <strong>Catégorie :</strong> {{ playlist.categorie }} &nbsp;|&nbsp;
+                🎥 <strong>{{ videos|length }}</strong> vidéo(s)
+            </p>
+            <div class="d-flex gap-2">
+                <a href="{{ path('video_new') }}" class="btn btn-success btn-sm">
+                    <i class="bi bi-plus-circle me-1"></i> Ajouter une vidéo
+                </a>
+                <a href="{{ path('playlist_edit', {id: playlist.id}) }}" class="btn btn-outline-warning btn-sm">
+                    <i class="bi bi-pencil me-1"></i> Modifier
+                </a>
+                <a href="{{ path('playlist_index') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-arrow-left me-1"></i> Retour
+                </a>
+            </div>
+        </div>
     </div>
 
     <hr class="mb-4">
-<form method="get" class="row g-2 mb-4">
-    <div class="col-md-4">
-        <input type="text" name="q" class="form-control"
-               placeholder="🔍 Rechercher..."
-               value="{{ app.request.get('q') }}">
-    </div>
 
-    <div class="col-md-3">
-        <select name="niveau" class="form-select">
-            <option value="">Tous niveaux</option>
-            <option value="debutant">Débutant</option>
-            <option value="intermediaire">Intermédiaire</option>
-            <option value="avance">Avancé</option>
-        </select>
-    </div>
+    {# ===== FILTRES ===== #}
+    <form method="get" class="row g-2 mb-4">
+        <div class="col-md-5">
+            <input type="text" name="q" class="form-control"
+                   placeholder="🔍 Rechercher une vidéo..."
+                   value="{{ app.request.get('q') }}">
+        </div>
+        <div class="col-md-4">
+            <select name="niveau" class="form-select">
+                <option value="">Tous niveaux</option>
+                <option value="debutant"      {{ app.request.get('niveau') == 'debutant' ? 'selected' }}>Débutant</option>
+                <option value="intermediaire" {{ app.request.get('niveau') == 'intermediaire' ? 'selected' }}>Intermédiaire</option>
+                <option value="avance"        {{ app.request.get('niveau') == 'avance' ? 'selected' }}>Avancé</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <button class="btn btn-primary w-100">Filtrer</button>
+        </div>
+    </form>
 
-    <div class="col-md-3">
-        <select name="categorie" class="form-select">
-            <option value="">Toutes catégories</option>
-            <option value="fitness">Fitness</option>
-            <option value="yoga">Yoga</option>
-            <option value="musculation">Musculation</option>
-            <option value="cardio">Cardio</option>
-        </select>
-    </div>
-
-    <div class="col-md-2">
-        <button class="btn btn-primary w-100">Filtrer</button>
-    </div>
-</form>
-
-    <!-- 🎥 VIDÉOS DE LA PLAYLIST -->
-    <h3 class="mb-4">🎥 Vidéos de la playlist</h3>
+    {# ===== GRILLE VIDÉOS ===== #}
+    <h3 class="mb-4">🎥 Vidéos ({{ videos|length }})</h3>
 
     <div class="row">
         {% for video in videos %}
             <div class="col-lg-4 col-md-6 mb-4">
                 <div class="card h-100 shadow-sm bg-dark text-white">
 
-                    <!-- 🎬 APERÇU VIDÉO -->
                     <div class="ratio ratio-16x9">
                         {% if video.url starts with 'http' %}
-                            <iframe
-                                src="{{ video.url }}"
-                                title="{{ video.titre }}"
-                                allowfullscreen>
+                            <iframe src="{{ video.url }}"
+                                    title="{{ video.titre }}"
+                                    allowfullscreen>
                             </iframe>
                         {% else %}
                             <video controls preload="metadata">
                                 <source src="{{ asset(video.url) }}" type="video/mp4">
-                                Votre navigateur ne supporte pas la vidéo.
                             </video>
                         {% endif %}
                     </div>
 
-                    <!-- 📄 INFOS -->
                     <div class="card-body">
                         <h5 class="card-title">{{ video.titre }}</h5>
-
                         <p class="card-text small opacity-75">
-                            {{ video.description|slice(0, 120) }}
-                            {% if video.description|length > 120 %}...{% endif %}
+                            {{ video.description|slice(0, 100) }}{% if video.description|length > 100 %}...{% endif %}
                         </p>
+                        <div class="d-flex gap-1 flex-wrap">
+                            <span class="badge bg-info">{{ video.niveau }}</span>
+                            {% if video.premium %}
+                                <span class="badge bg-warning text-dark">💎 Premium</span>
+                            {% else %}
+                                <span class="badge bg-success">✅ Gratuit</span>
+                            {% endif %}
+                            {% if video.duration %}
+                                <span class="badge bg-dark border">
+                                    <i class="bi bi-clock me-1"></i>{{ (video.duration / 60)|round }}min
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
 
-                        <ul class="list-unstyled small">
-                            <li>
-                                🎯 <strong>Niveau :</strong> {{ video.niveau }}
-                            </li>
-                            <li>
-                                💎 <strong>Premium :</strong>
-                                {% if video.premium %}
-                                    <span class="badge bg-warning text-dark">Oui</span>
-                                {% else %}
-                                    <span class="badge bg-success">Non</span>
-                                {% endif %}
-                            </li>
-                        </ul>
+                    <div class="card-footer bg-transparent border-top d-flex justify-content-between">
+                        <a href="{{ path('video_edit', {id: video.id}) }}"
+                           class="btn btn-outline-warning btn-sm">
+                            <i class="bi bi-pencil"></i> Modifier
+                        </a>
+                        <form method="post"
+                              action="{{ path('video_delete', {id: video.id}) }}"
+                              onsubmit="return confirm('Supprimer cette vidéo ?')">
+                            <input type="hidden" name="_token"
+                                   value="{{ csrf_token('delete' ~ video.id) }}">
+                            <button class="btn btn-outline-danger btn-sm">
+                                <i class="bi bi-trash"></i> Supprimer
+                            </button>
+                        </form>
                     </div>
 
                 </div>
             </div>
         {% else %}
-            <div class="col-12 text-center opacity-75">
-                <p>Aucune vidéo dans cette playlist</p>
+            <div class="col-12 text-center opacity-75 py-5">
+                <i class="bi bi-film fs-1 d-block mb-2"></i>
+                <p>Aucune vidéo dans cette playlist.</p>
+                <a href="{{ path('video_new') }}" class="btn btn-success">
+                    <i class="bi bi-plus-circle me-1"></i> Ajouter la première vidéo
+                </a>
             </div>
         {% endfor %}
     </div>
 
-    <!-- ⬅️ RETOUR -->
-    <a href="{{ path('playlist_index') }}" class="btn btn-secondary mt-4">
-        ⬅️ Retour aux playlists
-    </a>
-
 </div>
+
+{# SweetAlert2 depuis CDN (chargé ici si pas dans base.html.twig) #}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 {% endblock %}

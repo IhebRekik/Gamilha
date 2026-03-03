@@ -1,101 +1,126 @@
+{# 📁 templates/playlist/index.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Playlists{% endblock %}
+{% block title %}Gestion des Playlists{% endblock %}
 
 {% block body %}
 <div class="container mt-4">
 
+    {% for msg in app.flashes('success') %}
+        <div class="alert alert-success alert-dismissible fade show">
+            <i class="bi bi-check-circle me-1"></i> {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+    {% for msg in app.flashes('error') %}
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="bi bi-exclamation-triangle me-1"></i> {{ msg }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    {% endfor %}
+
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>🎶 Playlists</h1>
-        <form method="get" class="row g-2 mb-4">
-    <div class="col-md-4">
-        <input type="text" name="q" class="form-control"
-               placeholder="🔍 Rechercher..."
-               value="{{ app.request.get('q') }}">
-    </div>
-
-    <div class="col-md-3">
-        <select name="niveau" class="form-select">
-            <option value="">Tous niveaux</option>
-            <option value="debutant">Débutant</option>
-            <option value="intermediaire">Intermédiaire</option>
-            <option value="avance">Avancé</option>
-        </select>
-    </div>
-
-    <div class="col-md-3">
-        <select name="categorie" class="form-select">
-            <option value="">Toutes catégories</option>
-            <option value="fitness">Fitness</option>
-            <option value="yoga">Yoga</option>
-            <option value="musculation">Musculation</option>
-            <option value="cardio">Cardio</option>
-        </select>
-    </div>
-
-    <div class="col-md-2">
-        <button class="btn btn-primary w-100">Filtrer</button>
-    </div>
-</form>
-
-
-        <a href="{{ path('playlist_new') }}" class="btn btn-primary">
-            ➕ Nouvelle playlist
+        <a href="{{ path('playlist_new') }}" class="btn btn-success">
+            <i class="bi bi-plus-circle me-1"></i> Nouvelle playlist
         </a>
     </div>
+
+    {# Filtres #}
+    <form method="get" class="row g-2 mb-4">
+        <div class="col-md-4">
+            <input type="text" name="q" class="form-control"
+                   placeholder="🔍 Rechercher..."
+                   value="{{ app.request.get('q') }}">
+        </div>
+        <div class="col-md-3">
+            <select name="niveau" class="form-select">
+                <option value="">Tous niveaux</option>
+                <option value="debutant"      {{ app.request.get('niveau') == 'debutant' ? 'selected' }}>Débutant</option>
+                <option value="intermediaire" {{ app.request.get('niveau') == 'intermediaire' ? 'selected' }}>Intermédiaire</option>
+                <option value="avance"        {{ app.request.get('niveau') == 'avance' ? 'selected' }}>Avancé</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <select name="categorie" class="form-select">
+                <option value="">Toutes catégories</option>
+                <option value="action"   {{ app.request.get('categorie') == 'action' ? 'selected' }}>Action</option>
+                <option value="aventure" {{ app.request.get('categorie') == 'aventure' ? 'selected' }}>Aventure</option>
+                <option value="sport"    {{ app.request.get('categorie') == 'sport' ? 'selected' }}>Sport</option>
+                <option value="course"   {{ app.request.get('categorie') == 'course' ? 'selected' }}>Course</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-primary w-100">Filtrer</button>
+        </div>
+    </form>
 
     <div class="row">
         {% for playlist in playlists %}
             <div class="col-lg-4 col-md-6 mb-4">
                 <div class="card h-100 shadow-sm bg-dark text-white">
 
+                    {% if playlist.image %}
+                        <img src="{{ asset('uploads/playlists/' ~ playlist.image) }}"
+                             class="card-img-top"
+                             alt="{{ playlist.title }}"
+                             style="height:200px; object-fit:cover;">
+                    {% else %}
+                        <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center"
+                             style="height:200px;">
+                            <span class="text-white-50"><i class="bi bi-image fs-1"></i></span>
+                        </div>
+                    {% endif %}
+
                     <div class="card-body">
-                        <h5 class="card-title">
-                            {{ playlist.title }}
-                        </h5>
-
+                        <h5 class="card-title">{{ playlist.title }}</h5>
                         <p class="card-text small opacity-75">
-                            {{ playlist.description|slice(0, 120) }}
-                            {% if playlist.description|length > 120 %}...{% endif %}
+                            {{ playlist.description|slice(0, 100) }}{% if playlist.description|length > 100 %}...{% endif %}
                         </p>
-
-                        <p class="small">
-                            🎯 <strong>Niveau :</strong> {{ playlist.niveau }} <br>
-                            📂 <strong>Catégorie :</strong> {{ playlist.categorie }}
-                        </p>
+                        <div class="d-flex gap-1 flex-wrap mb-1">
+                            <span class="badge bg-info">{{ playlist.niveau }}</span>
+                            <span class="badge bg-secondary">{{ playlist.categorie }}</span>
+                            <span class="badge bg-dark border">
+                                <i class="bi bi-film me-1"></i>{{ playlist.videos|length }} vidéo(s)
+                            </span>
+                        </div>
+                        <small class="text-muted">
+                            <i class="bi bi-calendar3 me-1"></i>
+                            {{ playlist.createdAt ? playlist.createdAt|date('d/m/Y') : '—' }}
+                        </small>
                     </div>
 
-                    <!-- 🔘 ACTIONS -->
                     <div class="card-footer bg-transparent border-top d-flex justify-content-between align-items-center">
-                        <div>
-                            <a href="{{ path('playlist_show', {id: playlist.id}) }}"
-                               class="btn btn-info btn-sm">
-                                👀 Voir
-                            </a>
-
+                        <a href="{{ path('playlist_show', {id: playlist.id}) }}"
+                           class="btn btn-info btn-sm">
+                            <i class="bi bi-eye me-1"></i> Voir
+                        </a>
+                        <div class="d-flex gap-1">
                             <a href="{{ path('playlist_edit', {id: playlist.id}) }}"
-                               class="btn btn-warning btn-sm">
-                                ✏️
+                               class="btn btn-outline-warning btn-sm">
+                                <i class="bi bi-pencil"></i>
                             </a>
+                            <form method="post"
+                                  action="{{ path('playlist_delete', {id: playlist.id}) }}"
+                                  onsubmit="return confirm('Supprimer cette playlist ?')">
+                                <input type="hidden" name="_token"
+                                       value="{{ csrf_token('delete' ~ playlist.id) }}">
+                                <button class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
                         </div>
-
-                        <!-- 🗑️ SUPPRIMER -->
-                        <form method="post"
-                              action="{{ path('playlist_delete', {id: playlist.id}) }}"
-                              onsubmit="return confirm('Supprimer cette playlist ?');">
-                            <input type="hidden" name="_token"
-                                   value="{{ csrf_token('delete' ~ playlist.id) }}">
-                            <button class="btn btn-danger btn-sm">
-                                🗑️
-                            </button>
-                        </form>
                     </div>
 
                 </div>
             </div>
         {% else %}
-            <div class="col-12 text-center opacity-75">
-                <p>Aucune playlist disponible</p>
+            <div class="col-12 text-center opacity-75 py-5">
+                <i class="bi bi-collection-play fs-1 d-block mb-2"></i>
+                <p>Aucune playlist disponible.</p>
+                <a href="{{ path('playlist_new') }}" class="btn btn-success">
+                    <i class="bi bi-plus-circle me-1"></i> Créer la première playlist
+                </a>
             </div>
         {% endfor %}
     </div>

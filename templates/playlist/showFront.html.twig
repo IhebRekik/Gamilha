@@ -1,0 +1,634 @@
+{# 📁 templates/playlist/showFront.html.twig #}
+{% extends 'base_front.html.twig' %}
+
+{% block title %}{{ playlist.title }} — Gamilha{% endblock %}
+
+{% block stylesheets %}
+<style>
+    /* ===== Sous-titres ===== */
+    .subtitle-zone {
+        background: rgba(0,0,0,0.88);
+        color: #fff;
+        border-radius: 0 0 12px 12px;
+        padding: 0.6rem 1rem;
+        min-height: 52px;
+        text-align: center;
+        font-size: 0.92rem;
+        line-height: 1.5;
+        border-top: 1px solid rgba(139,92,246,0.25);
+        transition: opacity 0.3s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+    }
+    .subtitle-zone .sub-text    { color: #f0f0f0; font-size: 0.95rem; font-weight: 500; text-shadow: 0 1px 4px #000; }
+    .subtitle-zone .sub-loading { color: var(--gamilha-neon); font-style: italic; font-size: 0.82rem; }
+    .subtitle-zone .sub-error   { color: #f87171; font-style: italic; font-size: 0.82rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { display:inline-block; animation: spin 1s linear infinite; }
+
+    /* ===== Stats ===== */
+    .stats-panel {
+        background: var(--gamilha-card);
+        border: 1px solid var(--gamilha-border);
+        border-radius: 16px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    .stat-item { text-align: center; padding: 0.75rem 0.5rem; }
+    .stat-value {
+        font-size: 1.6rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--gamilha-accent), var(--gamilha-neon));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+    .stat-label { font-size: 0.75rem; color: var(--gamilha-muted); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .progress-gamilha { height: 10px; border-radius: 10px; background: rgba(139,92,246,0.12); }
+    .progress-gamilha .progress-bar {
+        background: linear-gradient(90deg, var(--gamilha-accent), var(--gamilha-neon));
+        border-radius: 10px;
+        transition: width 0.6s ease;
+    }
+
+    /* ===== Vidéos ===== */
+    .video-card {
+        background: var(--gamilha-card);
+        border: 1px solid var(--gamilha-border);
+        border-radius: 16px;
+        overflow: hidden;
+        transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    .video-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 40px rgba(139,92,246,0.2);
+        border-color: rgba(139,92,246,0.5);
+    }
+    .video-card .card-body { padding: 1rem; flex: 1; }
+
+    /* Bouton vu */
+    .btn-watched {
+        border: 1px solid rgba(139,92,246,0.3);
+        color: var(--gamilha-muted);
+        background: transparent;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+        width: 100%;
+        padding: 0.4rem 0.75rem;
+    }
+    .btn-watched:hover { border-color: var(--gamilha-accent); color: var(--gamilha-neon); }
+    .btn-watched.watched {
+        background: rgba(139,92,246,0.15);
+        border-color: var(--gamilha-accent);
+        color: var(--gamilha-neon);
+    }
+
+    /* Badges niveaux */
+    .badge-debutant      { background: rgba(34,197,94,0.2);  color: #4ade80; border:1px solid rgba(34,197,94,0.3); }
+    .badge-intermediaire { background: rgba(251,191,36,0.2); color: #fbbf24; border:1px solid rgba(251,191,36,0.3); }
+    .badge-avance        { background: rgba(239,68,68,0.2);  color: #f87171; border:1px solid rgba(239,68,68,0.3); }
+
+    .niveau-stat-box {
+        border-radius: 10px;
+        padding: 0.6rem 0.5rem;
+        text-align: center;
+        font-size: 0.78rem;
+        font-weight: 700;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container mt-4 pb-5">
+
+    {# ===== EN-TÊTE PLAYLIST ===== #}
+    <div class="d-flex gap-4 align-items-start mb-5">
+        {% if playlist.image %}
+            <img src="{{ asset('uploads/playlists/' ~ playlist.image) }}"
+                 alt="{{ playlist.title }}"
+                 class="rounded-3 shadow flex-shrink-0"
+                 style="width:160px; height:110px; object-fit:cover;">
+        {% endif %}
+        <div>
+            <h1 class="glow-text mb-1">🎶 {{ playlist.title }}</h1>
+            <p class="text-muted mb-2">{{ playlist.description }}</p>
+            <div class="d-flex gap-2 flex-wrap">
+                <span class="badge badge-gamilha">🎯 {{ playlist.niveau|capitalize }}</span>
+                <span class="badge badge-gamilha">📂 {{ playlist.categorie|capitalize }}</span>
+                <span class="badge badge-gamilha">🎥 {{ videos|length }} vidéo(s)</span>
+            </div>
+        </div>
+    </div>
+
+    {# ===== PANNEAU STATISTIQUES ===== #}
+    <div class="stats-panel" id="statsPanel">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="mb-0 fw-bold text-gradient-violet">
+                <i class="bi bi-bar-chart-fill me-2"></i>Vos statistiques
+            </h5>
+            <small class="text-muted" id="statsLastUpdate">Chargement…</small>
+        </div>
+
+        {# Ligne de chiffres #}
+        <div class="row g-2 mb-3">
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value" id="stat-total">{{ videos|length }}</div>
+                    <div class="stat-label">Vidéos total</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value" id="stat-watched">—</div>
+                    <div class="stat-label">Regardées</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value" id="stat-duration">—</div>
+                    <div class="stat-label">Durée totale</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="stat-item">
+                    <div class="stat-value" id="stat-progress">0%</div>
+                    <div class="stat-label">Progression</div>
+                </div>
+            </div>
+        </div>
+
+        {# Barre de progression #}
+        <div class="progress progress-gamilha mb-3">
+            <div class="progress-bar" id="progressBar" style="width:0%" role="progressbar"></div>
+        </div>
+
+        {# Répartition niveaux #}
+        <div class="row g-2 text-center">
+            <div class="col-4">
+                <div class="niveau-stat-box badge-debutant">
+                    <div style="font-size:1.1rem" id="stat-deb">—</div>
+                    <div>Débutant</div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="niveau-stat-box badge-intermediaire">
+                    <div style="font-size:1.1rem" id="stat-int">—</div>
+                    <div>Intermédiaire</div>
+                </div>
+            </div>
+            <div class="col-4">
+                <div class="niveau-stat-box badge-avance">
+                    <div style="font-size:1.1rem" id="stat-adv">—</div>
+                    <div>Avancé</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr style="border-color:var(--gamilha-border);" class="mb-4">
+
+    {# ===== FILTRES ===== #}
+    <form method="get" class="row g-2 mb-4">
+        <div class="col-md-6">
+            <input type="text" name="q" class="form-control bg-dark text-white border-secondary"
+                   placeholder="🔍 Rechercher une vidéo..."
+                   value="{{ app.request.get('q') }}">
+        </div>
+        <div class="col-md-4">
+            <select name="niveau" class="form-select bg-dark text-white border-secondary">
+                <option value="">Tous niveaux</option>
+                <option value="debutant"      {{ app.request.get('niveau') == 'debutant' ? 'selected' }}>Débutant</option>
+                <option value="intermediaire" {{ app.request.get('niveau') == 'intermediaire' ? 'selected' }}>Intermédiaire</option>
+                <option value="avance"        {{ app.request.get('niveau') == 'avance' ? 'selected' }}>Avancé</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button class="btn btn-gamilha w-100">Filtrer</button>
+        </div>
+    </form>
+
+    {# ===== GRILLE VIDÉOS ===== #}
+    <h3 class="section-title mb-4">🎥 Vidéos</h3>
+
+    <div class="row g-4">
+        {% for video in videos %}
+            <div class="col-lg-4 col-md-6">
+                <div class="video-card" data-video-id="{{ video.id }}">
+
+                    {# Lecteur #}
+                    <div class="ratio ratio-16x9">
+                        {% if video.url starts with 'http' %}
+                            <iframe
+                                id="player-{{ video.id }}"
+                                src="{{ video.url }}"
+                                title="{{ video.titre }}"
+                                allowfullscreen
+                                class="video-player"
+                                data-type="youtube"
+                                data-video-id="{{ video.id }}">
+                            </iframe>
+                        {% else %}
+                            <video
+                                id="player-{{ video.id }}"
+                                controls
+                                preload="metadata"
+                                class="video-player w-100"
+                                data-type="local"
+                                data-video-id="{{ video.id }}"
+                                data-video-path="{{ video.url }}">
+                                <source src="{{ asset(video.url) }}" type="video/mp4">
+                                Votre navigateur ne supporte pas la vidéo HTML5.
+                            </video>
+                        {% endif %}
+                    </div>
+
+                    {# ✅ Barre de progression de lecture (vidéo locale uniquement) #}
+                    {% if not (video.url starts with 'http') %}
+                    <div style="height:3px;background:rgba(139,92,246,0.12);border-radius:0;">
+                        <div id="vid-progress-{{ video.id }}"
+                             style="height:100%;width:0%;background:linear-gradient(90deg,#8b5cf6,#c084fc);transition:width 0.5s linear;border-radius:0;">
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {# ===== ZONE SOUS-TITRES ===== #}
+                    <div class="subtitle-zone" id="subtitle-{{ video.id }}">
+                        {% if not (video.url starts with 'http') %}
+                            {# Sélecteur de langue + bouton générer #}
+                            <div class="d-flex align-items-center gap-2 flex-wrap justify-content-center">
+                                <select class="form-select form-select-sm"
+                                        id="lang-{{ video.id }}"
+                                        style="width:auto; background:#1a1a26; color:#e2e8f0; border-color:rgba(139,92,246,0.3); font-size:0.78rem;">
+                                    <option value="auto">🌐 Auto-détection</option>
+                                    <option value="ar">🇹🇳 Arabe</option>
+                                    <option value="fr">🇫🇷 Français</option>
+                                    <option value="en">🇬🇧 Anglais</option>
+                                    <option value="es">🇪🇸 Espagnol</option>
+                                    <option value="de">🇩🇪 Allemand</option>
+                                </select>
+                                <button class="btn btn-sm btn-outline-light"
+                                        onclick="loadSubtitles({{ video.id }}, '{{ video.url|e('js') }}')">
+                                    <i class="bi bi-closed-captioning me-1"></i>
+                                    Générer sous-titres IA
+                                </button>
+                            </div>
+                        {% else %}
+                            <span class="sub-text" style="font-size:0.78rem; opacity:0.7;">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Activez les sous-titres (CC) directement dans le lecteur YouTube
+                            </span>
+                        {% endif %}
+                    </div>
+
+                    {# Infos #}
+                    <div class="card-body">
+                        <h5 class="fw-bold mb-1">{{ video.titre }}</h5>
+                        <p class="small text-muted mb-2">
+                            {{ video.description|slice(0, 100) }}{% if video.description|length > 100 %}...{% endif %}
+                        </p>
+                        <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
+                            <span class="badge badge-{{ video.niveau }}">{{ video.niveau|capitalize }}</span>
+                            {% if video.premium %}
+                                <span class="badge" style="background:rgba(251,191,36,0.2);color:#fbbf24;border:1px solid rgba(251,191,36,0.3);">
+                                    💎 Premium
+                                </span>
+                            {% else %}
+                                <span class="badge" style="background:rgba(34,197,94,0.2);color:#4ade80;border:1px solid rgba(34,197,94,0.3);">
+                                    ✅ Gratuit
+                                </span>
+                            {% endif %}
+                            {% if video.duration %}
+                                <span class="ms-auto small text-muted">
+                                    <i class="bi bi-clock me-1"></i>{{ (video.duration / 60)|round }}min
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    {# Bouton Vu #}
+                    <div class="px-3 pb-3">
+                        <button class="btn-watched"
+                                id="watched-btn-{{ video.id }}"
+                                onclick="toggleWatched({{ video.id }})">
+                            <i class="bi bi-eye me-1"></i> Marquer comme vu
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12 text-center text-muted py-5">
+                <i class="bi bi-film fs-1 d-block mb-2 opacity-50"></i>
+                <p>Aucune vidéo dans cette playlist.</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="mt-5">
+        <a href="{{ path('playlistFront_index') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Retour aux playlists
+        </a>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script>
+// =====================================================
+// 🔹 CONSTANTES
+// =====================================================
+const PLAYLIST_ID = {{ playlist.id }};
+const STORAGE_KEY = 'gamilha_watched_' + PLAYLIST_ID;
+const ALL_VIDEO_IDS = [{% for video in videos %}{{ video.id }}{% if not loop.last %},{% endif %}{% endfor %}];
+
+// =====================================================
+// 🔹 LOCALSTORAGE — vidéos vues
+// =====================================================
+function getWatched() {
+    try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); }
+    catch(e) { return []; }
+}
+function saveWatched(arr) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+}
+
+// =====================================================
+// 🔹 MARQUER UNE VIDÉO COMME VUE
+// =====================================================
+function markAsWatched(videoId, silent) {
+    let watched = getWatched();
+    if (watched.includes(videoId)) return; // déjà marquée
+    watched.push(videoId);
+    saveWatched(watched);
+    updateWatchedButton(videoId, true);
+    refreshStats();
+    if (!silent) {
+        Swal.fire({
+            toast: true, position: 'bottom-end', icon: 'success',
+            title: '✅ Vidéo terminée !',
+            html: '<small>Marquée automatiquement comme vue</small>',
+            showConfirmButton: false, timer: 3000, timerProgressBar: true,
+        });
+    }
+}
+
+function toggleWatched(videoId) {
+    let watched = getWatched();
+    if (watched.includes(videoId)) {
+        watched = watched.filter(function(id) { return id !== videoId; });
+        saveWatched(watched);
+        updateWatchedButton(videoId, false);
+        refreshStats();
+        Swal.fire({ toast:true, position:'bottom-end', icon:'info',
+            title:'Retiré de vos vues', showConfirmButton:false, timer:2000 });
+    } else {
+        markAsWatched(videoId, false);
+    }
+}
+
+function updateWatchedButton(videoId, seen) {
+    const btn  = document.getElementById('watched-btn-' + videoId);
+    const card = document.querySelector('[data-video-id="' + videoId + '"]');
+    if (!btn) return;
+    if (seen) {
+        btn.classList.add('watched');
+        btn.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i> Vu ✓';
+        if (card && !card.querySelector('.watched-badge')) {
+            var badge = document.createElement('div');
+            badge.className = 'watched-badge';
+            badge.innerHTML = '<i class="bi bi-check-circle-fill me-1"></i>Vu';
+            badge.style.cssText = 'position:absolute;top:8px;right:8px;background:rgba(34,197,94,0.92);color:#fff;border-radius:20px;padding:3px 10px;font-size:0.72rem;font-weight:700;z-index:10;pointer-events:none;';
+            card.style.position = 'relative';
+            card.prepend(badge);
+        }
+    } else {
+        btn.classList.remove('watched');
+        btn.innerHTML = '<i class="bi bi-eye me-1"></i> Marquer comme vu';
+        var badge = card && card.querySelector('.watched-badge');
+        if (badge) badge.remove();
+    }
+}
+
+function initWatchedButtons() {
+    var watched = getWatched();
+    ALL_VIDEO_IDS.forEach(function(id) {
+        updateWatchedButton(id, watched.includes(id));
+    });
+}
+
+// =====================================================
+// 🔹 EVENT "FIN DE VIDÉO" — marquage automatique
+// =====================================================
+function initVideoEndedEvents() {
+    ALL_VIDEO_IDS.forEach(function(videoId) {
+        var player = document.getElementById('player-' + videoId);
+        if (!player || player.tagName !== 'VIDEO') return;
+
+        // ✅ Auto-marquer quand la vidéo se termine
+        player.addEventListener('ended', function() {
+            markAsWatched(videoId, false);
+        });
+
+        // ✅ Barre de progression de lecture en temps réel
+        player.addEventListener('timeupdate', function() {
+            if (!player.duration) return;
+            var pct = (player.currentTime / player.duration) * 100;
+            var bar = document.getElementById('vid-progress-' + videoId);
+            if (bar) bar.style.width = pct.toFixed(1) + '%';
+            // Auto-marquer si >90% visionné (pour les utilisateurs qui ferment avant la fin)
+            if (pct >= 90 && !getWatched().includes(videoId)) {
+                markAsWatched(videoId, true); // silent
+            }
+        });
+    });
+}
+
+// =====================================================
+// 🔹 STATISTIQUES — AJAX vers API Symfony
+// =====================================================
+async function refreshStats() {
+    var lastUpdateEl = document.getElementById('statsLastUpdate');
+    if (lastUpdateEl) lastUpdateEl.innerHTML =
+        '<i class="bi bi-arrow-repeat spin me-1"></i>Mise à jour…';
+
+    var watched = getWatched();
+
+    // ✅ Format que Symfony comprend : watched[0]=1&watched[1]=3
+    var queryParts = watched.map(function(id, i) { return 'watched%5B' + i + '%5D=' + id; });
+    var queryString = queryParts.length > 0 ? '?' + queryParts.join('&') : '';
+    var url = '/api/stats/playlist/' + PLAYLIST_ID + queryString;
+
+    try {
+        var res = await fetch(url, { headers: { 'X-Requested-With': 'XMLHttpRequest' } });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        var data = await res.json();
+
+        // ✅ Mise à jour des valeurs
+        setStatValue('stat-total',    data.totalVideos    || 0, '');
+        setStatValue('stat-watched',  data.watchedCount   || 0, ' / ' + (data.totalVideos || 0));
+        setStatValue('stat-progress', data.progressPercent|| 0, '%');
+
+        var durEl = document.getElementById('stat-duration');
+        if (durEl) durEl.textContent = data.formattedTotal || '0min';
+
+        var bar = document.getElementById('progressBar');
+        if (bar) {
+            bar.style.width = (data.progressPercent || 0) + '%';
+            if (data.progressPercent >= 100)      bar.style.background = 'linear-gradient(90deg,#22c55e,#4ade80)';
+            else if (data.progressPercent >= 50)  bar.style.background = 'linear-gradient(90deg,#8b5cf6,#c084fc)';
+            else                                  bar.style.background = 'linear-gradient(90deg,#8b5cf6,#7c3aed)';
+        }
+
+        var niv = data.niveauRepartition || {};
+        var debEl = document.getElementById('stat-deb'); if (debEl) debEl.textContent = niv.debutant      || 0;
+        var intEl = document.getElementById('stat-int'); if (intEl) intEl.textContent = niv.intermediaire || 0;
+        var advEl = document.getElementById('stat-adv'); if (advEl) advEl.textContent = niv.avance        || 0;
+
+        // Durée regardée (bonus)
+        var wDurEl = document.getElementById('stat-watched-duration');
+        if (wDurEl) wDurEl.textContent = data.formattedWatched || '0min';
+
+        var now = new Date();
+        if (lastUpdateEl) lastUpdateEl.textContent =
+            'Mis à jour à ' + now.toLocaleTimeString('fr-FR', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+
+        // 🎉 Félicitation 100%
+        if (parseInt(data.progressPercent) === 100 && watched.length > 0) {
+            var alreadySeen = sessionStorage.getItem('congrats_' + PLAYLIST_ID);
+            if (!alreadySeen) {
+                sessionStorage.setItem('congrats_' + PLAYLIST_ID, '1');
+                setTimeout(function() {
+                    Swal.fire({
+                        icon: 'success', title: '🏆 Playlist terminée !',
+                        html: 'Bravo ! Vous avez regardé <b>toutes les vidéos</b>.',
+                        confirmButtonText: '🎮 Top !', confirmButtonColor: '#8b5cf6',
+                    });
+                }, 600);
+            }
+        }
+
+    } catch(e) {
+        console.error('Stats AJAX error:', e);
+        if (lastUpdateEl) lastUpdateEl.innerHTML =
+            '<span style="color:#f87171"><i class="bi bi-exclamation-triangle me-1"></i>' + e.message + '</span>';
+    }
+}
+
+// Mise à jour simple (sans animation pour éviter les bugs)
+function setStatValue(elId, value, suffix) {
+    var el = document.getElementById(elId);
+    if (el) el.textContent = value + suffix;
+}
+
+// =====================================================
+// 🔹 SOUS-TITRES — API Groq (Whisper large-v3)
+// =====================================================
+var subtitleCache  = {};
+var subtitleTimers = {};
+
+async function loadSubtitles(videoId, videoPath) {
+    var zone   = document.getElementById('subtitle-' + videoId);
+    var langEl = document.getElementById('lang-' + videoId);
+    var lang   = langEl ? langEl.value : 'auto';
+    if (!zone) return;
+
+    zone.innerHTML = '<span class="sub-loading"><i class="bi bi-arrow-repeat spin me-1"></i>Analyse audio Groq Whisper… (~3-5 sec)</span>';
+
+    if (subtitleCache[videoId]) {
+        startSubtitleSync(videoId);
+        return;
+    }
+
+    try {
+        var url  = '/api/subtitle/generate?videoPath=' + encodeURIComponent(videoPath) + '&lang=' + lang;
+        var res  = await fetch(url);
+        var data = await res.json();
+
+        if (!data.success && data.error) {
+            zone.innerHTML = '<span class="sub-error"><i class="bi bi-exclamation-triangle me-1"></i>' + esc(data.error) + '</span>';
+            return;
+        }
+        if (data.subtitles && data.subtitles.length > 0) {
+            subtitleCache[videoId] = data.subtitles;
+            var langTxt = data.detectedLanguage ? ' — <b>' + data.detectedLanguage + '</b>' : '';
+            zone.innerHTML =
+                '<div style="font-size:0.72rem;color:var(--gamilha-muted);margin-bottom:3px;">'
+                + '<i class="bi bi-check-circle-fill text-success me-1"></i>'
+                + data.subtitles.length + ' segments' + langTxt
+                + ' &nbsp;|&nbsp; <a href="#" onclick="resetSubtitles(' + videoId + ');return false;" style="color:var(--gamilha-neon);">Changer langue</a>'
+                + '</div>'
+                + '<div id="sub-text-' + videoId + '" class="sub-text" style="min-height:20px;">▶ Lancez la vidéo</div>';
+            startSubtitleSync(videoId);
+        } else if (data.text) {
+            zone.innerHTML = '<span class="sub-text">' + esc(data.text) + '</span>';
+        } else {
+            zone.innerHTML = '<span class="sub-error">Aucun sous-titre généré.</span>';
+        }
+    } catch(e) {
+        zone.innerHTML = '<span class="sub-error"><i class="bi bi-wifi-off me-1"></i>' + esc(e.message) + '</span>';
+    }
+}
+
+function startSubtitleSync(videoId) {
+    var player  = document.getElementById('player-' + videoId);
+    var subs    = subtitleCache[videoId];
+    if (!player || !subs) return;
+
+    var textEl  = document.getElementById('sub-text-' + videoId);
+    if (!textEl) return;
+
+    var lastText = '';
+    function loop() {
+        var t = player.currentTime || 0;
+        var active = null;
+        for (var i = 0; i < subs.length; i++) {
+            if (t >= subs[i].start && t <= subs[i].end) { active = subs[i]; break; }
+        }
+        var newText = active ? active.text : '';
+        if (newText !== lastText) { textEl.textContent = newText; lastText = newText; }
+        subtitleTimers[videoId] = requestAnimationFrame(loop);
+    }
+    if (subtitleTimers[videoId]) cancelAnimationFrame(subtitleTimers[videoId]);
+    loop();
+}
+
+function resetSubtitles(videoId) {
+    if (subtitleTimers[videoId]) cancelAnimationFrame(subtitleTimers[videoId]);
+    delete subtitleCache[videoId];
+    var player    = document.getElementById('player-' + videoId);
+    var videoPath = player ? player.getAttribute('data-video-path') : null;
+    var zone      = document.getElementById('subtitle-' + videoId);
+    if (!zone || !videoPath) return;
+    zone.innerHTML = '<div class="d-flex align-items-center gap-2 flex-wrap justify-content-center">'
+        + '<select class="form-select form-select-sm" id="lang-' + videoId + '" style="width:auto;background:#1a1a26;color:#e2e8f0;border-color:rgba(139,92,246,0.3);font-size:0.78rem;">'
+        + '<option value="auto">🌐 Auto-détection</option>'
+        + '<option value="ar">🇹🇳 Arabe</option>'
+        + '<option value="fr">🇫🇷 Français</option>'
+        + '<option value="en">🇬🇧 Anglais</option>'
+        + '</select>'
+        + '<button class="btn btn-sm btn-outline-light" onclick="loadSubtitles(' + videoId + ',\'' + videoPath + '\')">'
+        + '<i class="bi bi-closed-captioning me-1"></i> Générer sous-titres IA</button></div>';
+}
+
+function esc(str) {
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// =====================================================
+// 🔹 INITIALISATION
+// =====================================================
+document.addEventListener('DOMContentLoaded', function() {
+    initWatchedButtons();      // restaurer état des boutons depuis localStorage
+    initVideoEndedEvents();    // écouter les events 'ended' sur les players
+    refreshStats();            // charger les stats via AJAX
+});
+</script>
+{% endblock %}

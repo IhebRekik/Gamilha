@@ -59,7 +59,6 @@
             backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--gamilha-border);
         }
-
         .front-nav .navbar-brand {
             font-weight: 800;
             font-size: 1.4rem;
@@ -68,7 +67,6 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
         .front-nav .nav-link {
             color: var(--gamilha-muted) !important;
             font-weight: 500;
@@ -103,7 +101,6 @@
             border-radius: 10px;
             transition: transform 0.2s, box-shadow 0.2s;
         }
-
         .btn-gamilha:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
@@ -124,14 +121,17 @@
             overflow: hidden;
             transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
         }
-
         .card-front:hover {
             transform: translateY(-4px);
             box-shadow: 0 12px 40px rgba(139, 92, 246, 0.15);
             border-color: rgba(139, 92, 246, 0.4);
         }
-
-        /* ===== BADGE ===== */
+        .hero-gradient {
+            background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(139, 92, 246, 0.25), transparent),
+                        radial-gradient(ellipse 60% 40% at 80% 50%, rgba(124, 58, 237, 0.15), transparent),
+                        var(--gamilha-bg);
+        }
+        .glow-text { text-shadow: 0 0 40px rgba(139, 92, 246, 0.5); }
         .badge-gamilha {
             background: rgba(139, 92, 246, 0.25);
             color: var(--gamilha-neon);
@@ -145,6 +145,12 @@
         }
 
         /* ===== SECTION TITLE ===== */
+        .footer-front {
+            background: var(--gamilha-surface);
+            border-top: 1px solid var(--gamilha-border);
+            padding: 3rem 0 1.5rem;
+            margin-top: 4rem;
+        }
         .section-title {
             font-weight: 700;
             font-size: 1.75rem;

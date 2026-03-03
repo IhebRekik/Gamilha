@@ -1,4 +1,5 @@
 <?php
+// 📁 src/Form/PlaylistType.php
 
 namespace App\Form;
 
@@ -10,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Image;
 
 class PlaylistType extends AbstractType
 {
@@ -17,37 +19,54 @@ class PlaylistType extends AbstractType
     {
         $builder
             ->add('title', TextType::class, [
-                'label' => 'Titre de la playlist'
+                'label' => 'Titre de la playlist',
+                'attr'  => ['class' => 'form-control'],
             ])
             ->add('description', TextareaType::class, [
-                'label' => 'Description'
+                'label' => 'Description',
+                'attr'  => ['class' => 'form-control', 'rows' => 4],
             ])
             ->add('niveau', ChoiceType::class, [
-                'label' => 'Niveau',
+                'label'   => 'Niveau',
                 'choices' => [
-                    'Débutant' => 'debutant',
+                    'Débutant'      => 'debutant',
                     'Intermédiaire' => 'intermediaire',
-                    'Avancé' => 'avance',
-                ]
+                    'Avancé'        => 'avance',
+                ],
+                'attr' => ['class' => 'form-select'],
             ])
             ->add('categorie', ChoiceType::class, [
-                'label' => 'Catégorie',
+                'label'   => 'Catégorie',
                 'choices' => [
-                    'Fitness' => 'fitness',
-                    'Yoga' => 'yoga',
-                    'Musculation' => 'musculation',
-                    'Cardio' => 'cardio',
-                ]
+                    'Action'   => 'action',
+                    'Aventure' => 'aventure',
+                    'Sport'    => 'sport',
+                    'Course'   => 'course',
+                ],
+                'attr' => ['class' => 'form-select'],
             ])
-            ->add('image', TextType::class, [
-                'label' => 'Image (URL ou nom du fichier)'
+            ->add('imageFile', FileType::class, [
+                'label'       => 'Image de la playlist',
+                'mapped'      => false,
+                'required'    => false,
+                'constraints' => [
+                    new Image([
+                        'maxSize'          => '5M',
+                        'mimeTypes'        => ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'],
+                        'mimeTypesMessage' => 'Veuillez uploader une image valide (JPEG, PNG, GIF, WEBP)',
+                        'maxSizeMessage'   => 'L\'image ne doit pas dépasser 5Mo',
+                    ])
+                ],
+                'attr' => ['accept' => 'image/*', 'class' => 'form-control'],
+                'help' => 'Formats acceptés : JPEG, PNG, GIF, WEBP (max 5Mo)',
             ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'data_class' => Playlist::class,
+            'data_class'     => Playlist::class,
+            'csrf_protection'=> true,
         ]);
     }
 }

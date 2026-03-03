@@ -1,18 +1,87 @@
+{# 📁 templates/coachingvideo/new.html.twig #}
 {% extends 'base.html.twig' %}
 
-{% block title %}Nouvelle vidéo{% endblock %}
+{% block title %}Ajouter une vidéo{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <h1>➕ Ajouter une vidéo</h1>
+<div class="container mt-4" style="max-width: 700px;">
 
-    {{ form_start(form) }}
-        {{ form_widget(form) }}
-        <button class="btn btn-success mt-3">💾 Enregistrer</button>
+    <h1 class="mb-4">➕ Ajouter une vidéo de coaching</h1>
+
+    {{ form_start(form, {'attr': {'enctype': 'multipart/form-data', 'novalidate': 'novalidate'}}) }}
+
+        <div class="mb-3">
+            {{ form_label(form.titre) }}
+            {{ form_widget(form.titre) }}
+            {% for error in form.titre.vars.errors %}
+                <div class="text-danger small mt-1">{{ error.message }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.description) }}
+            {{ form_widget(form.description) }}
+            {% for error in form.description.vars.errors %}
+                <div class="text-danger small mt-1">{{ error.message }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="card bg-dark border-secondary mb-3 p-3">
+            <p class="small text-muted mb-2">
+                <i class="bi bi-info-circle me-1"></i>
+                Remplissez <strong>l'un ou l'autre</strong> : upload fichier <em>ou</em> URL YouTube embed.
+            </p>
+            <div class="mb-3">
+                {{ form_label(form.videoFile) }}
+                {{ form_widget(form.videoFile) }}
+                {% for error in form.videoFile.vars.errors %}
+                    <div class="text-danger small mt-1">{{ error.message }}</div>
+                {% endfor %}
+            </div>
+            <div class="mb-0">
+                {{ form_label(form.url) }}
+                {{ form_widget(form.url) }}
+                {% for error in form.url.vars.errors %}
+                    <div class="text-danger small mt-1">{{ error.message }}</div>
+                {% endfor %}
+                <div class="form-text">Ex : https://www.youtube.com/embed/dQw4w9WgXcQ</div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.niveau) }}
+            {{ form_widget(form.niveau) }}
+        </div>
+
+        <div class="mb-3">
+            {{ form_label(form.duration) }}
+            {{ form_widget(form.duration) }}
+            {{ form_help(form.duration) }}
+        </div>
+
+        <div class="mb-3 form-check">
+            {{ form_widget(form.premium) }}
+            {{ form_label(form.premium) }}
+        </div>
+
+        <div class="mb-4">
+            {{ form_label(form.playlist) }}
+            {{ form_widget(form.playlist) }}
+            {% for error in form.playlist.vars.errors %}
+                <div class="text-danger small mt-1">{{ error.message }}</div>
+            {% endfor %}
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-success">
+                <i class="bi bi-save me-1"></i> Enregistrer
+            </button>
+            <a href="{{ path('video_index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Retour
+            </a>
+        </div>
+
     {{ form_end(form) }}
 
-    <a href="{{ path('video_index') }}" class="btn btn-secondary mt-3">
-        ⬅️ Retour
-    </a>
 </div>
 {% endblock %}
