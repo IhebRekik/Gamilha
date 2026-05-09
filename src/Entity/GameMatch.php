@@ -45,7 +45,7 @@ class GameMatch
     private ?Equipe $equipeB = null;
 
     #[ORM\ManyToOne(targetEntity: Bracket::class, inversedBy: 'matchs')]
-    #[ORM\JoinColumn(name: 'bracket_id', referencedColumnName: 'idBracket', nullable: false, onDelete: 'CASCADE')]
+    #[ORM\JoinColumn(name: 'bracket_id', referencedColumnName: 'id_bracket', nullable: false, onDelete: 'CASCADE')]
     #[Assert\NotBlank(message: 'Le bracket est obligatoire.')]
     private ?Bracket $bracket = null;
 

@@ -24,7 +24,7 @@ class Playlist
         minMessage: 'Le titre doit faire au moins {{ limit }} caractères',
         maxMessage: 'Le titre ne peut pas dépasser {{ limit }} caractères'
     )]
-    private ?string $title = null;
+    private string $title ;
 
     #[ORM\Column(type: 'text')]
     #[Assert\NotBlank(message: 'La description ne peut pas être vide')]
@@ -32,7 +32,7 @@ class Playlist
         min: 10,
         minMessage: 'La description doit faire au moins {{ limit }} caractères'
     )]
-    private ?string $description = null;
+    private string $description ;
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: 'Le niveau est obligatoire')]
@@ -40,7 +40,7 @@ class Playlist
         choices: ['debutant', 'intermediaire', 'avance'],
         message: 'Veuillez choisir un niveau valide'
     )]
-    private ?string $niveau = null;
+    private string $niveau ;
 
     #[ORM\Column(length: 100)]
     #[Assert\NotBlank(message: 'La catégorie est obligatoire')]
@@ -48,10 +48,10 @@ class Playlist
         choices: ['action', 'aventure', 'sport', 'course'],
         message: 'Veuillez choisir une catégorie valide'
     )]
-    private ?string $categorie = null;
+    private string $categorie ;
 
     #[ORM\Column(length: 255)]
-    private ?string $image = null;
+    private string $image ;
 
     #[ORM\Column]
     private \DateTimeImmutable $createdAt ;

@@ -149,4 +149,70 @@
     </div>
 
 </div>
+<script>
+let mediaRecorder;
+let audioChunks = [];
+let isRecording = false;
+
+const recordBtn = document.getElementById("recordBtn");
+const audioInput = document.querySelector("input[name$='[audioFile]']");
+
+recordBtn.addEventListener("click", async () => {
+
+    if (!isRecording) {
+
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
+
+        audioChunks = [];
+
+        mediaRecorder.ondataavailable = event => {
+            audioChunks.push(event.data);
+        };
+
+       mediaRecorder.onstop = async () => {
+
+    const blob = new Blob(audioChunks, { type: 'audio/webm' });
+
+    const formData = new FormData();
+    formData.append("audio", blob, "record.webm");
+
+    try {
+        document.querySelector("textarea").value = "Transcription en cours...";
+        const response = await fetch("/chat/transcribe", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
+        if (data.text) {
+            document.querySelector("textarea").value = data.text;
+        } else {
+            console.log(data);
+alert(data.error ?? "Erreur transcription inconnue");
+        }
+
+    } catch (e) {
+        console.error("Erreur:", e);
+    }
+};
+        mediaRecorder.start();
+        isRecording = true;
+
+        recordBtn.innerHTML = "⏹️";
+        recordBtn.classList.remove("btn-danger");
+        recordBtn.classList.add("btn-warning");
+
+    } else {
+
+        mediaRecorder.stop();
+        isRecording = false;
+
+        recordBtn.innerHTML = "🎤";
+        recordBtn.classList.remove("btn-warning");
+        recordBtn.classList.add("btn-danger");
+    }
+});
+</script>
 {% endblock %}

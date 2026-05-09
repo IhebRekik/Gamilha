@@ -23,7 +23,7 @@ class CoachingVideo
         minMessage: 'Le titre doit faire au moins {{ limit }} caractères',
         maxMessage: 'Le titre ne peut pas dépasser {{ limit }} caractères'
     )]
-    private ?string $titre = null;
+    private string $titre ;
 
     #[ORM\Column(type: 'text')]
     #[Assert\NotBlank(message: 'La description ne peut pas être vide')]
@@ -31,7 +31,7 @@ class CoachingVideo
         min: 10,
         minMessage: 'La description doit faire au moins {{ limit }} caractères'
     )]
-    private ?string $description = null;
+    private string $description ;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\Url(message: 'Veuillez entrer une URL valide')]
@@ -45,7 +45,7 @@ class CoachingVideo
         choices: ['debutant', 'intermediaire', 'avance'],
         message: 'Veuillez choisir un niveau valide'
     )]
-    private ?string $niveau = null;
+    private string $niveau ;
 
     #[ORM\Column]
     private bool $premium ;
@@ -54,8 +54,8 @@ class CoachingVideo
      * Durée en secondes — utilisée pour les statistiques de progression.
      * Ex: 600 = 10 minutes
      */
-    #[ORM\Column(nullable: true)]
-    private ?int $duration = null;
+    #[ORM\Column(nullable: false)]
+    private int $duration ;
 
     #[ORM\ManyToOne(inversedBy: 'videos')]
     #[ORM\JoinColumn(nullable: false)]

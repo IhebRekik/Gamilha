@@ -9,13 +9,44 @@ use App\Repository\UserAbonnementRepository;
 use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Process\Process;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 final class ChatAiController extends AbstractController
 {
+    #[Route('/chat/transcribe', name: 'chat_transcribe', methods: ['POST'])]
+public function transcribe(Request $request): JsonResponse
+{
+    $audioFile = $request->files->get('audio');
+
+    if (!$audioFile) {
+        return new JsonResponse(['error' => 'No file'], 400);
+    }
+
+    $tempPath = $audioFile->getPathname();
+
+    $process = new Process([
+        'python',
+        $this->getParameter('kernel.project_dir') . '/transcribe.py',
+        $tempPath
+    ]);
+
+    $process->run();
+
+    if (!$process->isSuccessful()) {
+        return new JsonResponse(['error' => $process->getErrorOutput()], 500);
+    }
+
+    $output = json_decode($process->getOutput(), true);
+
+    return new JsonResponse([
+        'text' => $output['text'] ?? ''
+    ]);
+}
     #[Route('/chat/ai', name: 'chat')]
     public function index(
         Request $request,

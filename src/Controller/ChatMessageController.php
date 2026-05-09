@@ -52,7 +52,7 @@ use Symfony\Component\Routing\Attribute\Route;
 
             $chatMessage->setSender($sender);
             $chatMessage->setRecipient($userRepository->find($recipientId));
-            $chatMessage->setCreatedAt(new \DateTime());
+            $chatMessage->setCreatedAt(new \DateTimeImmutable());
             $entityManager->persist($chatMessage);
             $entityManager->flush();
 
@@ -125,7 +125,7 @@ use Symfony\Component\Routing\Attribute\Route;
         if ($form->isSubmitted() && $form->isValid()) {
             $chatMessage->setSender($sender);
             $chatMessage->setRecipient($recipient);
-            $chatMessage->setCreatedAt(new \DateTime());
+            $chatMessage->setCreatedAt(new \DateTimeImmutable());
 
             $entityManager->persist($chatMessage);
             $entityManager->flush();

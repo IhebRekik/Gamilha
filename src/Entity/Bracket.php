@@ -34,7 +34,7 @@ class Bracket
     private string $statut ;
 
     #[ORM\ManyToOne(targetEntity: Evenement::class, inversedBy: "brackets")]
-#[ORM\JoinColumn(name: "evenement_id", referencedColumnName: "id", nullable: false)]
+#[ORM\JoinColumn(name: "evenement_id", referencedColumnName: "idEvenement", nullable: false)]
 private ?Evenement $evenement = null;
 
     /** @var Collection<int, GameMatch> */

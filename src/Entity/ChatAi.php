@@ -6,6 +6,7 @@ use App\Repository\ChatAiRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ChatAiRepository::class)]
 #[Vich\Uploadable]
@@ -15,6 +16,7 @@ class ChatAi
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private int $id;
+    #[Assert\NotNull(message: "Le contenu est obligatoire.")]
     #[ORM\Column(length: 10000, nullable: true)]
     private ?string $content = null;
 

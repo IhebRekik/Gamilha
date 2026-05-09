@@ -66,8 +66,8 @@ final class UserAbonnementController extends AbstractController
         $userAbonnement = new UserAbonnement();
         $userAbonnement->setUser($user);
         $userAbonnement->setAbonnement($abonnement);
-        $userAbonnement->setDateDebut(new \DateTime());
-        $userAbonnement->setDateFin((new \DateTime())->modify('+' . $abonnement->getDuree() . ' months'));
+        $userAbonnement->setDateDebut(new \DateTimeImmutable());
+        $userAbonnement->setDateFin((new \DateTimeImmutable())->modify('+' . $abonnement->getDuree() . ' months'));
 
         $em->persist($userAbonnement);
         $em->flush();
@@ -75,7 +75,7 @@ final class UserAbonnementController extends AbstractController
         $paiement->setUser($user);
         $paiement->setAbonnement($abonnement);
         $paiement->setMontant((string) ($abonnement->getPrix() * 100));
-        $paiement->setCreatedAt(new \DateTime());
+        $paiement->setCreatedAt(new \DateTimeImmutable());
         $em->persist($paiement);
         $em->flush();
 

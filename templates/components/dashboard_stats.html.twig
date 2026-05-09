@@ -18,7 +18,7 @@ const gamesStats = {{ this.getGamesStats()|json_encode|raw }};
 	<div class="col-md-3">
 		<div class="card bg-dark border-0 shadow-lg text-white h-100">
 			<div class="card-body text-center d-flex flex-column justify-content-center">
-				<h2 class="fw-bold mb-1">{{ this.getUsersEvolution() }}%</h2>
+				<h2 class="fw-bold mb-1">{{ this.getUsersEvolution()|round(0, 'floor') }}%</h2>
 				<div class="text-success small">Evolution de Utilisateurs de ce mois</div>
 			</div>
 		</div>
@@ -28,7 +28,7 @@ const gamesStats = {{ this.getGamesStats()|json_encode|raw }};
 	<div class="col-md-3">
 		<div class="card bg-dark border-0 shadow-lg text-white h-100">
 			<div class="card-body text-center d-flex flex-column justify-content-center">
-                <h2 class="fw-bold mb-1">{{ this.getTournamentsEvolution() }}%</h2>
+                <h2 class="fw-bold mb-1">{{ this.getTournamentsEvolution()|round(0, 'floor') }}%</h2>
 				<div class="text-success small">Evolution de Tournois de ce mois</div>
                 
 			</div>
@@ -39,7 +39,7 @@ const gamesStats = {{ this.getGamesStats()|json_encode|raw }};
 	<div class="col-md-3">
 		<div class="card bg-dark border-0 shadow-lg text-white h-100">
 			<div class="card-body text-center d-flex flex-column justify-content-center">
-				<h2 class="fw-bold mb-1">{{ this.getStreamsEvolution() }}%</h2>
+				<h2 class="fw-bold mb-1">{{ this.getStreamsEvolution()|round(0, 'floor') }}%</h2>
                 <div class="text-success small">Evolution de Streams de ce mois</div>
 
 			</div>
@@ -51,7 +51,7 @@ const gamesStats = {{ this.getGamesStats()|json_encode|raw }};
 		<div class="card bg-dark border-0 shadow-lg text-white h-100">
 			<div class="card-body text-center d-flex flex-column justify-content-center">
 				<div class="fs-6 mb-2 text-muted">Revenus Mensuels</div>
-				<h2 class="fw-bold mb-1">{{ this.getRevenueEvolution() }}%</h2>
+				<h2 class="fw-bold mb-1">{{ this.getRevenueEvolution()|round(0, 'floor') }}%</h2>
 				<div class="text-success small">Evolution de Revenu de ce mois</div>
 			</div>
 		</div>
